@@ -1,8 +1,9 @@
 name: Deploy to GitHub Pages
 
 on:
+  # Deploys from any branch: the most recent push wins (one Pages site per repo).
   push:
-    branches: [main, master]
+    branches: ['**']
   workflow_dispatch:
 
 permissions:
