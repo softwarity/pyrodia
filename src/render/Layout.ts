@@ -9,6 +9,8 @@ export interface BoardLayout {
   canvasH: number;
   hudHeight: number;
   waterTop: number;
+  gridW: number;
+  gridH: number;
 }
 
 /**
@@ -26,5 +28,5 @@ export function computeLayout(canvasW: number, canvasH: number, gridW: number, g
   const boardH = tileSize * gridH;
   const originX = Math.floor((canvasW - boardW) / 2);
   const originY = Math.floor(hudHeight + margin + (availH - boardH) / 2);
-  return { originX, originY, tileSize, boardW, boardH, canvasW, canvasH, hudHeight, waterTop: originY + boardH };
+  return { originX, originY, tileSize, boardW, boardH, canvasW, canvasH, hudHeight, waterTop: originY + boardH, gridW, gridH };
 }

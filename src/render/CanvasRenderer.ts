@@ -97,8 +97,17 @@ export class CanvasRenderer {
   private ensureLayout(session: LevelSession): BoardLayout {
     const w = this.canvas.width / this.dpr;
     const h = this.canvas.height / this.dpr;
-    if (!this.layout || this.layout.canvasW !== w || this.layout.canvasH !== h || this.layoutReserve !== this.bottomReserve) {
-      this.layout = computeLayout(w, h, session.grid.width, session.grid.height, this.bottomReserve);
+    const gw = session.grid.width;
+    const gh = session.grid.height;
+    if (
+      !this.layout ||
+      this.layout.canvasW !== w ||
+      this.layout.canvasH !== h ||
+      this.layout.gridW !== gw ||
+      this.layout.gridH !== gh ||
+      this.layoutReserve !== this.bottomReserve
+    ) {
+      this.layout = computeLayout(w, h, gw, gh, this.bottomReserve);
       this.layoutReserve = this.bottomReserve;
     }
     return this.layout;
