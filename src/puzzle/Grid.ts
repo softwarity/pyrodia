@@ -1,13 +1,20 @@
-import { dirDelta, opposite, type Dir, type Mask } from './Direction';
-import { cloneTile, isRotatable, makeTile, tileMask, type Tile } from './Tile';
+import { DIRS, dirDelta, opposite, type Dir, type Mask } from './Direction';
+import { cloneTile, isSlidable, makeTile, tileMask, tileSymbol, type Tile } from './Tile';
 
 export interface Cell {
   x: number;
   y: number;
 }
 
+export interface SlideMove {
+  /** Tile that moves. */
+  from: Cell;
+  /** Void it moves into. */
+  to: Cell;
+}
+
 /**
- * The puzzle grid: a width x height matrix of tiles.
+ * The puzzle grid: a width x height matrix of tiles with one (or more) voids.
  * Pure data + logic, no rendering.
  */
 export class Grid {
@@ -49,14 +56,6 @@ export class Grid {
     return t ? tileMask(t) : 0;
   }
 
-  /** Rotate a tile. Returns true if the tile changed. */
-  rotate(x: number, y: number, clockwise = true): boolean {
-    const t = this.tryGet(x, y);
-    if (!t || !isRotatable(t)) return false;
-    t.rotation = (t.rotation + (clockwise ? 1 : 3)) % 4;
-    return true;
-  }
-
   /** Whether the side `side` of tile (x,y) is connected to its neighbour. */
   isConnected(x: number, y: number, side: Dir): boolean {
     const here = this.maskAt(x, y);
@@ -76,6 +75,67 @@ export class Grid {
     return out;
   }
 
+  voids(): Cell[] {
+    return this.find('empty');
+  }
+
+  /** The void adjacent to (x,y) that this tile could slide into, if any. */
+  slideTarget(x: number, y: number): Cell | null {
+    const t = this.tryGet(x, y);
+    if (!t || !isSlidable(t)) return null;
+    for (const d of DIRS) {
+      const { dx, dy } = dirDelta(d);
+      const n = this.tryGet(x + dx, y + dy);
+      if (n && n.kind === 'empty') return { x: x + dx, y: y + dy };
+    }
+    return null;
+  }
+
+  /** Every legal slide on the current board. */
+  legalMoves(): SlideMove[] {
+    const moves: SlideMove[] = [];
+    for (const v of this.voids()) {
+      for (const d of DIRS) {
+        const { dx, dy } = dirDelta(d);
+        const t = this.tryGet(v.x + dx, v.y + dy);
+        if (t && isSlidable(t)) moves.push({ from: { x: v.x + dx, y: v.y + dy }, to: v });
+      }
+    }
+    return moves;
+  }
+
+  /** Slide tile (x,y) into an adjacent void. Returns the void cell it moved into, or null. */
+  slide(x: number, y: number): Cell | null {
+    const target = this.slideTarget(x, y);
+    if (!target) return null;
+    const tile = this.get(x, y);
+    this.set(target.x, target.y, tile);
+    this.set(x, y, makeTile('empty'));
+    return target;
+  }
+
+  /**
+   * Move a void in direction `dir`: the tile on that side slides into the void.
+   * Used to apply scrambles. Returns false when illegal.
+   */
+  moveVoid(voidCell: Cell, dir: Dir): boolean {
+    const { dx, dy } = dirDelta(dir);
+    const tx = voidCell.x + dx;
+    const ty = voidCell.y + dy;
+    const t = this.tryGet(tx, ty);
+    if (!t || !isSlidable(t) || this.get(voidCell.x, voidCell.y).kind !== 'empty') return false;
+    this.set(voidCell.x, voidCell.y, t);
+    this.set(tx, ty, makeTile('empty'));
+    return true;
+  }
+
+  /** Arrangement hash (identical tile shapes are interchangeable). */
+  key(): string {
+    let s = '';
+    for (const c of this.cells) s += tileSymbol(c);
+    return s;
+  }
+
   clone(): Grid {
     return new Grid(this.width, this.height, this.cells);
   }
@@ -84,5 +144,9 @@ export class Grid {
     for (let y = 0; y < this.height; y++) {
       for (let x = 0; x < this.width; x++) fn(this.get(x, y), x, y);
     }
+  }
+
+  count(pred: (t: Tile) => boolean): number {
+    return this.cells.filter(pred).length;
   }
 }

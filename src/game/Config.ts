@@ -8,8 +8,8 @@ export const CONFIG = {
   deathDelay: 1.9,
   /** Fixed simulation step (seconds) for deterministic movement. */
   simStep: 1 / 120,
-  /** Rotation animation duration in seconds (visual only). */
-  rotateAnimDuration: 0.12,
+  /** Slide animation duration in seconds (visual only). */
+  slideAnimDuration: 0.11,
   /** Max lookahead steps for the debug "show path" view. */
   debugPathSteps: 200,
   /** Approximate falling physics in tile units. */

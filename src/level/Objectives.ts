@@ -7,6 +7,8 @@ export interface LevelOutcome {
   deathsThisLevel: number;
   pickupsCollected: number;
   pickupsTotal: number;
+  /** Pickups never collected on a previous attempt (the only ones that grant rewards). */
+  newPickups: number;
   boostsUsed: number;
 }
 

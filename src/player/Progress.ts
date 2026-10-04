@@ -8,6 +8,8 @@ export interface LevelRecord {
   attempts: number;
   /** Objectives met on the best run, by objective index. */
   objectives?: boolean[];
+  /** Pickup ids ever collected on this level (rewards are granted once). */
+  pickups?: number[];
 }
 
 export interface Settings {
@@ -126,6 +128,17 @@ export class Progress {
     let id = 1;
     while (this.isCompleted(id)) id++;
     return id;
+  }
+
+  collectedPickups(levelId: number): number[] {
+    return this.record(levelId)?.pickups ?? [];
+  }
+
+  notePickups(levelId: number, ids: Iterable<number>): void {
+    const r = this.data.levels[String(levelId)] ?? { completed: false, stars: 0, bestScore: 0, bestTime: 0, attempts: 0 };
+    r.pickups = Array.from(new Set([...(r.pickups ?? []), ...ids])).sort((a, b) => a - b);
+    this.data.levels[String(levelId)] = r;
+    this.save();
   }
 
   noteAttempt(levelId: number): void {

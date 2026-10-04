@@ -1,13 +1,13 @@
 import { CONFIG } from '../game/Config';
 import type { Game } from '../game/Game';
 import type { LevelSession } from '../game/LevelSession';
-import { DIRS, dirDelta, dirIndex, indexDir, maskToDirs, type Dir } from '../puzzle/Direction';
+import { DIRS, dirDelta, maskToDirs, type Dir } from '../puzzle/Direction';
+import type { SlideMove } from '../puzzle/Grid';
 import { predictPath, type PathPrediction } from '../puzzle/PathSim';
-import type { Solution } from '../puzzle/Solver';
-import { tileMask, type Tile } from '../puzzle/Tile';
+import { isSlidable, tileMask, type Tile } from '../puzzle/Tile';
 import { sideMid, tileLocalPosition, usesArc } from '../puzzle/TileGeometry';
 import { formatScore } from '../player/Scoring';
-import type { Pickup } from '../entities/Pickup';
+import type { PickupKind } from '../player/Fuel';
 import { computeLayout, type BoardLayout } from './Layout';
 import { ParticleSystem } from './Particles';
 import { THEME } from './Theme';
@@ -16,7 +16,8 @@ export interface DebugView {
   showConnections: boolean;
   showPath: boolean;
   showSolution: boolean;
-  solution: Solution | null;
+  /** Slides to perform, in order. */
+  solution: SlideMove[] | null;
 }
 
 /**
@@ -127,7 +128,6 @@ export class CanvasRenderer {
     if (this.debug.showPath) this.drawDebugPath(session, layout);
     if (this.debug.showSolution && this.debug.solution) this.drawSolution(this.debug.solution, layout);
     if (this.debug.showConnections) this.drawConnections(session, layout);
-    this.drawPickups(session, layout);
     this.drawFlame(session, layout, dt);
     this.drawParticles(layout);
     ctx.restore();
@@ -192,14 +192,39 @@ export class CanvasRenderer {
       const py = l.originY + y * ts;
       this.drawCellBackground(tile, px, py, ts, x, y);
     });
+    // slidable tiles get a soft rim so the player sees what can move
+    const canPlay = session.phase === 'ready' || session.phase === 'running';
     session.grid.forEach((tile, x, y) => {
       if (tile.kind === 'empty') return;
-      const px = l.originX + x * ts;
-      const py = l.originY + y * ts;
-      const anim = session.tileAnims.get(y * session.grid.width + x);
+      const idx = y * session.grid.width + x;
+      const anim = session.slideAnims.get(idx);
+      const shake = session.shakes.get(idx) ?? 0;
+      let px = l.originX + x * ts;
+      let py = l.originY + y * ts;
+      if (anim) {
+        const ease = 1 - Math.pow(1 - anim.t, 3);
+        px += anim.dx * ts * (1 - ease);
+        py += anim.dy * ts * (1 - ease);
+      }
+      if (shake > 0) px += Math.sin(shake * 40) * shake * ts * 0.06;
       const lit = this.isLit(session, x, y);
-      this.drawTile(tile, px, py, ts, anim, lit);
+      const slidable = canPlay && isSlidable(tile) && !!session.grid.slideTarget(x, y) && !session.flame.occupies(x, y);
+      this.drawTile(tile, px, py, ts, lit, slidable);
+      if (tile.pickup && tile.pickupId !== undefined) {
+        this.drawPickup(tile.pickup, px + ts / 2, py + ts / 2, ts, session.previouslyCollected.has(tile.pickupId), x, y);
+      }
     });
+    for (const a of session.pickupAnims.values()) {
+      const k = 1 - a.t / 0.6;
+      const cx = l.originX + (a.x + 0.5) * ts;
+      const cy = l.originY + (a.y + 0.5) * ts - k * ts * 0.4;
+      this.ctx.save();
+      this.ctx.translate(cx, cy);
+      this.ctx.scale(1 + k, 1 + k);
+      this.ctx.globalAlpha = 1 - k;
+      this.drawPickupIcon(a.kind, ts * 0.3);
+      this.ctx.restore();
+    }
   }
 
   private isLit(session: LevelSession, x: number, y: number): boolean {
@@ -210,15 +235,21 @@ export class CanvasRenderer {
   private drawCellBackground(tile: Tile, px: number, py: number, ts: number, x: number, y: number): void {
     const ctx = this.ctx;
     if (tile.kind === 'empty') {
-      // water visible through the hole
+      // the void: a hole with water glinting far below
       const wave = Math.sin(this.time * 2 + x * 0.9 + y * 1.3) * 0.08;
-      ctx.fillStyle = THEME.cellEmpty;
+      const g = ctx.createRadialGradient(px + ts / 2, py + ts / 2, ts * 0.1, px + ts / 2, py + ts / 2, ts * 0.75);
+      g.addColorStop(0, '#061a38');
+      g.addColorStop(1, '#0b2d5c');
+      ctx.fillStyle = g;
       ctx.fillRect(px, py, ts, ts);
       ctx.fillStyle = `rgba(120, 190, 255, ${0.12 + wave})`;
-      ctx.fillRect(px + ts * 0.15, py + ts * (0.55 + wave), ts * 0.7, ts * 0.06);
-      ctx.strokeStyle = 'rgba(0,0,0,0.35)';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(px + 0.5, py + 0.5, ts - 1, ts - 1);
+      ctx.fillRect(px + ts * 0.2, py + ts * (0.6 + wave), ts * 0.6, ts * 0.05);
+      ctx.fillStyle = `rgba(120, 190, 255, ${0.08 - wave * 0.5})`;
+      ctx.fillRect(px + ts * 0.3, py + ts * (0.4 - wave), ts * 0.4, ts * 0.04);
+      // inner shadow rim
+      ctx.strokeStyle = 'rgba(0,0,0,0.6)';
+      ctx.lineWidth = Math.max(2, ts * 0.05);
+      ctx.strokeRect(px + 1, py + 1, ts - 2, ts - 2);
       return;
     }
     ctx.fillStyle = tile.locked && tile.kind !== 'source' && tile.kind !== 'goal' ? THEME.cellPipeBgLocked : THEME.cellPipeBg;
@@ -228,24 +259,21 @@ export class CanvasRenderer {
     ctx.strokeRect(px + 0.5, py + 0.5, ts - 1, ts - 1);
   }
 
-  private drawTile(tile: Tile, px: number, py: number, ts: number, anim: { from: number; t: number; shake: number } | undefined, lit: boolean): void {
+  private drawTile(tile: Tile, px: number, py: number, ts: number, lit: boolean, slidable: boolean): void {
     const ctx = this.ctx;
     ctx.save();
-    let angle = 0;
-    let dx = 0;
-    if (anim) {
-      if (anim.t < 1) {
-        const ease = 1 - Math.pow(1 - anim.t, 3);
-        const delta = ((tile.rotation - anim.from) % 4 + 4) % 4; // 1 for cw, 3 for ccw (from+2 trick)
-        const dir = delta === 1 ? 1 : -1;
-        angle = -(1 - ease) * dir * (Math.PI / 2);
-      }
-      if (anim.shake > 0) dx = Math.sin(anim.shake * 40) * anim.shake * ts * 0.06;
+    // tile plate (drawn here too so sliding tiles carry their background)
+    ctx.fillStyle = tile.locked && tile.kind !== 'source' && tile.kind !== 'goal' ? THEME.cellPipeBgLocked : THEME.cellPipeBg;
+    ctx.fillRect(px + 1, py + 1, ts - 2, ts - 2);
+    if (slidable) {
+      const pulse = 0.35 + 0.25 * Math.sin(this.time * 4);
+      ctx.strokeStyle = `rgba(255, 200, 90, ${pulse})`;
+      ctx.lineWidth = Math.max(2, ts * 0.04);
+      ctx.strokeRect(px + 2, py + 2, ts - 4, ts - 4);
     }
-    ctx.translate(px + ts / 2 + dx, py + ts / 2);
-    // Draw the pipe in its base orientation rotated by (rotation * 90deg + anim)
+    ctx.translate(px + ts / 2, py + ts / 2);
     const baseRotation = tile.kind === 'straight' ? tile.rotation % 2 : tile.kind === 'cross' ? 0 : tile.rotation;
-    ctx.rotate(baseRotation * (Math.PI / 2) + angle);
+    ctx.rotate(baseRotation * (Math.PI / 2));
     const mask = tileMask({ ...tile, rotation: 0 });
     switch (tile.kind) {
       case 'source':
@@ -524,34 +552,40 @@ export class CanvasRenderer {
     ctx.restore();
   }
 
-  private drawSolution(sol: Solution, l: BoardLayout): void {
+  private drawSolution(moves: SlideMove[], l: BoardLayout): void {
     const ctx = this.ctx;
     const ts = l.tileSize;
     ctx.save();
-    ctx.strokeStyle = THEME.debugSolution;
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    sol.path.forEach((p, i) => {
-      const x = l.originX + (p.x + 0.5) * ts;
-      const y = l.originY + (p.y + 0.5) * ts;
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    });
-    ctx.stroke();
-    ctx.fillStyle = THEME.debugSolution;
-    ctx.font = `${Math.max(10, ts * 0.28)}px sans-serif`;
+    ctx.font = `700 ${Math.max(10, ts * 0.28)}px sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    for (const c of sol.changes) {
-      const x = l.originX + (c.x + 0.5) * ts;
-      const y = l.originY + (c.y + 0.5) * ts;
+    moves.forEach((m, i) => {
+      const fx = l.originX + (m.from.x + 0.5) * ts;
+      const fy = l.originY + (m.from.y + 0.5) * ts;
+      const tx = l.originX + (m.to.x + 0.5) * ts;
+      const ty = l.originY + (m.to.y + 0.5) * ts;
+      const alpha = i === 0 ? 1 : 0.55;
+      ctx.strokeStyle = `rgba(80, 200, 255, ${alpha})`;
+      ctx.fillStyle = `rgba(80, 200, 255, ${alpha})`;
+      ctx.lineWidth = 3;
       ctx.beginPath();
-      ctx.arc(x, y, ts * 0.2, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(0,0,0,0.6)';
+      ctx.moveTo(fx, fy);
+      ctx.lineTo(fx + (tx - fx) * 0.7, fy + (ty - fy) * 0.7);
+      ctx.stroke();
+      const ang = Math.atan2(ty - fy, tx - fx);
+      ctx.beginPath();
+      ctx.moveTo(fx + (tx - fx) * 0.8, fy + (ty - fy) * 0.8);
+      ctx.lineTo(fx + (tx - fx) * 0.6 + Math.cos(ang + 2.3) * ts * 0.12, fy + (ty - fy) * 0.6 + Math.sin(ang + 2.3) * ts * 0.12);
+      ctx.lineTo(fx + (tx - fx) * 0.6 + Math.cos(ang - 2.3) * ts * 0.12, fy + (ty - fy) * 0.6 + Math.sin(ang - 2.3) * ts * 0.12);
+      ctx.closePath();
       ctx.fill();
-      ctx.fillStyle = THEME.debugSolution;
-      ctx.fillText(`${c.cwClicks}`, x, y);
-    }
+      ctx.fillStyle = 'rgba(0,0,0,0.7)';
+      ctx.beginPath();
+      ctx.arc(fx, fy, ts * 0.18, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = `rgba(80, 200, 255, ${alpha})`;
+      ctx.fillText(`${i + 1}`, fx, fy);
+    });
     ctx.restore();
   }
 
@@ -585,42 +619,28 @@ export class CanvasRenderer {
 
   // ----- pickups -----------------------------------------------------------------
 
-  private drawPickups(session: LevelSession, l: BoardLayout): void {
+  private drawPickup(kind: PickupKind, cx: number, cy: number, ts: number, alreadyCollected: boolean, x: number, y: number): void {
     const ctx = this.ctx;
-    const ts = l.tileSize;
-    for (const p of session.pickups) {
-      if (p.collected && p.collectAnim <= 0) continue;
-      const bob = Math.sin(this.time * 3 + p.x * 1.7 + p.y) * ts * 0.03;
-      const cx = l.originX + (p.x + 0.5) * ts;
-      const cy = l.originY + (p.y + 0.5) * ts + bob;
-      let scale = 1;
-      let alpha = 1;
-      if (p.collected) {
-        const k = 1 - p.collectAnim / 0.6;
-        scale = 1 + k * 1.2;
-        alpha = 1 - k;
-      }
-      ctx.save();
-      ctx.translate(cx, cy);
-      ctx.scale(scale, scale);
-      ctx.globalAlpha = alpha;
-      // soft halo so pickups read on top of pipes
-      const halo = ctx.createRadialGradient(0, 0, 1, 0, 0, ts * 0.34);
-      halo.addColorStop(0, 'rgba(255,230,160,0.55)');
-      halo.addColorStop(1, 'rgba(255,230,160,0)');
-      ctx.fillStyle = halo;
-      ctx.beginPath();
-      ctx.arc(0, 0, ts * 0.34, 0, Math.PI * 2);
-      ctx.fill();
-      this.drawPickupIcon(p, ts * 0.3);
-      ctx.restore();
-    }
+    const bob = Math.sin(this.time * 3 + x * 1.7 + y) * ts * 0.03;
+    ctx.save();
+    ctx.translate(cx, cy + bob);
+    ctx.globalAlpha = alreadyCollected ? 0.45 : 1;
+    const halo = ctx.createRadialGradient(0, 0, 1, 0, 0, ts * 0.34);
+    halo.addColorStop(0, alreadyCollected ? 'rgba(200,200,220,0.35)' : 'rgba(255,230,160,0.55)');
+    halo.addColorStop(1, 'rgba(255,230,160,0)');
+    ctx.fillStyle = halo;
+    ctx.beginPath();
+    ctx.arc(0, 0, ts * 0.34, 0, Math.PI * 2);
+    ctx.fill();
+    if (alreadyCollected) ctx.filter = 'grayscale(0.7)';
+    this.drawPickupIcon(kind, ts * 0.3);
+    ctx.restore();
   }
 
-  private drawPickupIcon(p: Pickup, r: number): void {
+  private drawPickupIcon(kind: PickupKind, r: number): void {
     const ctx = this.ctx;
     ctx.lineWidth = Math.max(1.5, r * 0.12);
-    switch (p.fuelKind) {
+    switch (kind) {
       case 'wood': {
         ctx.save();
         ctx.rotate(-0.5);
@@ -931,6 +951,3 @@ export class CanvasRenderer {
   }
 }
 
-// keep helpers referenced for tree-shaking friendly builds
-void dirIndex;
-void indexDir;

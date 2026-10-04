@@ -39,10 +39,11 @@ export class WebAudioBackend implements AudioBackend {
   play(event: SoundEvent): void {
     if (!this.enabled || !this.ctx || !this.master) return;
     switch (event) {
-      case 'rotateTile':
-        this.notes([{ freq: 520, endFreq: 760, dur: 0.07, type: 'square', gain: 0.25 }]);
+      case 'slideTile':
+        this.notes([{ freq: 300, endFreq: 520, dur: 0.09, type: 'triangle', gain: 0.3 }]);
+        this.noise(0.08, 0.15, 1500);
         break;
-      case 'rotateDenied':
+      case 'slideDenied':
         this.notes([{ freq: 180, endFreq: 120, dur: 0.12, type: 'sawtooth', gain: 0.3 }]);
         break;
       case 'flameMove':

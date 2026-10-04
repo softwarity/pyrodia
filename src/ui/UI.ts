@@ -236,7 +236,7 @@ export class UI {
       }),
     );
     s.appendChild(panel);
-    s.appendChild(el('p', 'tagline', 'Tap / left click: rotate clockwise · Right click or swipe left: counter-clockwise'));
+    s.appendChild(el('p', 'tagline', 'Tap a tile next to the hole to slide it in · or swipe it towards the hole'));
     return s;
   }
 
@@ -305,7 +305,7 @@ export class UI {
             `<span>Time bonus</span><b>+${formatScore(b.timeBonus)}</b>` +
             `<span>Fuel bonus</span><b>+${formatScore(b.fuelBonus)}</b>` +
             `<span>Life bonus</span><b>+${formatScore(b.lifeBonus)}</b>` +
-            `<span>Fuel pickups</span><b>+${formatScore(b.pickupBonus)}</b>` +
+            `<span>New fuel pickups</span><b>+${formatScore(b.pickupBonus)}</b>` +
             `<span>Perfect bonus</span><b>+${formatScore(b.perfectBonus)}</b>` +
             `<span class="total">Level score</span><b class="total">${formatScore(b.total)}</b>` +
             `<span>Run score</span><b>${formatScore(data.runScore)}${data.newHighScore ? ' ★ NEW HIGH' : ''}</b>` +
@@ -388,7 +388,7 @@ export class UI {
       this.game.pause();
     });
     g.appendChild(pause);
-    const ready = el('div', 'banner ready', 'READY<small>rotate the pipes · the flame never waits</small>');
+    const ready = el('div', 'banner ready', 'READY<small>slide the pipes · the flame never waits</small>');
     g.appendChild(ready);
     this.hintEl = el('div', 'hint');
     this.hintEl.style.display = 'none';

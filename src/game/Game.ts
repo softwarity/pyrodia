@@ -130,7 +130,7 @@ export class Game {
 
   private createSession(): void {
     const def = this.currentLevel;
-    const session = new LevelSession(def);
+    const session = new LevelSession(def, this.isDebugLevel ? [] : this.progress.collectedPickups(def.id));
     this.session = session;
     if (!this.isDebugLevel) this.progress.noteAttempt(def.id);
     session.events.on('death', ({ cause }) => this.onDeath(cause));
@@ -179,9 +179,9 @@ export class Game {
 
   // ----- input --------------------------------------------------------------
 
-  rotateAt(x: number, y: number, clockwise = true): void {
+  slideAt(x: number, y: number): void {
     if (this.state !== 'PLAYING' || !this.session) return;
-    this.session.rotate(x, y, clockwise);
+    this.session.slide(x, y);
   }
 
   // ----- simulation ---------------------------------------------------------
@@ -229,6 +229,8 @@ export class Game {
     this.score += breakdown.total;
     this.events.emit('scoreChanged', { score: this.score });
     if (!this.isDebugLevel) {
+      // Rewards for pickups are granted once per level: remember what was collected.
+      this.progress.notePickups(def.id, session.collected);
       this.progress.noteCompletion(
         def.id,
         breakdown.stars,

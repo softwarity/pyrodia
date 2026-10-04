@@ -71,7 +71,7 @@ export class DebugPanel {
     });
     btn('dump level', () => {
       if (!game.session) return;
-      const def = { ...game.session.def, rows: gridToRows(game.session.parsed.grid) };
+      const def = { ...game.session.def, rows: gridToRows(game.session.parsed.solvedGrid) };
       console.log(JSON.stringify(def, null, 2));
       this.info.textContent = 'level JSON dumped to console';
     });
@@ -101,6 +101,7 @@ export class DebugPanel {
     game.events.on('levelLoaded', () => {
       game.session?.setSpeedMultiplier(this.speed);
       this.refreshSolution();
+      game.session?.events.on('slide', () => this.refreshSolution());
     });
   }
 
@@ -114,7 +115,9 @@ export class DebugPanel {
     if (!s) return;
     if (this.renderer.debug.showSolution) {
       const st = s.parsed.start;
-      this.renderer.debug.solution = solve(s.grid, st.x, st.y, st.dir);
+      // shortest solution from the *current* board; fall back to the known reverse scramble
+      const found = solve(s.grid, st.x, st.y, st.dir, { maxDepth: Math.max(6, s.knownSolution.length + 2), budget: 60_000 });
+      this.renderer.debug.solution = found ? found.moves : s.knownSolution;
     } else {
       this.renderer.debug.solution = null;
     }
@@ -129,14 +132,15 @@ export class DebugPanel {
       this.game.loadCustomLevel({
         ...cur,
         name: `${cur.name} (gen ${seed})`,
-        rows: gridToRows(g.grid),
+        rows: gridToRows(g.solvedGrid),
+        scramble: g.scramble,
         pickups: g.pickups,
         initialFuel: g.initialFuel,
         maxFuel: g.maxFuel,
         fuelPerTile: g.fuelPerTile,
         seed,
       });
-      this.info.textContent = `generated seed ${seed}, path ${g.pathLength}, scrambles ${g.scrambles}`;
+      this.info.textContent = `generated seed ${seed}, route ${g.routeLength}, scramble ${g.scramble}`;
     } catch (e) {
       this.info.textContent = `generation failed: ${(e as Error).message}`;
     }
@@ -149,7 +153,7 @@ export class DebugPanel {
       return;
     }
     const f = s.flame;
-    this.info.textContent = `state ${this.game.state} · ${s.phase}\nflame (${f.x},${f.y}) ${f.status} p=${f.progress.toFixed(2)}\nfuel ${f.fuel.current.toFixed(1)}/${f.fuel.max} pickups ${s.pickupsCollected}/${s.pickups.length}\nt=${s.timeRemaining.toFixed(1)} rot=${s.rotations} boosts=${s.boostsUsed}`;
+    this.info.textContent = `state ${this.game.state} · ${s.phase}\nflame (${f.x},${f.y}) ${f.status} p=${f.progress.toFixed(2)}\nfuel ${f.fuel.current.toFixed(1)}/${f.fuel.max} pickups ${s.collected.size}/${s.pickupsTotal}\nt=${s.timeRemaining.toFixed(1)} slides=${s.slides} boosts=${s.boostsUsed}`;
   }
 
   toggle(): void {

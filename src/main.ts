@@ -31,8 +31,10 @@ game.events.on('levelLoaded', () => {
   const s = game.session;
   if (!s) return;
   renderer.particles.clear();
-  s.events.on('rotate', () => audio.rotateTile());
-  s.events.on('rotateDenied', () => audio.rotateDenied());
+  s.events.on('slide', () => audio.slideTile());
+  s.events.on('slideDenied', ({ reason }) => {
+    if (reason !== 'void') audio.slideDenied();
+  });
   s.events.on('started', () => audio.ready());
   s.events.on('enterTile', () => audio.flameMove());
   s.events.on('bounce', () => audio.flameBounce());
@@ -80,19 +82,27 @@ game.events.on('levelComplete', ({ breakdown }) => {
 // ----- input --------------------------------------------------------------------
 
 new PointerInput(canvas, {
-  onTap(x, y, button) {
+  onTap(x, y) {
     audio.unlock();
     if (game.state !== 'PLAYING' || !game.session) return;
     const cell = renderer.cellAt(x, y, game.session);
     if (!cell) return;
-    game.rotateAt(cell.x, cell.y, button !== 2);
+    game.slideAt(cell.x, cell.y);
   },
-  onSwipe(x, y, direction) {
+  onSwipe(x, y, dx, dy) {
     audio.unlock();
     if (game.state !== 'PLAYING' || !game.session) return;
     const cell = renderer.cellAt(x, y, game.session);
     if (!cell) return;
-    game.rotateAt(cell.x, cell.y, direction > 0);
+    const tile = game.session.grid.tryGet(cell.x, cell.y);
+    if (tile && tile.kind === 'empty') {
+      // swiping on the hole pulls the tile from the opposite side into it
+      game.slideAt(cell.x - dx, cell.y - dy);
+      return;
+    }
+    const target = game.session.grid.slideTarget(cell.x, cell.y);
+    if (target && target.x - cell.x === dx && target.y - cell.y === dy) game.slideAt(cell.x, cell.y);
+    else game.slideAt(cell.x, cell.y);
   },
 });
 

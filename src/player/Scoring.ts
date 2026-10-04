@@ -13,7 +13,7 @@ export const SCORE_CONFIG = {
   fuelBonusMax: 800,
   /** Bonus per remaining life. */
   lifeBonusPerLife: 250,
-  /** Bonus per fuel pickup collected. */
+  /** Bonus per fuel pickup collected for the first time on this level (not cumulative across replays). */
   pickupBonus: 150,
   /** Bonus for a perfect level (3 flames). */
   perfectBonus: 750,
@@ -45,7 +45,7 @@ export function computeLevelScore(def: LevelDef, outcome: LevelOutcome, lives: n
   const timeBonus = Math.round(SCORE_CONFIG.timeBonusMax * timeRatio);
   const fuelBonus = Math.round(SCORE_CONFIG.fuelBonusMax * fuelRatio);
   const lifeBonus = lives * SCORE_CONFIG.lifeBonusPerLife;
-  const pickupBonus = outcome.pickupsCollected * SCORE_CONFIG.pickupBonus;
+  const pickupBonus = outcome.newPickups * SCORE_CONFIG.pickupBonus;
   const perfectBonus = stars === 3 ? SCORE_CONFIG.perfectBonus : 0;
   const embersEarned = SCORE_CONFIG.embersPerCompletion + SCORE_CONFIG.embersPerStar * stars + (stars === 3 ? SCORE_CONFIG.embersPerfect : 0);
   return {

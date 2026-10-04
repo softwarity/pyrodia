@@ -13,18 +13,17 @@ for (const def of LEVELS) {
     const parsed = parseLevel(def);
     const result = validateGrid(parsed.grid, {
       flameSpeed: def.flameSpeed,
+      knownSolution: parsed.solution,
       fuel: {
         initial: def.initialFuel ?? FUEL_CONFIG.defaultInitialFuel,
         max: def.maxFuel ?? FUEL_CONFIG.defaultMaxFuel,
         perTile: def.fuelPerTile ?? FUEL_CONFIG.defaultFuelPerTile,
-        pickups: def.pickups ?? [],
       },
     });
-    const sol = result.solution;
     const status = result.ok ? 'OK ' : 'ERR';
     console.log(
-      `${status} #${String(def.id).padStart(3)} ${def.name.padEnd(18)} ${def.width}x${def.height} speed ${def.flameSpeed} ` +
-        `path ${sol?.path.length ?? '-'} clicks ${sol?.totalClicks ?? '-'} react ${result.reactionTime.toFixed(1)}s pickups ${def.pickups?.length ?? 0}` +
+      `${status} #${String(def.id).padStart(3)} ${def.name.padEnd(16)} ${def.width}x${def.height} speed ${def.flameSpeed} ` +
+        `route ${result.route.length} slides ${result.movesNeeded} (scramble ${def.scramble.length}) react ${result.reactionTime.toFixed(1)}s pickups ${def.pickups?.length ?? 0}` +
         (result.warnings.length ? `  warn: ${result.warnings.join('; ')}` : ''),
     );
     if (!result.ok) {

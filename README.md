@@ -2,11 +2,11 @@
 
 *A Pyro's Journey.* Think fast. Feed the fire. Don't get wet.
 
-PYRODIA is a real-time pipe-rotation arcade puzzle, in the spirit of the PC Engine classic
+PYRODIA is a real-time sliding pipe puzzle, in the spirit of the PC Engine classic
 *Blodia / Timeball*, reimagined around a living flame. The flame moves on its own through a
-network of pipes. You rotate pipe tiles **while it is moving** to keep it inside the network,
-feed it fuel, and bring it home to the hearth before it falls into the water, runs out of
-fuel, or runs out of time.
+network of pipes. The board is a sliding puzzle with one hole: you slide pipe tiles into the
+hole **while the flame is moving** to keep it inside the network, feed it fuel, and bring it
+home to the hearth before it falls into the water, runs out of fuel, or runs out of time.
 
 This repository is a fully playable HTML5 / TypeScript prototype: 100 levels, lives, score,
 fuel, Embers, objectives, level select, persistence, procedural generator, validator and debug
@@ -45,20 +45,25 @@ relative (`./`) so the build works from any sub-path such as `https://<user>.git
 
 | Action | Desktop | Touch |
 | --- | --- | --- |
-| Rotate tile clockwise | left click | tap |
-| Rotate counter-clockwise | right click | swipe left on the tile |
+| Slide a tile into the hole | click a tile next to the hole | tap it, or swipe it towards the hole |
 | Pause | ❚❚ button, `P` or `Esc` | ❚❚ button |
 | Restart level | pause menu or `R` | pause menu |
 
 Rules in one breath: keep the fire in the pipes, feed it, get it to the hearth.
 
 * **The flame never waits.** It moves at the level's speed from the moment the short READY
-  phase ends. You can already rotate tiles during READY.
+  phase ends. You can already slide tiles during READY.
+* **Only tiles next to the hole can move** (they have a faint glowing rim). Sliding a tile
+  moves the hole to where the tile was, like a 15-puzzle. The source and the hearth are fixed,
+  and so are tiles marked with a padlock.
 * **Movement rule at a junction**: straight ahead if possible, otherwise turn right, otherwise
   turn left. A **dead end** bounces the flame back (useful to buy time or grab fuel).
-* **You cannot rotate the tile the flame is currently in** (it shakes and refuses).
-* **Water** is under everything. A pipe opening that leads nowhere drops the flame into the
-  water: SPLASH, one life lost, level restarts.
+* **You cannot slide the tile the flame is currently in** (it shakes and refuses).
+* **Water** is under everything. A pipe opening that leads nowhere, including into the hole,
+  drops the flame into the water: SPLASH, one life lost, level restarts.
+* **You do not have to visit every pipe.** Reaching the hearth is enough. Many levels offer a
+  short route and a longer detour (a T-junction into a dead-end branch) that holds extra fuel
+  and rare embers: the short way is safe, the detour pays.
 * **Fuel** burns with every tile travelled. Wood (+10), oil (+30), brazier (full refill) and
   rare embers (+20 fuel, +3 Embers) are picked up by passing through their tile centre. Empty
   tank = the flame burns out.
@@ -68,6 +73,10 @@ Rules in one breath: keep the fire in the pipes, feed it, get it to the hearth.
 * **Embers** (✦) are a persistent currency earned by finishing levels. During play you can
   spend them on *Emergency Fuel* (+30 fuel) or *Emergency Time* (+5 s). Using a boost forfeits
   the PERFECT rating for that attempt.
+* **Rewards are not cumulative across replays.** A pickup always refuels the flame, but its
+  score bonus and its Embers are granted only the first time it is collected on that level.
+  Pickups you already collected on an earlier attempt are drawn greyed out; collecting one you
+  missed before still counts in full.
 
 Level results: 🔥🔥🔥 PERFECT (every objective met, no boost) · 🔥🔥 EXCELLENT · 🔥 COMPLETED.
 Default objectives are *no death*, *collect all fuel* (when the level has pickups) and *finish
@@ -107,9 +116,10 @@ Key objects:
 * **`Game`** – top-level state machine (`TITLE → LEVEL_SELECT → PLAYING → LEVEL_COMPLETE → …`,
   `PLAYING → DEATH → RESTART | GAME_OVER`, plus `PAUSED`, `OPTIONS`). Owns the run (lives,
   score, level index) and the current `LevelSession`. Emits typed events; it has no DOM access.
-* **`LevelSession`** – one attempt at one level: grid, entities (flames + pickups), timer, fixed
-  timestep simulation (120 Hz) for deterministic movement, lookahead prediction, boosts, and
-  the per-attempt stats that feed scoring/objectives.
+* **`LevelSession`** – one attempt at one level: grid, entities (flames), timer, fixed
+  timestep simulation (120 Hz) for deterministic movement, slides, pickups (which travel with
+  their tile), lookahead prediction, boosts, and the per-attempt stats that feed
+  scoring/objectives.
 * **`CanvasRenderer`** – draws board, water, pipes, pickups, flame, particles and the HUD from
   game state. It reads, never mutates. Replaceable by another backend.
 * **`UI`** – DOM screens (title, level select, options, pause, level complete, game over,
@@ -123,30 +133,34 @@ Key objects:
 ## Level data
 
 Levels are pure data (`LevelDef`). Hand-made tutorial levels live in
-`src/level/data/handmade.ts`; levels 13–100 are generated deterministically and **baked** into
-`src/level/data/generated.ts` so the shipped game uses static data. The grid is written as rows
-of tokens:
+`src/level/data/handmade.ts`; levels 9–100 are generated deterministically and **baked** into
+`src/level/data/generated.ts` so the shipped game uses static data.
+
+`rows` describe the **solved** board (a complete route from the source to the hearth) and
+`scramble` is the list of hole moves applied to it to produce the board the player starts from.
+The intended solution is simply the reverse sequence, so every level is solvable by
+construction, and the validator double-checks it.
 
 ```ts
 {
-  id: 3,
-  name: 'Two Turns',
-  width: 5, height: 5,
-  flameSpeed: 0.8,       // tiles per second
-  timeLimit: 35,         // seconds
+  id: 2,
+  name: 'Around the Bend',
+  width: 5, height: 4,
+  flameSpeed: 0.65,      // tiles per second
+  timeLimit: 30,         // seconds
   lookahead: 3,          // tiles previewed ahead of the flame (0 = none)
-  baseScore: 600,
+  baseScore: 550,
   initialFuel: 100, maxFuel: 100, fuelPerTile: 2,   // optional, defaults in player/Fuel.ts
-  pickups: [{ x: 0, y: 3, kind: 'wood' }, { x: 3, y: 4, kind: 'oil' }],
+  pickups: [{ x: 2, y: 2, kind: 'wood' }],          // on the SOLVED board; they travel with the tile
   objectives: [...],     // optional, defaults derived in level/Objectives.ts
-  hint: 'Fix the tiles furthest ahead first...',
+  hint: 'Only tiles next to the hole can move...',
   rows: [
-    '.. .. .. .. ..',
-    '.. .. .. .. ..',
-    'C0 I0 C1 .. ..',
-    'I0 .. I0 .. ..',
-    'S0 .. C3 I1 G3',
+    'S2 C1 I1 D3 C2',
+    'I0 X0 D2 I0 I1',
+    'C0 I1 I1 I1 G3',
+    'I1 .. C3 D1 D0',
   ],
+  scramble: 'UL',        // hole moves up, then left
 }
 ```
 
@@ -154,17 +168,18 @@ Token = `<Kind><Rotation>[*]`:
 
 | Kind | Meaning | Rotations |
 | --- | --- | --- |
-| `..` | empty: water | – |
+| `..` | the hole (void): water underneath | – |
 | `I` | straight | `I0` vertical, `I1` horizontal |
 | `C` | corner | `C0` └ (N+E), `C1` ┌ (E+S), `C2` ┐ (S+W), `C3` ┘ (W+N) |
 | `T` | T-junction | `T0` ├ (N+E+S), `T1` ┬, `T2` ┤, `T3` ┴ |
 | `X` | cross | `X0` |
 | `D` | dead end (bounces) | opening `D0` N, `D1` E, `D2` S, `D3` W |
-| `S` | source (flame start, locked) | opening direction as above |
-| `G` | goal / hearth (locked) | opening direction as above |
-| `*` | suffix: locked tile | e.g. `C1*` |
+| `S` | source (flame start, fixed) | opening direction as above |
+| `G` | goal / hearth (fixed) | opening direction as above |
+| `*` | suffix: fixed tile (cannot slide) | e.g. `C1*` |
 
-Start and goal positions are derived from the `S`/`G` tiles, so a level only needs its rows.
+Scramble letters are hole moves: `U` the hole moves up (the tile above slides down), `D`, `L`,
+`R` likewise. Start and goal positions are derived from the `S`/`G` tiles.
 
 ## Pipe connectivity
 
@@ -175,7 +190,8 @@ connected when each has the bit facing the other (`Grid.isConnected`).
 
 `puzzle/PathSim.ts` holds the single movement rule (`chooseExit`: straight › right › left ›
 bounce) and `predictPath`, used by the live flame, the lookahead preview, the validator and the
-solver so they can never disagree.
+solver so they can never disagree. Sliding is `Grid.slide(x, y)`: the tile swaps places with
+the adjacent hole; `Grid.legalMoves()` lists what can move.
 
 ## Flame movement
 
@@ -185,15 +201,17 @@ so movement is deterministic regardless of frame rate. When `progress` reaches 1
 checks the neighbour through `exit`: if the neighbour has a matching opening it enters it and
 its new exit is decided immediately with the movement rule (the occupied tile is locked against
 rotation, so deciding on entry is equivalent to deciding at the centre); otherwise it starts
-falling (small arc, then splash). Rendering converts (`entry`, `exit`, `progress`) into a
-position inside the tile with `puzzle/TileGeometry.ts` (quarter arcs for corners, straight
-segments through the centre otherwise).
+falling (small arc, then splash). The hole counts as "nothing there". Rendering converts
+(`entry`, `exit`, `progress`) into a position inside the tile with `puzzle/TileGeometry.ts`
+(quarter arcs for corners, straight segments through the centre otherwise).
 
 ## Fuel
 
 `player/Fuel.ts`. Each flame owns a `FuelTank`. Fuel burns per tile travelled
-(`fuelPerTile`), so faster levels do not burn more per tile, only per second. Crossing a tile
-centre collects any `Pickup` there (`wood`, `oil`, `brazier`, `ember`). Fuel ratio drives the
+(`fuelPerTile`), so faster levels do not burn more per tile, only per second. Pickups sit *in*
+a tile and slide with it; crossing the tile centre collects it (`wood`, `oil`, `brazier`,
+`ember`). Fuel is always granted; score and Embers only the first time that pickup is
+collected on that level (`Progress` remembers the collected pickup ids per level). Fuel ratio drives the
 flame's size and flicker (`Flame.intensity`) and is exposed so later mechanics can read it
 (small flame can't burn wood, big flame melts ice...). An empty tank triggers an extinguish
 animation and a `fuel` death. The validator simulates fuel along the solution path so a level
@@ -215,7 +233,8 @@ score = base + timeBonus + fuelBonus + lifeBonus + pickupBonus + perfectBonus
 ```
 
 * `timeBonus` = 1500 × remaining time ratio, `fuelBonus` = 800 × remaining fuel ratio
-* `lifeBonus` = 250 per remaining life, `pickupBonus` = 150 per pickup collected
+* `lifeBonus` = 250 per remaining life, `pickupBonus` = 150 per pickup collected for the first
+  time on this level
 * `perfectBonus` = 750 when the level is rated 3 flames
 
 Run score, high score (persisted), per-level best score and total best are tracked.
@@ -231,18 +250,20 @@ an entry and handling its effect in `LevelSession.applyBoost`.
 
 Level *n+1* unlocks when level *n* is completed. The title's PLAY button continues at the
 furthest unlocked level. The difficulty curve for generated levels is one function
-(`level/difficulty.ts`): board size 6×5 → 10×8, flame speed 0.9 → 2.0 tiles/s, lookahead 3 → 1,
-fuel burn 2 → 5.5 per tile, scrambled tiles 1 → 9, more decoys, junctions, locked tiles and
-detour pickups as the number grows.
+(`level/difficulty.ts`): board size 5×4 → 9×7, flame speed 0.7 → 1.6 tiles/s, lookahead 3 → 1,
+fuel burn 2 → 5 per tile, scramble length 1 → 9 slides, more junction decoys, fixed tiles and
+bonus detours as the number grows.
 
 ## Adding a level
 
 1. Add a `LevelDef` to `src/level/data/handmade.ts` (or edit a generated one) with a unique
-   `id`; rows must contain exactly one `S` and at least one `G`.
-2. Run `npm run levels:validate`. The validator checks: source/goal openings point at pipes,
-   the initial configuration does not already win and does not kill the flame on the first
-   tile, a solution exists (solver), the solution needs at least one rotation, pickups sit on
-   pipe tiles, fuel suffices along the solution, and it warns about tight click timing.
+   `id`. Write the **solved** board in `rows` (exactly one `S`, at least one `G`, at least one
+   `..` hole) and a `scramble` of hole moves.
+2. Run `npm run levels:validate`. The validator checks: the scramble is legal, the start board
+   does not already win and does not kill the flame on the first tile, the reverse scramble
+   really leads to the hearth, a breadth-first solver finds the shortest solution (reported as
+   `slides`), pickups sit on pipe tiles, fuel suffices along the route, and it warns about
+   tight timing.
 3. `npm test` runs the same validation for all levels.
 
 The debug panel's *regenerate* button previews a fresh procedural level with the current
@@ -253,7 +274,8 @@ level's size, and *dump level* prints its JSON so it can be pasted into the data
 * **New pipe behaviour / tile** (ice block, wood that burns away): add a `TileKind` in
   `puzzle/Tile.ts` with its base mask and rotation count, a token letter in `KIND_CODES`, a
   drawing case in `CanvasRenderer.drawTile`, and if it alters routing, a branch in
-  `chooseExit`/`Flame.advance` (e.g. refuse entry while frozen).
+  `chooseExit`/`Flame.advance` (e.g. refuse entry while frozen). If it must not slide, mark it
+  locked in `makeTile`.
 * **New entity** (wind, oil slick, extinguisher, a second flame): extend `entities/Entity`,
   push it into `LevelSession.entities`, update it in `LevelSession.update`, and render it from
   the entity list. The session already holds `flames: Flame[]`; multi-flame levels only need a
@@ -285,11 +307,12 @@ The prototype was built with that port in mind:
 ## Design notes vs. Blodia / Timeball
 
 The original is a sliding-tile pipe puzzle with a ball that must not leave the pipes. PYRODIA
-keeps its mechanical DNA (grid pipes, a continuously moving object that falls if the pipe is
-open, lives, score, escalating speed) but uses rotation instead of sliding (better for touch),
-a living flame with fuel and pickups, a lookahead to make deaths understandable, objectives and
-Embers for replay value, and completely original visuals, sounds and level data. Nothing from
-the original ROM, graphics, music or text is used.
+keeps that mechanical DNA (a 15-puzzle board of pipes, one hole, a continuously moving object
+that falls if the pipe is open, lives, score, escalating speed) and adds a living flame with
+fuel and pickups, optional bonus detours instead of the original "roll over every tile" goal,
+a lookahead to make deaths understandable, objectives and Embers for replay value, and
+completely original visuals, sounds and level data. Nothing from the original ROM, graphics,
+music or text is used.
 
 ## License
 

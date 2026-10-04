@@ -1,13 +1,12 @@
 export interface PointerHandler {
   /** Tap / click at CSS pixel coordinates. `button` 0 = primary, 2 = secondary. */
   onTap(x: number, y: number, button: number): void;
-  /** Horizontal swipe: direction +1 (right) or -1 (left). */
-  onSwipe(x: number, y: number, direction: number): void;
+  /** Swipe starting at (x,y) in a cardinal direction (dx,dy) with |dx|+|dy| = 1. */
+  onSwipe(x: number, y: number, dx: number, dy: number): void;
 }
 
 /**
- * Unified mouse + touch input. Left click / tap => primary, right click or a
- * left swipe => secondary (counter-clockwise rotation).
+ * Unified mouse + touch input: taps and four-direction swipes.
  */
 export class PointerInput {
   private start: { x: number; y: number; t: number; id: number } | null = null;
@@ -56,8 +55,9 @@ export class PointerInput {
     const dist = Math.hypot(dx, dy);
     const s = this.start;
     this.start = null;
-    if (dist > 30 && Math.abs(dx) > Math.abs(dy) * 1.3) {
-      this.handler.onSwipe(s.x, s.y, dx > 0 ? 1 : -1);
+    if (dist > 30) {
+      if (Math.abs(dx) > Math.abs(dy)) this.handler.onSwipe(s.x, s.y, dx > 0 ? 1 : -1, 0);
+      else this.handler.onSwipe(s.x, s.y, 0, dy > 0 ? 1 : -1);
     } else if (!this.moved) {
       this.handler.onTap(s.x, s.y, e.button);
     }

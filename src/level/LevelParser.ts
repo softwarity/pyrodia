@@ -1,5 +1,5 @@
-import { indexDir } from '../puzzle/Direction';
-import { Grid } from '../puzzle/Grid';
+import { E, N, S, W, indexDir, opposite, type Dir } from '../puzzle/Direction';
+import { Grid, type SlideMove } from '../puzzle/Grid';
 import { CODE_KINDS, KIND_CODES, makeTile, type Tile } from '../puzzle/Tile';
 import type { LevelDef, ParsedLevel } from './LevelDef';
 
@@ -39,8 +39,48 @@ export function gridToRows(grid: Grid): string[] {
   return rows;
 }
 
+const MOVE_DIRS: Record<string, Dir> = { U: N, R: E, D: S, L: W };
+export const DIR_LETTERS: Record<Dir, string> = { 1: 'U', 2: 'R', 4: 'D', 8: 'L' };
+
+/**
+ * Apply a scramble (void moves) to a solved grid. Returns the slides that undo
+ * it, in order. Throws on an illegal move so broken level data is caught early.
+ */
+export function applyScramble(grid: Grid, scramble: string): SlideMove[] {
+  const undo: SlideMove[] = [];
+  const voids = grid.voids();
+  if (voids.length === 0) {
+    if (scramble.length) throw new Error('scramble on a board without a void');
+    return undo;
+  }
+  // With several voids, letters apply to the first void in reading order.
+  let v = voids[0];
+  for (const letter of scramble.replace(/\s+/g, '').toUpperCase()) {
+    const dir = MOVE_DIRS[letter];
+    if (!dir) throw new Error(`bad scramble letter "${letter}"`);
+    const before = { ...v };
+    if (!grid.moveVoid(v, dir)) throw new Error(`illegal scramble move ${letter} at (${v.x},${v.y})`);
+    const dx = dir === E ? 1 : dir === W ? -1 : 0;
+    const dy = dir === S ? 1 : dir === N ? -1 : 0;
+    v = { x: v.x + dx, y: v.y + dy };
+    // undoing = sliding the tile now at `before` back into the void at `v`
+    undo.unshift({ from: before, to: v });
+    void opposite;
+  }
+  return undo;
+}
+
 export function parseLevel(def: LevelDef): ParsedLevel {
-  const grid = parseRows(def.rows, def.width, def.height);
+  const solvedGrid = parseRows(def.rows, def.width, def.height);
+  // attach pickups to tiles of the solved board
+  (def.pickups ?? []).forEach((p, i) => {
+    const t = solvedGrid.tryGet(p.x, p.y);
+    if (!t) throw new Error(`Level ${def.id}: pickup ${i} outside the board`);
+    t.pickup = p.kind;
+    t.pickupId = i;
+  });
+  const grid = solvedGrid.clone();
+  const solution = applyScramble(grid, def.scramble ?? '');
   const sources = grid.find('source');
   if (sources.length !== 1) throw new Error(`Level ${def.id}: expected exactly 1 source, found ${sources.length}`);
   const goals = grid.find('goal');
@@ -50,7 +90,10 @@ export function parseLevel(def: LevelDef): ParsedLevel {
   return {
     def,
     grid,
+    solvedGrid,
     start,
     goals: goals.map((g) => ({ x: g.x, y: g.y, dir: indexDir(grid.get(g.x, g.y).rotation) })),
+    solution,
+    pickupCount: def.pickups?.length ?? 0,
   };
 }

@@ -1,26 +1,34 @@
+import type { PickupKind } from '../player/Fuel';
 import { E, N, S, W, rotateMaskCW, type Mask } from './Direction';
 
 /**
- * Tile kinds. Special kinds are designed so that new ones (wood, ice, oil...)
- * can be added later without touching the core movement code: a tile is
- * fundamentally "a connection mask + a behaviour tag".
+ * Tile kinds. A tile is "a connection mask + a behaviour tag" so new kinds
+ * (wood, ice, oil...) can be added without touching the movement code.
+ *
+ * In the sliding (Blodia-style) model tiles never rotate during play: the
+ * player slides a tile into the adjacent void. `rotation` is therefore part of
+ * the level data only.
  */
 export type TileKind =
-  | 'empty' // no pipe: water underneath
+  | 'empty' // the void: a hole in the board, water underneath
   | 'straight'
   | 'corner'
   | 'tee'
   | 'cross'
   | 'cap' // dead-end: the flame bounces back
-  | 'source' // where the flame is born (locked)
-  | 'goal'; // where the flame must arrive (locked)
+  | 'source' // where the flame is born (fixed)
+  | 'goal'; // where the flame must arrive (fixed)
 
 export interface Tile {
   kind: TileKind;
   /** 0..3 quarter turns clockwise from the base orientation. */
   rotation: number;
-  /** Locked tiles cannot be rotated by the player. */
+  /** Fixed tiles cannot be slid by the player. */
   locked: boolean;
+  /** Optional fuel pickup sitting in this pipe; it travels with the tile. */
+  pickup?: PickupKind;
+  /** Stable id of the pickup inside its level (for "collected once" tracking). */
+  pickupId?: number;
 }
 
 /** Base connection masks at rotation 0. */
@@ -63,7 +71,9 @@ export const CODE_KINDS: Record<string, TileKind> = Object.fromEntries(
 ) as Record<string, TileKind>;
 
 export function makeTile(kind: TileKind, rotation = 0, locked = false): Tile {
-  return { kind, rotation: ((rotation % 4) + 4) % 4, locked: locked || kind === 'source' || kind === 'goal' || kind === 'empty' };
+  const n = DISTINCT_ROTATIONS[kind];
+  const r = ((rotation % 4) + 4) % 4;
+  return { kind, rotation: n === 1 ? 0 : n === 2 ? r % 2 : r, locked: locked || kind === 'source' || kind === 'goal' || kind === 'empty' };
 }
 
 export function tileMask(tile: Tile): Mask {
@@ -74,8 +84,9 @@ export function maskForKind(kind: TileKind, rotation: number): Mask {
   return rotateMaskCW(BASE_MASK[kind], rotation);
 }
 
-export function isRotatable(tile: Tile): boolean {
-  return !tile.locked && DISTINCT_ROTATIONS[tile.kind] > 1;
+/** Can the player slide this tile into an adjacent void? */
+export function isSlidable(tile: Tile): boolean {
+  return tile.kind !== 'empty' && !tile.locked;
 }
 
 export function isPipe(tile: Tile): boolean {
@@ -83,20 +94,17 @@ export function isPipe(tile: Tile): boolean {
 }
 
 export function cloneTile(t: Tile): Tile {
-  return { kind: t.kind, rotation: t.rotation, locked: t.locked };
+  const c: Tile = { kind: t.kind, rotation: t.rotation, locked: t.locked };
+  if (t.pickup) {
+    c.pickup = t.pickup;
+    c.pickupId = t.pickupId;
+  }
+  return c;
 }
 
-/** Number of clockwise clicks to go from rotation a to rotation b for this kind. */
-export function cwDistance(kind: TileKind, from: number, to: number): number {
-  const n = DISTINCT_ROTATIONS[kind];
-  if (n <= 1) return 0;
-  return (((to - from) % n) + n) % n;
-}
-
-/** Minimum clicks if both directions are allowed. */
-export function minRotationDistance(kind: TileKind, from: number, to: number): number {
-  const n = DISTINCT_ROTATIONS[kind];
-  if (n <= 1) return 0;
-  const cw = cwDistance(kind, from, to);
-  return Math.min(cw, n - cw);
+/** One character per distinct tile shape, used to hash board arrangements. */
+export function tileSymbol(t: Tile): string {
+  const kindIndex = Object.keys(BASE_MASK).indexOf(t.kind);
+  const code = 48 + kindIndex * 8 + t.rotation * 2 + (t.locked ? 1 : 0);
+  return String.fromCharCode(code);
 }

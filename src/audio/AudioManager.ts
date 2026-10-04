@@ -5,8 +5,8 @@
  * sample based one (or a native bridge) later without touching gameplay code.
  */
 export type SoundEvent =
-  | 'rotateTile'
-  | 'rotateDenied'
+  | 'slideTile'
+  | 'slideDenied'
   | 'flameMove'
   | 'flameDanger'
   | 'flameBounce'
@@ -51,11 +51,11 @@ export class AudioManager {
     this.backend.play(event);
   }
 
-  rotateTile(): void {
-    this.play('rotateTile');
+  slideTile(): void {
+    this.play('slideTile');
   }
-  rotateDenied(): void {
-    this.play('rotateDenied');
+  slideDenied(): void {
+    this.play('slideDenied');
   }
   flameMove(): void {
     this.play('flameMove');
