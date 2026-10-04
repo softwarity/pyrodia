@@ -11,9 +11,13 @@ export interface BoardLayout {
   waterTop: number;
 }
 
-export function computeLayout(canvasW: number, canvasH: number, gridW: number, gridH: number): BoardLayout {
+/**
+ * @param bottomReserve CSS pixels at the bottom of the canvas occupied by DOM
+ * chrome (hint, boost buttons); the board never extends into it.
+ */
+export function computeLayout(canvasW: number, canvasH: number, gridW: number, gridH: number, bottomReserve = 0): BoardLayout {
   const hudHeight = Math.max(58, Math.min(86, canvasH * 0.11));
-  const waterBand = Math.max(28, Math.min(70, canvasH * 0.08));
+  const waterBand = Math.max(Math.max(28, Math.min(70, canvasH * 0.08)), bottomReserve);
   const margin = Math.max(8, Math.min(24, canvasW * 0.03));
   const availW = canvasW - margin * 2;
   const availH = canvasH - hudHeight - waterBand - margin * 2;

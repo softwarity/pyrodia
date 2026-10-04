@@ -34,6 +34,8 @@ export class UI {
   private hintEl: HTMLElement | null = null;
   private bannerEl: HTMLElement | null = null;
   private bannerTimer = 0;
+  private hintTimer = 0;
+  private hintReserve = 0;
   private lastComplete: { level: LevelDef; breakdown: ScoreBreakdown; runScore: number; newHighScore: boolean; isLast: boolean } | null = null;
   private lastGameOver: { score: number; highScore: boolean; levelId: number } | null = null;
 
@@ -56,7 +58,29 @@ export class UI {
     this.show(game.state);
   }
 
+  /**
+   * Height (CSS px) of the in-game chrome stacked at the bottom of the screen
+   * (boost buttons + hint). The renderer keeps the board above it.
+   */
+  bottomChromeHeight(): number {
+    if (!this.ingame) return 0;
+    const h = window.innerHeight;
+    let top = h;
+    const boosts = this.ingame.querySelector<HTMLElement>('.boosts');
+    if (boosts) top = Math.min(top, boosts.getBoundingClientRect().top);
+    if (this.hintEl && this.hintEl.style.display !== 'none') {
+      const r = this.hintEl.getBoundingClientRect();
+      if (r.height > 0) this.hintReserve = h - r.top;
+    }
+    if (this.hintReserve > 0) top = Math.min(top, h - this.hintReserve);
+    return Math.max(0, h - top + 6);
+  }
+
   update(dt: number): void {
+    if (this.hintEl && this.hintEl.style.display !== 'none' && this.game.state === 'PLAYING') {
+      this.hintTimer -= dt;
+      if (this.hintTimer <= 0) this.hintEl.style.display = 'none';
+    }
     if (this.bannerEl && this.bannerTimer > 0) {
       this.bannerTimer -= dt;
       if (this.bannerTimer <= 0) {
@@ -388,7 +412,7 @@ export class UI {
       this.game.pause();
     });
     g.appendChild(pause);
-    const ready = el('div', 'banner ready', 'READY<small>slide the pipes · the flame never waits</small>');
+    const ready = el('div', 'banner ready', 'READY<small>study the board · your first slide (or a tap on the flame) starts the clock</small>');
     g.appendChild(ready);
     this.hintEl = el('div', 'hint');
     this.hintEl.style.display = 'none';
@@ -416,6 +440,8 @@ export class UI {
     const show = this.game.progress.settings.showHints && !!level.hint;
     this.hintEl.style.display = show ? '' : 'none';
     this.hintEl.textContent = level.hint ?? '';
+    this.hintTimer = 12;
+    this.hintReserve = 0; // re-measured on the next frame while the hint is visible
   }
 
   banner(text: string, sub: string, bad: boolean, seconds: number): void {

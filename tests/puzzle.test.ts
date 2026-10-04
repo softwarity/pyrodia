@@ -112,8 +112,18 @@ describe('simulation', () => {
     for (let t = 0; t < seconds; t += 1 / 60) session.update(1 / 60);
   };
 
+  it('waits for the player before moving', () => {
+    const session = new LevelSession(LEVELS[0]);
+    run(session, 5);
+    expect(session.phase).toBe('ready');
+    expect(session.timeRemaining).toBe(LEVELS[0].timeLimit);
+    session.start();
+    expect(session.phase).toBe('running');
+  });
+
   it('the flame falls into the hole when the path is broken', () => {
     const session = new LevelSession(LEVELS[0]);
+    session.start();
     let death: string | null = null;
     session.events.on('death', (d) => (death = d.cause));
     run(session, 12);
@@ -123,7 +133,8 @@ describe('simulation', () => {
 
   it('the flame reaches the goal and collects fuel after the slide', () => {
     const session = new LevelSession(LEVELS[0]);
-    expect(session.slide(2, 2)).toBe(true);
+    expect(session.slide(2, 2)).toBe(true); // first slide starts the level
+    expect(session.phase).toBe('running');
     let won = false;
     let firstTime: boolean | null = null;
     session.events.on('won', () => (won = true));
@@ -153,7 +164,8 @@ describe('simulation', () => {
 
   it('refuses to slide the tile the flame is in', () => {
     const session = new LevelSession(LEVELS[0]);
-    run(session, 2.6); // ready delay 1.5s + a bit: flame is in tile (1,1)
+    session.start();
+    run(session, 2.0); // flame is in tile (1,1)
     expect(session.flame.x).toBe(1);
     expect(session.flame.y).toBe(1);
     expect(session.slide(1, 1)).toBe(false);
@@ -162,6 +174,7 @@ describe('simulation', () => {
   it('the flame dies when fuel runs out', () => {
     const def = { ...LEVELS[0], initialFuel: 2, fuelPerTile: 2, pickups: [] };
     const session = new LevelSession(def);
+    session.start();
     let cause: string | null = null;
     session.events.on('death', (d) => (cause = d.cause));
     run(session, 8);

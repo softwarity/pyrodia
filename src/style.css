@@ -668,7 +668,8 @@ h1.logo {
 }
 
 .hint {
-  bottom: max(64px, calc(env(safe-area-inset-bottom) + 56px));
+  bottom: max(66px, calc(env(safe-area-inset-bottom) + 60px));
+  cursor: pointer;
 }
 
 .banner.ready {

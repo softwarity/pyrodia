@@ -38,6 +38,7 @@ export class DebugPanel {
     btn('‹ prev', () => this.inPlay(() => game.previousLevel()));
     btn('next ›', () => this.inPlay(() => game.nextLevel()));
     btn('restart', () => this.inPlay(() => game.restartLevel()));
+    btn('start flame', () => game.session?.start());
     btn('pause', () => game.togglePause());
     btn('win level', () => this.inPlay(() => game.session && game.session.events.emit('won', { timeRemaining: game.session.timeRemaining })));
     btn('kill flame', () => this.inPlay(() => game.session && game.session.events.emit('death', { cause: 'water', wx: 0, wy: 0 })));

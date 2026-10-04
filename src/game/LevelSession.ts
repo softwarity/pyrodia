@@ -59,7 +59,7 @@ export class LevelSession {
   embersCollected = 0;
   boostsUsed = 0;
   phase: SessionPhase = 'ready';
-  /** Seconds until the flame starts moving. */
+  /** Seconds until the flame starts moving automatically (unused when the level waits for the player). */
   readyTimer: number;
   timeRemaining: number;
   elapsed = 0;
@@ -85,7 +85,7 @@ export class LevelSession {
     this.grid = this.parsed.grid;
     this.previouslyCollected = new Set(previouslyCollected);
     this.pickupsTotal = this.parsed.pickupCount;
-    this.readyTimer = CONFIG.readyDelay;
+    this.readyTimer = CONFIG.autoStartDelay;
     this.timeRemaining = def.timeLimit;
     const s = this.parsed.start;
     this.maxFuel = def.maxFuel ?? FUEL_CONFIG.defaultMaxFuel;
@@ -176,6 +176,14 @@ export class LevelSession {
     return this.speedMultiplier;
   }
 
+  /** Start the flame (called on the player's first move, or by the auto-start timer). */
+  start(): void {
+    if (this.phase !== 'ready') return;
+    this.phase = 'running';
+    this.flame.start();
+    this.events.emit('started', undefined);
+  }
+
   /** Player input: slide the tile at (x,y) into the adjacent void. */
   slide(x: number, y: number): boolean {
     if (this.phase === 'won' || this.phase === 'lost') return false;
@@ -184,6 +192,11 @@ export class LevelSession {
     const idx = y * this.grid.width + x;
     if (tile.kind === 'empty') {
       this.events.emit('slideDenied', { x, y, reason: 'void' });
+      return false;
+    }
+    if (this.phase === 'ready' && (tile.kind === 'source' || this.flame.occupies(x, y))) {
+      // tapping the flame releases it without moving anything
+      this.start();
       return false;
     }
     if (tile.locked) {
@@ -206,6 +219,7 @@ export class LevelSession {
     this.slideAnims.set(target.y * this.grid.width + target.x, { dx: x - target.x, dy: y - target.y, t: 0 });
     this.refreshPrediction();
     this.events.emit('slide', { from: { x, y }, to: target });
+    if (this.phase === 'ready') this.start();
     return true;
   }
 
@@ -229,14 +243,11 @@ export class LevelSession {
       return;
     }
     if (this.phase === 'ready') {
-      this.readyTimer -= dt;
-      if (this.readyTimer <= 0) {
-        this.phase = 'running';
-        this.flame.start();
-        this.events.emit('started', undefined);
-      } else {
-        return;
+      if (CONFIG.autoStartDelay > 0) {
+        this.readyTimer -= dt;
+        if (this.readyTimer <= 0) this.start();
       }
+      if (this.phase === 'ready') return;
     }
     this.accumulator += dt;
     const step = CONFIG.simStep;

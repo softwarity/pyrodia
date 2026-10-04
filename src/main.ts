@@ -136,6 +136,7 @@ function frame(now: number): void {
   const dt = Math.min(0.1, (now - last) / 1000);
   last = now;
   game.update(dt);
+  renderer.bottomReserve = ui.bottomChromeHeight();
   renderer.render(game, dt);
   ui.update(dt);
   debugPanel?.update();

@@ -33,7 +33,14 @@ await page.click('button.btn:has-text("PLAY")');
 await page.waitForTimeout(400);
 await page.screenshot({ path: `${out}/02-level1-ready.png` });
 
-// Let the flame fall (no rotation) -> death
+// Tap the flame to start, then let it fall (no slide) -> death
+const src = await page.evaluate(() => {
+  const { game, renderer } = window.pyrodia;
+  const l = renderer.layout;
+  const s = game.session.parsed.start;
+  return { x: l.originX + (s.x + 0.5) * l.tileSize, y: l.originY + (s.y + 0.5) * l.tileSize };
+});
+await page.mouse.click(src.x, src.y);
 await page.waitForTimeout(6500);
 await page.screenshot({ path: `${out}/03-splash.png` });
 const stateAfterDeath = await page.evaluate(() => ({ state: window.pyrodia.game.state, lives: window.pyrodia.game.lives.count }));

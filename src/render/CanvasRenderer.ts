@@ -36,6 +36,9 @@ export class CanvasRenderer {
   private flashAlpha = 0;
   private flashColor = '#ffffff';
   debug: DebugView = { showConnections: false, showPath: false, showSolution: false, solution: null };
+  /** Bottom area (CSS px) covered by DOM overlays; the board is laid out above it. */
+  bottomReserve = 0;
+  private layoutReserve = -1;
   private lastFlamePos: { x: number; y: number } | null = null;
   private emberTimer = 0;
 
@@ -94,8 +97,9 @@ export class CanvasRenderer {
   private ensureLayout(session: LevelSession): BoardLayout {
     const w = this.canvas.width / this.dpr;
     const h = this.canvas.height / this.dpr;
-    if (!this.layout || this.layout.canvasW !== w || this.layout.canvasH !== h) {
-      this.layout = computeLayout(w, h, session.grid.width, session.grid.height);
+    if (!this.layout || this.layout.canvasW !== w || this.layout.canvasH !== h || this.layoutReserve !== this.bottomReserve) {
+      this.layout = computeLayout(w, h, session.grid.width, session.grid.height, this.bottomReserve);
+      this.layoutReserve = this.bottomReserve;
     }
     return this.layout;
   }
@@ -854,8 +858,9 @@ export class CanvasRenderer {
     ctx.fillText(`SCORE ${formatScore(game.score)}`, pad, row1);
     ctx.textAlign = 'center';
     ctx.fillText(`LEVEL ${session.def.id}`, w / 2, row1);
+    const rightInset = 48; // room for the DOM pause button
     const lifeR = fontSize * 0.42;
-    let lx = w - pad - lifeR;
+    let lx = w - pad - rightInset - lifeR;
     for (let i = 0; i < game.lives.max; i++) {
       this.drawMiniFlame(lx, row1, lifeR, i < game.lives.count);
       lx -= lifeR * 2.6;
@@ -895,8 +900,8 @@ export class CanvasRenderer {
     ctx.textAlign = 'right';
     ctx.fillStyle = THEME.hudText;
     ctx.font = font(700, fontSize * 0.85);
-    ctx.fillText(`${game.embers}`, w - pad, row2);
-    const emberX = w - pad - ctx.measureText(`${game.embers}`).width - fontSize * 0.7;
+    ctx.fillText(`${game.embers}`, w - pad - rightInset, row2);
+    const emberX = w - pad - rightInset - ctx.measureText(`${game.embers}`).width - fontSize * 0.7;
     this.drawEmberIcon(emberX, row2, fontSize * 0.36);
     ctx.fillStyle = THEME.hudDim;
     ctx.font = font(600, fontSize * 0.6);
