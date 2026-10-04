@@ -959,15 +959,22 @@ export class CanvasRenderer {
       lx -= lifeR * 2.6;
     }
 
-    // row 2: fuel bar | time | embers
-    const barW = Math.min(220, Math.max(64, w * 0.22));
-    const barH = Math.max(10, fontSize * 0.6);
+    // row 2: fuel bar | time (or ready prompt) | embers
+    const ratio = Math.max(0, Math.min(1, session.timeRemaining / session.def.timeLimit));
+    const ready = session.phase === 'ready';
+    const centreText = ready ? (w < 520 ? 'TAP TO START' : 'READY · SLIDE A TILE OR TAP THE FLAME') : `${session.timeRemaining.toFixed(1)}s`;
+    ctx.font = ready ? font(800, fontSize * 0.9) : font(700, fontSize);
+    const centreW = ctx.measureText(centreText).width;
     const fuel = session.flame.fuel;
+    const barH = Math.max(10, fontSize * 0.6);
+    const fx = pad + fontSize * 2.2;
+    const numberW = fontSize * 1.9;
+    // the bar never runs into the centred text
+    const barW = Math.max(36, Math.min(220, w * 0.22, (w - centreW) / 2 - 10 - fx - numberW));
     ctx.textAlign = 'left';
     ctx.fillStyle = THEME.hudDim;
     ctx.font = font(600, fontSize * 0.7);
     ctx.fillText('FUEL', pad, row2);
-    const fx = pad + fontSize * 2.2;
     ctx.fillStyle = THEME.timeBarBg;
     ctx.beginPath();
     ctx.roundRect(fx, row2 - barH / 2, barW, barH, barH / 2);
@@ -985,18 +992,17 @@ export class CanvasRenderer {
     ctx.fillText(`${Math.ceil(fuel.current)}`, fx + barW + 8, row2);
 
     ctx.textAlign = 'center';
-    ctx.font = font(700, fontSize);
-    const ratio = Math.max(0, Math.min(1, session.timeRemaining / session.def.timeLimit));
-    if (session.phase === 'ready') {
+    if (ready) {
       // the clock only starts with the player's first move
-      const pulse = 0.65 + 0.35 * Math.sin(this.time * 5);
-      ctx.fillStyle = `rgba(255, 213, 74, ${pulse})`;
+      const p = 0.65 + 0.35 * Math.sin(this.time * 5);
+      ctx.fillStyle = `rgba(255, 213, 74, ${p})`;
       ctx.font = font(800, fontSize * 0.9);
-      ctx.fillText(w < 520 ? 'TAP TO START' : 'READY · SLIDE A TILE OR TAP THE FLAME', w / 2, row2);
+      ctx.fillText(centreText, w / 2, row2);
     } else {
       ctx.fillStyle = ratio < 0.25 ? THEME.timeBarLow : THEME.hudText;
-      ctx.fillText(`${session.timeRemaining.toFixed(1)}s`, w / 2, row2);
-      if (session.fastForward) {
+      ctx.font = font(700, fontSize);
+      ctx.fillText(centreText, w / 2, row2);
+      if (session.fastForward && w >= 520) {
         ctx.fillStyle = `rgba(255, 213, 74, ${0.6 + 0.4 * Math.sin(this.time * 12)})`;
         ctx.font = font(800, fontSize * 0.7);
         ctx.fillText('⏩ FAST', w / 2 + fontSize * 3.2, row2);
