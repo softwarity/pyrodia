@@ -29,7 +29,8 @@ export interface ObjectiveDef {
  *
  * Rows are space separated tokens:  <Kind><Rotation>[*]
  *
- *   Kind:      . void   I straight   C corner   T tee   X cross
+ *   Kind:      .. void   -- blank (solid tile without pipe, slides)
+ *              I straight   C corner   T tee   X cross
  *              D cap (dead-end, bounces)   S source (flame start)   G goal
  *              W<rot><n> warp: a numbered pipe end; the flame entering warp n
  *              comes out of the other warp n (e.g. W31 opens West, number 1)

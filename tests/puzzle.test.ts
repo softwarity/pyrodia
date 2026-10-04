@@ -118,6 +118,16 @@ describe('warps', () => {
   });
 });
 
+describe('blank tiles', () => {
+  it('slide like any tile and drop the flame', () => {
+    const grid = parseRows(['S1 -- G3', 'I1 .. --'], 3, 2, false);
+    expect(grid.get(1, 0).kind).toBe('blank');
+    expect(predictPath(grid, 0, 0, E, 10).end.type).toBe('fall');
+    expect(grid.slide(1, 0)).toEqual({ x: 1, y: 1 });
+    expect(gridToRows(grid)).toEqual(['S1 .. G3', 'I1 -- --']);
+  });
+});
+
 describe('levels', () => {
   it('has 100 levels with unique ascending ids', () => {
     expect(LEVELS.length).toBe(100);

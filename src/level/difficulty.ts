@@ -15,7 +15,7 @@ function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * Math.min(1, Math.max(0, t));
 }
 
-export const FIRST_GENERATED_LEVEL = 9;
+export const FIRST_GENERATED_LEVEL = 13;
 export const LAST_LEVEL = 100;
 
 export function difficultyFor(id: number): DifficultyProfile {

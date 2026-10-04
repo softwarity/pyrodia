@@ -315,6 +315,9 @@ export class CanvasRenderer {
     ctx.rotate(baseRotation * (Math.PI / 2));
     const mask = tileMask({ ...tile, rotation: 0 });
     switch (tile.kind) {
+      case 'blank':
+        this.drawBlank(ts);
+        break;
       case 'source':
         this.drawSource(ts, lit);
         break;
@@ -370,6 +373,21 @@ export class CanvasRenderer {
     ctx.fillText(String(id), 0, ts * 0.01);
   }
 
+  /** A solid tile without a pipe: a plain plate with four rivets. */
+  private drawBlank(ts: number): void {
+    const ctx = this.ctx;
+    ctx.fillStyle = 'rgba(255,255,255,0.03)';
+    ctx.fillRect(-ts * 0.42, -ts * 0.42, ts * 0.84, ts * 0.84);
+    ctx.fillStyle = 'rgba(255,255,255,0.12)';
+    for (const sx of [-1, 1]) {
+      for (const sy of [-1, 1]) {
+        ctx.beginPath();
+        ctx.arc(sx * ts * 0.34, sy * ts * 0.34, Math.max(1.5, ts * 0.03), 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  }
+
   private pipeWidths(ts: number): { outer: number; inner: number } {
     return { outer: ts * 0.42, inner: ts * 0.26 };
   }
@@ -409,6 +427,7 @@ export class CanvasRenderer {
       }
       ctx.stroke();
     };
+    strokePath(outer + Math.max(2, ts * 0.05), 'rgba(8, 10, 20, 0.75)'); // dark outline: tube look
     strokePath(outer, outerColor);
     strokePath(inner, innerColor);
     // highlight stripe

@@ -11,6 +11,7 @@ import { E, N, S, W, rotateMaskCW, type Mask } from './Direction';
  */
 export type TileKind =
   | 'empty' // the void: a hole in the board, water underneath
+  | 'blank' // a solid tile with no pipe: slides like any other, the flame falls off it
   | 'straight'
   | 'corner'
   | 'tee'
@@ -37,6 +38,7 @@ export interface Tile {
 /** Base connection masks at rotation 0. */
 export const BASE_MASK: Record<TileKind, Mask> = {
   empty: 0,
+  blank: 0,
   straight: N | S,
   corner: N | E,
   tee: N | E | S,
@@ -50,6 +52,7 @@ export const BASE_MASK: Record<TileKind, Mask> = {
 /** How many visually distinct rotations a tile kind has. */
 export const DISTINCT_ROTATIONS: Record<TileKind, number> = {
   empty: 1,
+  blank: 1,
   straight: 2,
   corner: 4,
   tee: 4,
@@ -62,6 +65,7 @@ export const DISTINCT_ROTATIONS: Record<TileKind, number> = {
 
 export const KIND_CODES: Record<TileKind, string> = {
   empty: '.',
+  blank: '-',
   straight: 'I',
   corner: 'C',
   tee: 'T',
@@ -98,7 +102,7 @@ export function isSlidable(tile: Tile): boolean {
 }
 
 export function isPipe(tile: Tile): boolean {
-  return tile.kind !== 'empty';
+  return tile.kind !== 'empty' && tile.kind !== 'blank';
 }
 
 export function cloneTile(t: Tile): Tile {

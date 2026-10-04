@@ -6,6 +6,8 @@ import type { LevelDef, ParsedLevel } from './LevelDef';
 export function parseToken(token: string): Tile {
   const t = token.trim();
   if (t === '..' || t === '.') return makeTile('empty');
+  if (t === '--' || t === '-') return makeTile('blank');
+  if (t === '--*') return makeTile('blank', 0, true);
   const wm = /^W([0-3])([1-9])(\*?)$/.exec(t);
   if (wm) return makeTile('warp', parseInt(wm[1], 10), wm[3] === '*', parseInt(wm[2], 10));
   const m = /^([ICTXDSG])([0-3])(\*?)$/.exec(t);
@@ -16,6 +18,7 @@ export function parseToken(token: string): Tile {
 
 export function tileToToken(tile: Tile): string {
   if (tile.kind === 'empty') return '..';
+  if (tile.kind === 'blank') return tile.locked ? '--*' : '--';
   const lockedMark = tile.locked && tile.kind !== 'source' && tile.kind !== 'goal' ? '*' : '';
   if (tile.kind === 'warp') return `W${tile.rotation}${tile.warpId ?? 1}${lockedMark}`;
   return `${KIND_CODES[tile.kind]}${tile.rotation}${lockedMark}`;

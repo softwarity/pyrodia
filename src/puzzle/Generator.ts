@@ -309,7 +309,7 @@ export function generateLevel(params: GeneratorParams): GeneratedLevel {
       solved.set(b.x, b.y, makeTile('warp', rng.int(0, 3), false, nextWarpId));
       nextWarpId++;
     }
-    const decoyKinds: TileKind[] = ['straight', 'straight', 'corner', 'corner', 'corner', 'tee', 'cross', 'cap'];
+    const decoyKinds: TileKind[] = ['straight', 'straight', 'corner', 'corner', 'corner', 'tee', 'cross', 'cap', 'blank', 'blank'];
     for (const c of free) {
       const kind = rng.pick(decoyKinds);
       solved.set(c.x, c.y, makeTile(kind, rng.int(0, 3), rng.chance(p.lockedDecoyChance)));

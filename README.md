@@ -143,9 +143,10 @@ Key objects:
 
 ## Level data
 
-Levels are pure data (`LevelDef`). Hand-made tutorial levels live in
-`src/level/data/handmade.ts`; levels 9–100 are generated deterministically and **baked** into
-`src/level/data/generated.ts` so the shipped game uses static data.
+Levels are pure data (`LevelDef`). Hand-made levels live in `src/level/data/handmade.ts`:
+a tutorial set (1–8) and a "classic" set (9–12) whose layouts echo the first Blodia boards;
+levels 13–100 are generated deterministically and **baked** into `src/level/data/generated.ts`
+so the shipped game uses static data.
 
 `rows` describe the **solved** board (a complete route from the source to the hearth) and
 `scramble` is the list of hole moves applied to it to produce the board the player starts from.
@@ -180,6 +181,7 @@ Token = `<Kind><Rotation>[*]`:
 | Kind | Meaning | Rotations |
 | --- | --- | --- |
 | `..` | the hole (void): water underneath | – |
+| `--` | blank: a solid tile without pipe, slides like any other (`--*` fixed) | – |
 | `I` | straight | `I0` vertical, `I1` horizontal |
 | `C` | corner | `C0` └ (N+E), `C1` ┌ (E+S), `C2` ┐ (S+W), `C3` ┘ (W+N) |
 | `T` | T-junction | `T0` ├ (N+E+S), `T1` ┬, `T2` ┤, `T3` ┴ |

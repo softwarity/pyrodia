@@ -4,124 +4,24 @@ import type { LevelDef } from '../LevelDef';
 
 export const GENERATED_LEVELS: LevelDef[] = [
   {
-    "id": 9,
+    "id": 13,
     "name": "Ember 1",
     "width": 5,
     "height": 4,
     "rows": [
-      "C1 I1 C2 T3 C2",
-      "C0 S3 I0 .. X0",
-      "C3 D1 G0 C0 D3",
-      "C3 C2 C2 C0 I1"
+      "G2 -- C1 C2 I0",
+      "I0 C1 I1 S3 C2",
+      "I0 I0 I1 C0 T3",
+      "C0 C3 .. -- C0"
     ],
     "scramble": "L",
     "flameSpeed": 0.7,
-    "timeLimit": 40,
-    "lookahead": 3,
-    "baseScore": 950,
-    "initialFuel": 100,
-    "maxFuel": 100,
-    "fuelPerTile": 2,
-    "pickups": [],
-    "tags": [
-      "generated"
-    ],
-    "seed": 72271
-  },
-  {
-    "id": 10,
-    "name": "Kindling 1",
-    "width": 5,
-    "height": 4,
-    "rows": [
-      "I1 C0 C1 C2 G2",
-      "C3 I0 I0 I0 I0",
-      "C2 D0 S0 C0 C3",
-      "C3 I0 D0 .. C0"
-    ],
-    "scramble": "U",
-    "flameSpeed": 0.71,
     "timeLimit": 50,
-    "lookahead": 3,
-    "baseScore": 1000,
-    "initialFuel": 100,
-    "maxFuel": 100,
-    "fuelPerTile": 2,
-    "pickups": [],
-    "tags": [
-      "generated"
-    ],
-    "seed": 80190
-  },
-  {
-    "id": 11,
-    "name": "Tinder 1",
-    "width": 5,
-    "height": 4,
-    "rows": [
-      "C0 I0 C1 C2 C0",
-      "T0 I1 I0 S0 C0",
-      "C0 G2 I0 I0 X0",
-      ".. C0 C3 I1 X0"
-    ],
-    "scramble": "R",
-    "flameSpeed": 0.72,
-    "timeLimit": 45,
-    "lookahead": 3,
-    "baseScore": 1050,
-    "initialFuel": 100,
-    "maxFuel": 100,
-    "fuelPerTile": 2.1,
-    "pickups": [],
-    "tags": [
-      "generated"
-    ],
-    "seed": 88109
-  },
-  {
-    "id": 12,
-    "name": "Smoulder 1",
-    "width": 5,
-    "height": 4,
-    "rows": [
-      "D1 .. C2 I1 C1",
-      "C1 I1 C2 C0 I1",
-      "I0 G1 C3 C0 C1",
-      "C0 I1 S3 T1 I0"
-    ],
-    "scramble": "D",
-    "flameSpeed": 0.73,
-    "timeLimit": 45,
-    "lookahead": 3,
-    "baseScore": 1100,
-    "initialFuel": 100,
-    "maxFuel": 100,
-    "fuelPerTile": 2.1,
-    "pickups": [],
-    "tags": [
-      "generated"
-    ],
-    "seed": 96028
-  },
-  {
-    "id": 13,
-    "name": "Flicker 1",
-    "width": 5,
-    "height": 4,
-    "rows": [
-      "G2 D0 C1 I0 I0",
-      "I0 C1 I1 S3 C2",
-      "I0 I0 I1 C0 C3",
-      "C0 C3 .. D1 C0"
-    ],
-    "scramble": "L",
-    "flameSpeed": 0.74,
-    "timeLimit": 45,
     "lookahead": 3,
     "baseScore": 1150,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 2.1,
+    "fuelPerTile": 2,
     "pickups": [],
     "tags": [
       "generated"
@@ -130,23 +30,23 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 14,
-    "name": "Spark Trail 1",
+    "name": "Kindling 1",
     "width": 5,
     "height": 4,
     "rows": [
-      "I1 S1 I1 C2 D3",
-      "C1 C0 I0 I0 D1",
-      "I1 C2 .. I0 X0",
-      "C0 I0 D1 G0 C2"
+      "I1 S1 I1 C2 --",
+      "C1 C0 I0 I0 --",
+      "C3 C2 .. I0 D2",
+      "T0 C2 -- G0 C2"
     ],
     "scramble": "R",
-    "flameSpeed": 0.75,
+    "flameSpeed": 0.71,
     "timeLimit": 35,
     "lookahead": 3,
     "baseScore": 1200,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 2.2,
+    "fuelPerTile": 2,
     "pickups": [],
     "tags": [
       "generated"
@@ -155,23 +55,23 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 15,
-    "name": "Hearth 1",
+    "name": "Tinder 1",
     "width": 5,
     "height": 4,
     "rows": [
-      "I1 X0 I1 C0 C1",
-      "T3 X0 I1 C2 X0",
-      "S2 C3 I1 C2 ..",
-      "C0 I1 I1 I1 G3"
+      "D0 C1 -- X0 D2",
+      "C0 I0 .. C1 C2",
+      "D3 G1 I1 C3 I0",
+      "D2 C1 C2 S1 C3"
     ],
-    "scramble": "LD",
-    "flameSpeed": 0.76,
-    "timeLimit": 35,
+    "scramble": "D",
+    "flameSpeed": 0.72,
+    "timeLimit": 45,
     "lookahead": 3,
     "baseScore": 1250,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 2.2,
+    "fuelPerTile": 2.1,
     "pickups": [],
     "tags": [
       "generated"
@@ -180,23 +80,23 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 16,
-    "name": "Wick 1",
+    "name": "Smoulder 1",
     "width": 5,
     "height": 4,
     "rows": [
-      "I1 C3 I1 C1 C2",
-      "G1 I1 I1 C3 I0",
-      "T3 .. I1 C1 S0",
-      "I0 C1 C0 I1 I1"
+      "I1 C1 I1 G3 --",
+      ".. C0 I1 I1 C2",
+      "C1 -- T0 I1 S0",
+      "I0 I1 X0 I0 C1"
     ],
-    "scramble": "UR",
-    "flameSpeed": 0.77,
-    "timeLimit": 40,
+    "scramble": "R",
+    "flameSpeed": 0.73,
+    "timeLimit": 45,
     "lookahead": 3,
     "baseScore": 1300,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 2.2,
+    "fuelPerTile": 2.1,
     "pickups": [],
     "tags": [
       "generated"
@@ -205,24 +105,24 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 17,
-    "name": "Brazier 1",
+    "name": "Flicker 1",
     "width": 6,
     "height": 5,
     "rows": [
-      "I0 T0 C0 C1 X0 I0",
-      "I0 T3 G2 C1 I1 C2",
-      ".. I1 X0 I0 C1 I0",
-      "T3 I0 C0 C3 I0 S0",
-      "D1 D2 X0 C2 I1 D2"
+      "-- D0 C3 I1 -- I0",
+      "-- -- D3 C1 I0 C2",
+      "T3 -- I0 X0 -- C2",
+      "S1 I1 C2 .. C1 C2",
+      "-- D1 C0 I1 C3 G0"
     ],
-    "scramble": "RR",
-    "flameSpeed": 0.78,
-    "timeLimit": 50,
+    "scramble": "R",
+    "flameSpeed": 0.74,
+    "timeLimit": 45,
     "lookahead": 3,
     "baseScore": 1350,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 2.3,
+    "fuelPerTile": 2.1,
     "pickups": [],
     "tags": [
       "generated"
@@ -231,24 +131,24 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 18,
-    "name": "Lantern 1",
+    "name": "Spark Trail 1",
     "width": 6,
     "height": 5,
     "rows": [
-      "C3 T3 C1 I1 I1 C2",
-      "T0 D2 I0 .. X0 I0",
-      "X0 T3 S0 I1 C1 I0",
-      "T0 D1 C0 I0 I0 G0",
-      "C3 C0 D0 C2 X0 X0"
+      "C1 C2 C3 C3 X0 T0",
+      "I0 I0 .. -- D0 T1",
+      "S0 I0 T2 I0 I0 D3",
+      "T0 I0 -- D2 -- D0",
+      "X0 G0 -- T2 D3 --"
     ],
-    "scramble": "UR",
-    "flameSpeed": 0.79,
-    "timeLimit": 45,
+    "scramble": "L",
+    "flameSpeed": 0.75,
+    "timeLimit": 40,
     "lookahead": 3,
     "baseScore": 1400,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 2.3,
+    "fuelPerTile": 2.2,
     "pickups": [],
     "tags": [
       "generated"
@@ -257,24 +157,24 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 19,
-    "name": "Furnace 1",
+    "name": "Hearth 1",
     "width": 6,
     "height": 5,
     "rows": [
-      "I0 I1 I0 T3 .. C3",
-      "T2 C3 I1 C1 I1 C2",
-      "C0 D2 S1 C3 D2 I0",
-      "C1 C0 C1 X0 D1 G0",
-      "I1 D0 X0 I1 T1 C0"
+      "C3 C1 I1 C1 D0 D3",
+      "-- C1 I0 -- -- X0",
+      "G1 C2 X0 -- C3 --",
+      "-- I0 X0 .. C2 C0",
+      "X0 C0 I1 I1 S3 D2"
     ],
-    "scramble": "DD",
-    "flameSpeed": 0.8,
-    "timeLimit": 35,
+    "scramble": "LL",
+    "flameSpeed": 0.76,
+    "timeLimit": 40,
     "lookahead": 3,
     "baseScore": 1450,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 2.3,
+    "fuelPerTile": 2.2,
     "pickups": [],
     "tags": [
       "generated"
@@ -283,24 +183,24 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 20,
-    "name": "Cinder 1",
+    "name": "Wick 1",
     "width": 6,
     "height": 5,
     "rows": [
-      "C1 I1 I1 I1 I1 G3",
-      "C0 I1 S3 .. T2 I1",
-      "C0 C1 C1 X0 D2 C0",
-      "I1 C1 C1 I1 T3 X0",
-      "C1 C2 D0 T1 C0 C0"
+      "S1 C2 C1 I1 I1 G3",
+      "C2 C0 C3 D2 I0 C0",
+      "T3 I0 D3 .. X0 C1",
+      "I0 X0 C2 D2 T0 --",
+      "-- C2 -- C0 -- I1"
     ],
-    "scramble": "RU",
-    "flameSpeed": 0.81,
-    "timeLimit": 45,
+    "scramble": "UU",
+    "flameSpeed": 0.77,
+    "timeLimit": 40,
     "lookahead": 3,
     "baseScore": 1500,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 2.4,
+    "fuelPerTile": 2.2,
     "pickups": [],
     "tags": [
       "generated"
@@ -309,31 +209,25 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 21,
-    "name": "Ashfall 1",
+    "name": "Brazier 1",
     "width": 6,
     "height": 5,
     "rows": [
-      "I1 I0 T0 D1 C2 S2",
-      "T3 C0 T2 X0 C3 I0",
-      "D2 C2 D3 X0 X0 I0",
-      "C1 W31 C0 I1 W11 C3",
-      "G0 X0 D1 .. C3 I0"
+      "I1 T1 .. I1 C3 C1",
+      "T3 D1 G1 I1 C2 I1",
+      "D0 D0 I1 X0 I0 C2",
+      "C3 I1 I0 D1 C0 S3",
+      "-- -- C2 D3 D0 --"
     ],
-    "scramble": "RU",
-    "flameSpeed": 0.82,
-    "timeLimit": 40,
+    "scramble": "RD",
+    "flameSpeed": 0.78,
+    "timeLimit": 35,
     "lookahead": 3,
     "baseScore": 1550,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 2.4,
-    "pickups": [
-      {
-        "x": 0,
-        "y": 2,
-        "kind": "oil"
-      }
-    ],
+    "fuelPerTile": 2.3,
+    "pickups": [],
     "tags": [
       "generated"
     ],
@@ -341,24 +235,24 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 22,
-    "name": "Blaze 1",
+    "name": "Lantern 1",
     "width": 6,
     "height": 5,
     "rows": [
-      "I0 C0 C3 X0 S2 X0",
-      "I0 X0 C1 W31 I0 C0",
-      "C1 G2 I0 C3 W01 X0",
-      "X0 C0 C3 I1 C1 C1",
-      "C3 C2 .. D0 D1 C2"
+      "D0 D0 C1 G3 -- T0",
+      "D3 D1 T0 I0 C2 I0",
+      "C2 -- I0 I0 I1 I0",
+      "T3 T0 I0 C0 .. --",
+      "S1 I1 C3 C3 -- --"
     ],
-    "scramble": "UR",
-    "flameSpeed": 0.83,
-    "timeLimit": 45,
+    "scramble": "LL",
+    "flameSpeed": 0.79,
+    "timeLimit": 40,
     "lookahead": 3,
     "baseScore": 1600,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 2.4,
+    "fuelPerTile": 2.3,
     "pickups": [],
     "tags": [
       "generated"
@@ -367,72 +261,25 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 23,
-    "name": "Wildfire 1",
+    "name": "Furnace 1",
     "width": 6,
     "height": 5,
     "rows": [
-      "I1 D2 D1 I0 D3 D1",
-      "C0 S2 D3 T3 .. I1",
-      "W21 I0 C0 T2 C3 T3",
-      "C0 C3 C2 X0 W21 C0",
-      "X0 I1 C0 D1 C0 G3"
+      "T1 T1 C1 D3 X0 --",
+      "C0 S2 -- -- -- C0",
+      ".. I0 C0 C3 -- C2",
+      "C1 C3 C0 C2 I1 C3",
+      "T3 I1 I1 G3 -- D1"
     ],
     "scramble": "DD",
-    "flameSpeed": 0.84,
-    "timeLimit": 40,
+    "flameSpeed": 0.8,
+    "timeLimit": 50,
     "lookahead": 3,
     "baseScore": 1650,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 2.5,
+    "fuelPerTile": 2.3,
     "pickups": [
-      {
-        "x": 3,
-        "y": 4,
-        "kind": "ember"
-      },
-      {
-        "x": 4,
-        "y": 4,
-        "kind": "wood"
-      }
-    ],
-    "tags": [
-      "generated"
-    ],
-    "seed": 183137
-  },
-  {
-    "id": 24,
-    "name": "Inferno 1",
-    "width": 6,
-    "height": 5,
-    "rows": [
-      "T2 D0 C3 C3 I1 C3",
-      "I0 G2 I0 C3 I1 T1",
-      "S2 I0 I0 T3 I0 C3",
-      "I0 I0 .. C3 I1 I0",
-      "C0 T2 I1 I0 X0 D1"
-    ],
-    "scramble": "LU",
-    "flameSpeed": 0.85,
-    "timeLimit": 45,
-    "lookahead": 3,
-    "baseScore": 1700,
-    "initialFuel": 100,
-    "maxFuel": 100,
-    "fuelPerTile": 2.5,
-    "pickups": [
-      {
-        "x": 1,
-        "y": 0,
-        "kind": "ember"
-      },
-      {
-        "x": 1,
-        "y": 2,
-        "kind": "wood"
-      },
       {
         "x": 5,
         "y": 4,
@@ -442,40 +289,55 @@ export const GENERATED_LEVELS: LevelDef[] = [
     "tags": [
       "generated"
     ],
+    "seed": 183137
+  },
+  {
+    "id": 24,
+    "name": "Cinder 1",
+    "width": 6,
+    "height": 5,
+    "rows": [
+      "C3 C3 -- -- C1 C2",
+      "C0 I1 C3 -- W01 I0",
+      "I0 .. S2 T0 I1 G0",
+      "C3 I0 I0 I0 I0 --",
+      "-- W11 C3 X0 D0 --"
+    ],
+    "scramble": "DD",
+    "flameSpeed": 0.81,
+    "timeLimit": 45,
+    "lookahead": 3,
+    "baseScore": 1700,
+    "initialFuel": 100,
+    "maxFuel": 100,
+    "fuelPerTile": 2.4,
+    "pickups": [],
+    "tags": [
+      "generated"
+    ],
     "seed": 191056
   },
   {
     "id": 25,
-    "name": "Torchlight 1",
+    "name": "Ashfall 1",
     "width": 6,
     "height": 5,
     "rows": [
-      "D1 T2 S2 T1 I1 I1",
-      "I0 D0 I0 D1 G2 C2",
-      "D3 D1 I0 T2 C0 C2",
-      "C3 I1 W01 I0 C0 X0",
-      "I0 I1 I0 .. C0 W01"
+      "C1 S3 I0 C1 -- C1",
+      "I0 -- I0 C2 I1 D3",
+      "I0 C0 .. -- D1 --",
+      "I0 C2 I1 X0 D0 C0",
+      "C0 G3 C0 -- I0 C0"
     ],
-    "scramble": "RR",
-    "flameSpeed": 0.86,
-    "timeLimit": 40,
+    "scramble": "LL",
+    "flameSpeed": 0.82,
+    "timeLimit": 35,
     "lookahead": 3,
     "baseScore": 1750,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 2.5,
-    "pickups": [
-      {
-        "x": 0,
-        "y": 2,
-        "kind": "oil"
-      },
-      {
-        "x": 4,
-        "y": 2,
-        "kind": "wood"
-      }
-    ],
+    "fuelPerTile": 2.4,
+    "pickups": [],
     "tags": [
       "generated"
     ],
@@ -483,28 +345,28 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 26,
-    "name": "Pyre 1",
+    "name": "Blaze 1",
     "width": 6,
     "height": 5,
     "rows": [
-      "G1 I1 C2 T0 I0 C0",
-      "W21 C2 I0 I1 C2 I0",
-      "I0 I1 C0 W31 C3 T0",
-      "S0 I0 .. C3 C1 C1",
-      "C1 I0 D1 X0 T3 X0"
+      "T1 -- D0 S1 I1 C2",
+      "G1 C2 D3 C3 I0 I0",
+      "I1 C0 W31 C2 W11 C3",
+      "I0 D0 T1 D2 C3 X0",
+      "T2 I1 X0 X0 I0 .."
     ],
-    "scramble": "UL",
-    "flameSpeed": 0.87,
-    "timeLimit": 40,
+    "scramble": "UU",
+    "flameSpeed": 0.83,
+    "timeLimit": 45,
     "lookahead": 3,
     "baseScore": 1800,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 2.6,
+    "fuelPerTile": 2.4,
     "pickups": [
       {
         "x": 2,
-        "y": 0,
+        "y": 1,
         "kind": "oil"
       }
     ],
@@ -515,29 +377,29 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 27,
-    "name": "Backdraft 1",
+    "name": "Wildfire 1",
     "width": 6,
     "height": 5,
     "rows": [
-      "C1 I1 C2 I0 C1 W21",
-      "S0 C2 I0 D3 X0 I0",
-      "C0 T0 W01 D2 G1 C3",
-      ".. T0 I1 T2 I1 D0",
-      "I1 C0 I1 C2 D1 D3"
+      "C0 I1 I1 I1 W11 C2",
+      "T1 C2 D0 C3 -- I0",
+      "I0 -- C0 T0 I1 G0",
+      "X0 W11 I1 I1 C2 I1",
+      "C2 D0 C2 .. S0 X0"
     ],
-    "scramble": "URR",
-    "flameSpeed": 0.88,
+    "scramble": "LU",
+    "flameSpeed": 0.84,
     "timeLimit": 45,
     "lookahead": 3,
     "baseScore": 1850,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 2.6,
+    "fuelPerTile": 2.5,
     "pickups": [
       {
         "x": 5,
         "y": 1,
-        "kind": "oil"
+        "kind": "wood"
       }
     ],
     "tags": [
@@ -547,34 +409,29 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 28,
-    "name": "Flashover 1",
+    "name": "Inferno 1",
     "width": 6,
     "height": 5,
     "rows": [
-      "D1 C0 C2 X0 C1 D0",
-      "X0 W21 G0 .. C2 T1",
-      "X0 C0 I1 S3 X0 D0",
-      "T0 C1 W31 T3 C0 X0",
-      "C2 I0 T2 T3 X0 I1"
+      "C3 T3 T2 I1 S2 I1",
+      "D0 -- -- T0 I0 --",
+      "C3 C2 G2 W21 I0 D3",
+      "-- I1 C0 C3 W01 --",
+      "I1 T2 -- -- X0 .."
     ],
-    "scramble": "ULL",
-    "flameSpeed": 0.89,
-    "timeLimit": 45,
+    "scramble": "UL",
+    "flameSpeed": 0.86,
+    "timeLimit": 40,
     "lookahead": 3,
     "baseScore": 1900,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 2.6,
+    "fuelPerTile": 2.5,
     "pickups": [
       {
-        "x": 0,
-        "y": 0,
-        "kind": "ember"
-      },
-      {
-        "x": 1,
-        "y": 4,
-        "kind": "wood"
+        "x": 2,
+        "y": 3,
+        "kind": "oil"
       }
     ],
     "tags": [
@@ -584,33 +441,28 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 29,
-    "name": "Scorch 1",
+    "name": "Torchlight 1",
     "width": 6,
     "height": 5,
     "rows": [
-      "I0 T2 W11 I1 I1 S3",
-      "T2 C1 C2 T0 C0 C1",
-      "G2 C2 X0 I1 D2 I0",
-      "C0 T1 D3 T0 C0 C1",
-      "W11 C3 D0 .. C3 C2"
+      "I0 I1 W11 I1 I1 S3",
+      "T3 .. C0 C3 X0 C1",
+      "C1 I1 G3 I0 D0 D2",
+      "I0 C1 C0 I0 D1 I1",
+      "W01 X0 X0 C0 X0 --"
     ],
-    "scramble": "LUR",
-    "flameSpeed": 0.9,
-    "timeLimit": 50,
+    "scramble": "RU",
+    "flameSpeed": 0.87,
+    "timeLimit": 40,
     "lookahead": 3,
     "baseScore": 1950,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 2.7,
+    "fuelPerTile": 2.6,
     "pickups": [
       {
-        "x": 0,
-        "y": 3,
-        "kind": "oil"
-      },
-      {
-        "x": 2,
-        "y": 3,
+        "x": 1,
+        "y": 2,
         "kind": "oil"
       }
     ],
@@ -621,24 +473,24 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 30,
-    "name": "Sear 1",
+    "name": "Pyre 1",
     "width": 6,
     "height": 5,
     "rows": [
-      "D3 T0 I1 T1 I1 C2",
-      "T1 W01 D3 D3 S1 C3",
-      ".. D1 W21 I1 C3 T1",
-      "X0 G1 C3 I0 C1 I1",
-      "C1 D2 X0 C3 I1 C1"
+      "D3 C1 I1 I1 I1 T1",
+      "C3 I0 D0 I0 S1 C3",
+      "C2 I0 C3 D0 C0 I0",
+      "I1 G0 C0 .. -- D3",
+      "I1 D2 I0 C3 T0 C0"
     ],
-    "scramble": "URR",
-    "flameSpeed": 0.91,
-    "timeLimit": 55,
+    "scramble": "UUU",
+    "flameSpeed": 0.88,
+    "timeLimit": 50,
     "lookahead": 3,
     "baseScore": 2000,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 2.7,
+    "fuelPerTile": 2.6,
     "pickups": [
       {
         "x": 0,
@@ -663,24 +515,24 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 31,
-    "name": "Char 1",
+    "name": "Backdraft 1",
     "width": 6,
     "height": 5,
     "rows": [
-      "C3 I1 C0 X0 C1 T2",
-      "D2 I0 W11 I1 S3 I0",
-      "D0 I1 G1 C2 W11 C2",
-      "I0 X0 T2 C0 X0 C3",
-      "C3 .. C1 X0 X0 C3"
+      "C3 C3 C0 -- X0 X0",
+      "-- C2 W11 I1 S3 I0",
+      "-- I1 G1 C2 W11 C2",
+      "C2 -- X0 C0 X0 C3",
+      "C3 .. C1 -- -- T3"
     ],
     "scramble": "RUR",
-    "flameSpeed": 0.92,
+    "flameSpeed": 0.89,
     "timeLimit": 45,
     "lookahead": 3,
     "baseScore": 2050,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 2.7,
+    "fuelPerTile": 2.6,
     "pickups": [
       {
         "x": 3,
@@ -695,24 +547,24 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 32,
-    "name": "Smoke Signal 1",
+    "name": "Flashover 1",
     "width": 6,
     "height": 5,
     "rows": [
-      "W31 D0 T3 C1 D2 C1",
-      ".. W11 C2 C2 C1 I0",
-      "D3 C0 I0 I1 C3 S0",
-      "D1 I0 I0 I1 I0 T0",
-      "G1 I1 C3 I1 I0 I1"
+      "W31 C1 C0 C1 C0 C1",
+      "I0 W11 C2 I1 X0 I0",
+      "-- -- I0 D3 I1 S0",
+      "C1 I1 I0 C3 T2 ..",
+      "-- G1 C3 C2 I0 --"
     ],
-    "scramble": "URR",
-    "flameSpeed": 0.93,
+    "scramble": "LLL",
+    "flameSpeed": 0.9,
     "timeLimit": 45,
     "lookahead": 3,
     "baseScore": 2100,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 2.8,
+    "fuelPerTile": 2.7,
     "pickups": [
       {
         "x": 2,
@@ -727,28 +579,38 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 33,
-    "name": "Firebreak 1",
+    "name": "Scorch 1",
     "width": 6,
     "height": 5,
     "rows": [
-      "X0 C0 D2 C1 X0 C3",
-      "G3 I0 C0 C0 C1 I1",
-      "T1 S1 I1 W31 I0 D2",
-      "C2 C1 .. T1 W01 C2",
-      "X0 X0 C0 C0 D0 D2"
+      "C1 I1 W31 T3 X0 C1",
+      "S0 C0 I0 C2 C3 D1",
+      "I1 T0 D2 -- C1 T2",
+      "C3 C3 C1 W31 .. T2",
+      "-- D1 T3 T1 G3 D2"
     ],
-    "scramble": "RRD",
-    "flameSpeed": 0.94,
-    "timeLimit": 35,
+    "scramble": "LLU",
+    "flameSpeed": 0.91,
+    "timeLimit": 45,
     "lookahead": 3,
     "baseScore": 2150,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 2.8,
+    "fuelPerTile": 2.7,
     "pickups": [
       {
-        "x": 5,
-        "y": 1,
+        "x": 2,
+        "y": 2,
+        "kind": "oil"
+      },
+      {
+        "x": 1,
+        "y": 4,
+        "kind": "oil"
+      },
+      {
+        "x": 2,
+        "y": 4,
         "kind": "wood"
       }
     ],
@@ -759,24 +621,24 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 34,
-    "name": "Flare 1",
+    "name": "Sear 1",
     "width": 6,
     "height": 5,
     "rows": [
-      "W21 X0 T2 T3 C3 C0",
-      "I0 X0 T2 T0 D1 C0",
-      "T3 I1 G3 I1 D1 I1",
-      "I1 I0 .. S2 T2 C3",
-      "I1 C2 I1 C0 W31 T3"
+      "W21 X0 T3 -- -- C0",
+      "I0 X0 D0 C0 D0 --",
+      "T3 I1 G3 C2 I0 D1",
+      "C1 I1 .. S2 C0 --",
+      "-- -- -- C0 W31 C1"
     ],
-    "scramble": "LLU",
-    "flameSpeed": 0.95,
-    "timeLimit": 50,
+    "scramble": "LUL",
+    "flameSpeed": 0.92,
+    "timeLimit": 45,
     "lookahead": 3,
     "baseScore": 2200,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 2.8,
+    "fuelPerTile": 2.7,
     "pickups": [
       {
         "x": 0,
@@ -784,14 +646,9 @@ export const GENERATED_LEVELS: LevelDef[] = [
         "kind": "wood"
       },
       {
-        "x": 4,
-        "y": 2,
-        "kind": "ember"
-      },
-      {
         "x": 5,
         "y": 2,
-        "kind": "wood"
+        "kind": "ember"
       }
     ],
     "tags": [
@@ -801,24 +658,24 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 35,
-    "name": "Combustion 1",
+    "name": "Char 1",
     "width": 6,
     "height": 5,
     "rows": [
-      "T0 C3 I0 D2 C0 S2",
-      "C2 T3 I0 .. D3 I0",
-      "C2 C0 C3 C1 C0 I0",
-      "C2 D3 X0 C0 T2 I0",
+      "X0 T3 I0 -- C0 S2",
+      "C2 X0 C0 .. -- I0",
+      "C2 C0 C3 T1 C0 I0",
+      "X0 -- -- T0 X0 I0",
       "I0 C3 G1 I1 I1 C3"
     ],
     "scramble": "DDD",
-    "flameSpeed": 0.96,
+    "flameSpeed": 0.93,
     "timeLimit": 35,
     "lookahead": 3,
     "baseScore": 2250,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 2.9,
+    "fuelPerTile": 2.8,
     "pickups": [
       {
         "x": 5,
@@ -833,24 +690,24 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 36,
-    "name": "Ignition 1",
+    "name": "Smoke Signal 1",
     "width": 6,
     "height": 5,
     "rows": [
-      "C3 C0 .. C1 C2 I1",
-      "C1 C2 C0 I1 S2 I0",
+      "C3 C0 .. T1 T2 I1",
+      "C1 X0 C0 I1 S2 I0",
       "I1 W31 C0 I0 I0 C1",
-      "C2 C2 T1 I1 W01 T0",
+      "C2 C2 D1 I1 W01 T0",
       "C0 C3 C0 I0 C3 G0"
     ],
     "scramble": "DLD",
-    "flameSpeed": 0.97,
+    "flameSpeed": 0.94,
     "timeLimit": 35,
     "lookahead": 3,
     "baseScore": 2300,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 2.9,
+    "fuelPerTile": 2.8,
     "pickups": [
       {
         "x": 5,
@@ -865,38 +722,28 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 37,
-    "name": "Heatwave 1",
+    "name": "Firebreak 1",
     "width": 6,
     "height": 5,
     "rows": [
-      "D2 C0 T0 C0 C1 C2",
-      "I0 C1 I0 I1 I0 W01",
-      "C1 I1 I1 C2 S0 C2",
-      "G0 X0 C1 W01 C0 X0",
-      "T3 T0 D2 C2 T1 .."
+      "I0 I0 G2 T0 -- I1",
+      "C1 X0 I0 D3 -- W21",
+      "X0 X0 C0 I1 I1 C3",
+      "C1 I1 C1 I1 T3 ..",
+      "C1 W11 I1 S3 -- I1"
     ],
-    "scramble": "UUU",
-    "flameSpeed": 0.98,
+    "scramble": "UUL",
+    "flameSpeed": 0.95,
     "timeLimit": 45,
     "lookahead": 3,
     "baseScore": 2350,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 2.9,
+    "fuelPerTile": 2.8,
     "pickups": [
       {
-        "x": 0,
-        "y": 0,
-        "kind": "oil"
-      },
-      {
-        "x": 0,
+        "x": 2,
         "y": 1,
-        "kind": "wood"
-      },
-      {
-        "x": 1,
-        "y": 2,
         "kind": "wood"
       }
     ],
@@ -907,29 +754,29 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 38,
-    "name": "Afterglow 1",
+    "name": "Flare 1",
     "width": 6,
     "height": 5,
     "rows": [
-      "T2 C2 W01 C1 X0 C0",
-      "X0 C1 .. C1 W21 I1",
-      "I1 I0 C2 S1 C3 I0",
-      "G1 I1 C2 I1 D3 C1",
-      "C2 I1 I0 C2 T1 C1"
+      "C1 C2 W01 C1 C1 I1",
+      "T0 C1 .. I1 W21 C1",
+      "X0 C2 X0 S1 C3 --",
+      "I1 G1 C2 I1 D3 I0",
+      "T2 T1 I0 I1 -- X0"
     ],
-    "scramble": "URRR",
-    "flameSpeed": 0.99,
+    "scramble": "URR",
+    "flameSpeed": 0.96,
     "timeLimit": 35,
     "lookahead": 3,
     "baseScore": 2400,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 3,
+    "fuelPerTile": 2.9,
     "pickups": [
       {
-        "x": 1,
+        "x": 2,
         "y": 3,
-        "kind": "wood"
+        "kind": "oil"
       },
       {
         "x": 3,
@@ -949,24 +796,24 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 39,
-    "name": "Ember 2",
+    "name": "Combustion 1",
     "width": 7,
     "height": 5,
     "rows": [
-      "C2 W11 I1 C2 I0 S1 C2",
-      "C2 C0 C3 I0 X0 X0 I0",
-      "C3 X0* C0 G0 .. C2 I0",
-      "C2 C3 T2 D0 T1 I1 W01",
-      "D2 C0 I0 C0 T3 T0 I0"
+      "C2 W11 I1 C2 C0 S1 C2",
+      "C2 X0 T3 I0 D0 D2 I0",
+      "X0 -- C0 G0 .. C2 I0",
+      "T2 C3 D2 -- D1 C1 W01",
+      "-- C0 I0 C0 D3 X0 I0"
     ],
-    "scramble": "UULD",
-    "flameSpeed": 1,
+    "scramble": "UUL",
+    "flameSpeed": 0.97,
     "timeLimit": 40,
     "lookahead": 3,
     "baseScore": 2450,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 3,
+    "fuelPerTile": 2.9,
     "pickups": [
       {
         "x": 6,
@@ -981,34 +828,29 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 40,
-    "name": "Kindling 2",
+    "name": "Ignition 1",
     "width": 7,
     "height": 5,
     "rows": [
-      "X0 I1 C2 C3 I0 D0 I1",
-      "I0 X0 I0 .. I0 G2 C3",
-      "X0 C0 D1 X0 S0 T2 C2",
-      "I0 I1 C3 C1 I0 I0 T0",
-      "C0 D0 I0 D3 C1 T2 C1"
+      "X0 G2 C0 C2 I1 C1 I0",
+      "X0 I0 C0 C1 X0 X0 --",
+      "C2 I0 D1 X0 .. I1 D1",
+      "-- I0 S1 C2 -- I0 T1",
+      "-- C0 I1 C3 -- D3 T1"
     ],
-    "scramble": "DDRD",
-    "flameSpeed": 1.01,
+    "scramble": "LLL",
+    "flameSpeed": 0.98,
     "timeLimit": 40,
     "lookahead": 3,
     "baseScore": 2500,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 3,
+    "fuelPerTile": 2.9,
     "pickups": [
       {
-        "x": 5,
-        "y": 0,
-        "kind": "oil"
-      },
-      {
-        "x": 5,
-        "y": 3,
-        "kind": "oil"
+        "x": 1,
+        "y": 2,
+        "kind": "wood"
       }
     ],
     "tags": [
@@ -1018,24 +860,24 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 41,
-    "name": "Tinder 2",
+    "name": "Heatwave 1",
     "width": 7,
     "height": 5,
     "rows": [
-      "I1 S2 C0 I1 T2 I1 G2",
-      "C3 I0 I0 C0 C2 D2 I0",
-      "D2 W01 C3 C2 C3 C1 C3",
-      "X0 W02 W02 X0 .. I0 W21",
-      "X0 D1 T3 I0 D1 C0 C3"
+      "C0 S2 D0 I0 T1 T3 G2",
+      "-- I0 I0 I0 C1 T1 I0",
+      "X0 W01 X0 C1 X0 C1 C3",
+      "T1 T0 -- C2 .. I0 W21",
+      "-- D1 I0 I1 C1 C0 C3"
     ],
     "scramble": "URRU",
-    "flameSpeed": 1.02,
+    "flameSpeed": 0.99,
     "timeLimit": 45,
     "lookahead": 3,
     "baseScore": 2550,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 3.1,
+    "fuelPerTile": 3,
     "pickups": [
       {
         "x": 6,
@@ -1050,24 +892,24 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 42,
-    "name": "Smoulder 2",
+    "name": "Afterglow 1",
     "width": 7,
     "height": 5,
     "rows": [
-      "X0 D1 W02 T1 T1 C0 C3",
-      "C3 I0 W22 I1 I0 X0 D1",
-      "S2 I1 W11 I1 X0 C2 D3",
-      "C3 .. C3 X0 W21 C0 I1",
-      "D1 C0 D1 G1 C3 I0 C2"
+      "C1 -- -- T1 -- D3 C1",
+      "C0 -- I0 C1 I1 T3 I0",
+      "S2 C3 W11 I1 X0 C2 D3",
+      "C3 .. C3 C2 W21 C0 I1",
+      "C1 D2 -- G1 C3 T2 I0"
     ],
-    "scramble": "URUR",
-    "flameSpeed": 1.03,
+    "scramble": "RRRU",
+    "flameSpeed": 1,
     "timeLimit": 45,
     "lookahead": 3,
     "baseScore": 2600,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 3.1,
+    "fuelPerTile": 3,
     "pickups": [
       {
         "x": 3,
@@ -1087,24 +929,24 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 43,
-    "name": "Flicker 2",
+    "name": "Ember 2",
     "width": 7,
     "height": 5,
     "rows": [
-      "W21 X0 W22 C3 T2 D2 G2",
-      "I0 I1 I0 I0 W21 C2 I0",
-      "I0 C3 T0 C0 C0 X0 C3",
-      "I0 C1 D1 I1 I1 I0 I0",
-      "S0 W32 X0 I0 .. T3 D0"
+      "W21 C3 C2 C0 T2 C1 G2",
+      "I0 I0 I0 I0 W21 C2 I0",
+      "I0 C1 -- -- C0 X0 C3",
+      "I0 X0 X0 C3 I0 -- I0",
+      "S0 T2 I1 X0 .. -- D0"
     ],
     "scramble": "RUUL",
-    "flameSpeed": 1.04,
+    "flameSpeed": 1.01,
     "timeLimit": 45,
     "lookahead": 3,
     "baseScore": 2650,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 3.1,
+    "fuelPerTile": 3,
     "pickups": [
       {
         "x": 6,
@@ -1129,27 +971,27 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 44,
-    "name": "Spark Trail 2",
+    "name": "Kindling 2",
     "width": 7,
     "height": 5,
     "rows": [
-      "G1 I1 I1 I1 I1 I1 W31",
-      "I1 I0 I1 C3 I1 T0 W22",
-      "I0 I1 I1 W32 C3 D3 X0",
-      "C3 X0 C3 C2 W21 C3 T3",
-      "S3 C1 T2 .. C0 I1 I1"
+      "T3 G1 I1 I1 I1 I1 W31",
+      "-- C3 I1 W22 -- I1 C3",
+      "X0 I1 X0 -- W12 T3 T3",
+      "I0 I0 C2 D3 W21 I1 T2",
+      "S3 .. X0 T3 C0 I1 I1"
     ],
-    "scramble": "RUUR",
-    "flameSpeed": 1.05,
+    "scramble": "RURR",
+    "flameSpeed": 1.02,
     "timeLimit": 45,
     "lookahead": 3,
     "baseScore": 2700,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 3.2,
+    "fuelPerTile": 3.1,
     "pickups": [
       {
-        "x": 2,
+        "x": 3,
         "y": 0,
         "kind": "wood"
       }
@@ -1161,24 +1003,24 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 45,
-    "name": "Hearth 2",
+    "name": "Tinder 2",
     "width": 7,
     "height": 5,
     "rows": [
-      "C0 T1 W02 W21 T2 I1 I1",
-      "I1 I1 G1 C3 W02 D1 I0*",
+      "C0 T1 W02 W21 D2 C1 I1",
+      "C1 C3 G1 C3 W02 -- I0*",
       "I1 D3 I1 W11 I1 I1 C2",
-      "C0 D0 I0 T0 C3 C3 I0",
-      "I0 X0 .. D1 C3 T1 S0"
+      "X0 -- C0 X0 T3 C3 I0",
+      "I0 D2 .. -- C3 D1 S0"
     ],
-    "scramble": "UURD",
-    "flameSpeed": 1.06,
-    "timeLimit": 35,
+    "scramble": "RUUR",
+    "flameSpeed": 1.03,
+    "timeLimit": 40,
     "lookahead": 3,
     "baseScore": 2750,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 3.2,
+    "fuelPerTile": 3.1,
     "pickups": [
       {
         "x": 3,
@@ -1203,29 +1045,49 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 46,
-    "name": "Wick 2",
+    "name": "Smoulder 2",
     "width": 7,
     "height": 5,
     "rows": [
-      "W11 I1 C2 I0 I0 W12 C3",
-      "C3 W02 I0 W01 T1 I1 X0",
-      "X0 .. I0 D3 C3 X0 T1",
-      "G1 I1 C3 X0 I1 T0 C3",
-      "T3 S1 I1 C2 C1 C0* X0"
+      "C0 -- -- W22 W21 C1 G3",
+      "-- T3 D1 I1 T3 C3 C0",
+      "-- D1 -- W32 D0 I0 ..",
+      "I1 C1 S3 C2 C0 D0 --",
+      "C3 C0 I1 T1 W31 I1 T2"
     ],
-    "scramble": "UURR",
-    "flameSpeed": 1.07,
-    "timeLimit": 50,
+    "scramble": "ULUL",
+    "flameSpeed": 1.04,
+    "timeLimit": 55,
     "lookahead": 3,
     "baseScore": 2800,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 3.2,
+    "fuelPerTile": 3.1,
     "pickups": [
       {
         "x": 2,
-        "y": 3,
+        "y": 1,
+        "kind": "oil"
+      },
+      {
+        "x": 3,
+        "y": 1,
         "kind": "wood"
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "kind": "wood"
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "kind": "oil"
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "kind": "oil"
       }
     ],
     "tags": [
@@ -1235,24 +1097,24 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 47,
-    "name": "Brazier 2",
+    "name": "Flicker 2",
     "width": 7,
     "height": 5,
     "rows": [
-      "W01 W02 C1 .. I0 I0 T1",
-      "W22 X0 C1 I1 C2 C0 D2",
-      "D0 I0* W01 C2 I0 C3 X0",
-      "I1 D2 C1 D2 G0 C0 T2",
-      "C1 S3 I0 C3 X0 X0* C2"
+      "W01 W02 T1 .. I0 I0 X0",
+      "W22 D0 C1 I1 C2 C0 --",
+      "-- I0* W01 C2 I0 C3 --",
+      "I1 -- C1 -- G0 C0 X0",
+      "C1 S3 I0 C3 D1 D3* T2"
     ],
     "scramble": "RDLD",
-    "flameSpeed": 1.08,
+    "flameSpeed": 1.05,
     "timeLimit": 35,
     "lookahead": 3,
     "baseScore": 2850,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 3.3,
+    "fuelPerTile": 3.2,
     "pickups": [
       {
         "x": 4,
@@ -1267,24 +1129,24 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 48,
-    "name": "Lantern 2",
+    "name": "Spark Trail 2",
     "width": 7,
     "height": 5,
     "rows": [
-      "C3 D2 W12 W22 C0 I1 W31",
-      "C0 T2 I1 G1 C2 S2 D2",
+      "C3 -- W12 W22 C0 I1 W31",
+      "C0 X0 C3 G1 C2 S2 --",
       "I0 C0 I0 C0 I0 C0 C2",
-      "C0 C3 I0 D0 I0 I1 W01",
-      "C3 .. I0 T2 I0 D2 T3"
+      "C0 C3 C0 -- I0 I1 W01",
+      "C3 .. C2 D2 I0 -- X0"
     ],
     "scramble": "RRUR",
-    "flameSpeed": 1.09,
+    "flameSpeed": 1.06,
     "timeLimit": 45,
     "lookahead": 3,
     "baseScore": 2900,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 3.3,
+    "fuelPerTile": 3.2,
     "pickups": [
       {
         "x": 4,
@@ -1299,59 +1161,44 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 49,
-    "name": "Furnace 2",
+    "name": "Hearth 2",
     "width": 7,
     "height": 5,
     "rows": [
-      "D2 D2 D0 I0 T0 C3 I1",
-      "I0 C1 C2 I1 D3 X0 C2",
-      "T0 C3 I0 W21 I0 C3 T1",
-      "G0 C1 T2 I1 X0 C1 ..",
-      "C1 S0 I0 W11 C0 X0 C2"
+      "C3 W21 T0 W31 G1 C2 C2",
+      "T3 I0 C0 I1 I1 T2 X0",
+      "I0 S0 C0 -- W12 I0 I1",
+      "X0 D3 D2 X0 T1 D0 I1",
+      "W32 C3 I0 I0 C1 -- .."
     ],
-    "scramble": "LLULL",
-    "flameSpeed": 1.1,
-    "timeLimit": 60,
+    "scramble": "ULDR",
+    "flameSpeed": 1.07,
+    "timeLimit": 65,
     "lookahead": 3,
     "baseScore": 2950,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 3.3,
+    "fuelPerTile": 3.2,
     "pickups": [
-      {
-        "x": 0,
-        "y": 0,
-        "kind": "oil"
-      },
-      {
-        "x": 1,
-        "y": 0,
-        "kind": "oil"
-      },
-      {
-        "x": 2,
-        "y": 0,
-        "kind": "ember"
-      },
-      {
-        "x": 0,
-        "y": 1,
-        "kind": "wood"
-      },
-      {
-        "x": 3,
-        "y": 1,
-        "kind": "wood"
-      },
       {
         "x": 4,
         "y": 1,
         "kind": "oil"
       },
       {
-        "x": 1,
+        "x": 5,
         "y": 2,
-        "kind": "oil"
+        "kind": "wood"
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "kind": "ember"
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "kind": "ember"
       },
       {
         "x": 2,
@@ -1366,24 +1213,24 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 50,
-    "name": "Cinder 2",
+    "name": "Wick 2",
     "width": 7,
     "height": 5,
     "rows": [
-      "I0 D0 W12 C3 W02 I0 I0",
-      "X0 X0 X0 X0 D3 T0 ..",
-      "I0 I0 D1 X0 S1 C3 W21",
-      "T0 T0 I1 G1 I1 I1 C3",
-      "I0 I0 X0 D0 I1 C1 W31"
+      "C0 -- W12 T3 W02 I0 I0",
+      "D2 -- D3 D3 -- T0 ..",
+      "I0 C2 -- -- S1 C3 W21",
+      "X0 D0 I1 G1 I1 I1 C3",
+      "C0 I0 D0 -- C3 C1 W31"
     ],
-    "scramble": "DDDLL",
-    "flameSpeed": 1.11,
+    "scramble": "DDDL",
+    "flameSpeed": 1.08,
     "timeLimit": 40,
     "lookahead": 3,
     "baseScore": 3000,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 3.4,
+    "fuelPerTile": 3.3,
     "pickups": [
       {
         "x": 5,
@@ -1398,25 +1245,25 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 51,
-    "name": "Ashfall 2",
+    "name": "Brazier 2",
     "width": 7,
     "height": 6,
     "rows": [
-      "C3 I0 I0 I1 .. D1 D3",
-      "I1 X0 I0 T3 C0 W02 C0",
-      "C1 W12 C0 W31 D3 C0 C2",
-      "D0 C1 I0 G2 I1 C1 C3",
-      "C1 I1 W31 I0 X0 D2 I0",
-      "C0 S3 C1 C3 X0 D0 T1"
+      "C3 I0 I0 I1 .. -- --",
+      "I1 -- I0 D3 C0 W02 C0",
+      "X0 W12 C0 W31 -- X0 C2",
+      "-- C1 I0 G2 I1 T1 C3",
+      "C1 I1 W31 I0 D1 -- C2",
+      "C0 S3 C1 C3 -- -- D1"
     ],
-    "scramble": "LDDRD",
-    "flameSpeed": 1.12,
-    "timeLimit": 45,
+    "scramble": "LDDR",
+    "flameSpeed": 1.09,
+    "timeLimit": 50,
     "lookahead": 2,
     "baseScore": 3050,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 3.4,
+    "fuelPerTile": 3.3,
     "pickups": [
       {
         "x": 3,
@@ -1431,40 +1278,40 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 52,
-    "name": "Blaze 2",
+    "name": "Lantern 2",
     "width": 7,
     "height": 6,
     "rows": [
-      "T3 C2 .. I0 C1 D1 I1",
-      "G2 I0 W32 I1 I1 D0 I1",
-      "C0 C3 C3 X0 C3 W21 W32",
-      "W11 C2 X0 T3 C2 I0 C1",
-      "C2 S0 C1 D1 I1 C0 I1",
-      "I0 I0 T1 C0 T3 C2 I0"
+      "C0 C2 T3 C3 -- D1 I1",
+      "-- I0 I1 C2 -- I0 X0",
+      "G1 C3 -- T3 -- W21 W02",
+      "W11 C2 C3 T1 X0 T2 C0",
+      "C2 S0 .. D1 I1 C0 I1",
+      "I0 T3 D1 C0 I1 W32 D1"
     ],
-    "scramble": "RRRDR",
-    "flameSpeed": 1.13,
-    "timeLimit": 60,
+    "scramble": "RDRRU",
+    "flameSpeed": 1.1,
+    "timeLimit": 50,
     "lookahead": 2,
     "baseScore": 3100,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 3.4,
+    "fuelPerTile": 3.3,
     "pickups": [
+      {
+        "x": 0,
+        "y": 0,
+        "kind": "wood"
+      },
       {
         "x": 5,
         "y": 0,
-        "kind": "oil"
+        "kind": "ember"
       },
       {
         "x": 6,
         "y": 0,
         "kind": "wood"
-      },
-      {
-        "x": 1,
-        "y": 2,
-        "kind": "oil"
       },
       {
         "x": 3,
@@ -1484,25 +1331,25 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 53,
-    "name": "Wildfire 2",
+    "name": "Furnace 2",
     "width": 7,
     "height": 6,
     "rows": [
-      "C0 C1 W31 W02 X0 X0 I1",
-      "C0 I0 W02 X0 C1 W31 T1",
-      "X0* I0 T0 C1 S0 T3 T0",
-      "C1 I0 D0 D1 C0* .. C1",
-      "I1 T3 I1 C2 I1 C3 D1",
-      "G1 I1 I1 C3 C2 D2 D1"
+      "C1 C1 W31 C0 C3 D0 I1",
+      "I0 X0 I0 -- C1 W31 C0",
+      "T3 I0 T3 .. S0 C0 C3",
+      "I1 I0 W22 W22 T3 C2 C0",
+      "I1 C0 I1 C2 I0 -- D1",
+      "C3 G1 I1 C3 -- D0 C3"
     ],
-    "scramble": "DDRUL",
-    "flameSpeed": 1.14,
-    "timeLimit": 60,
+    "scramble": "DDRRD",
+    "flameSpeed": 1.11,
+    "timeLimit": 50,
     "lookahead": 2,
     "baseScore": 3150,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 3.5,
+    "fuelPerTile": 3.4,
     "pickups": [
       {
         "x": 0,
@@ -1510,14 +1357,14 @@ export const GENERATED_LEVELS: LevelDef[] = [
         "kind": "wood"
       },
       {
+        "x": 2,
+        "y": 4,
+        "kind": "wood"
+      },
+      {
         "x": 6,
         "y": 4,
         "kind": "ember"
-      },
-      {
-        "x": 3,
-        "y": 5,
-        "kind": "oil"
       }
     ],
     "tags": [
@@ -1527,25 +1374,25 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 54,
-    "name": "Inferno 2",
+    "name": "Cinder 2",
     "width": 7,
     "height": 6,
     "rows": [
-      "G1 I1 I1 I1 C3 T3 I1",
-      "C2 T2 C1 W22 S2 I1 X0",
-      "C1 C0 T1 C0 I0 T3 C1",
-      "C2 I0 C3 I0 W01 D2 W02",
-      "I0 T1 C3 I0 C1 W31 C0",
-      "C0 C2 .. I0 I0 I1 I1"
+      "G1 I1 I1 I1 C3 X0 I1",
+      "C2 X0 C1 W22 S2 I1 D3",
+      "C1 C0 X0 C0 I0 D3 C1",
+      "T2 I0 C3 I0 W01 -- W02",
+      "I0 X0 C3 C2 C1 W31 X0",
+      "T0 C2 .. I0 I0 I1 I1"
     ],
     "scramble": "RRURD",
-    "flameSpeed": 1.15,
+    "flameSpeed": 1.12,
     "timeLimit": 40,
     "lookahead": 2,
     "baseScore": 3200,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 3.5,
+    "fuelPerTile": 3.4,
     "pickups": [
       {
         "x": 1,
@@ -1560,39 +1407,59 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 55,
-    "name": "Torchlight 2",
+    "name": "Ashfall 2",
     "width": 7,
     "height": 6,
     "rows": [
-      "I0 I1 C2 S2 W03 X0 C2",
-      "I0 I0 C1 I0 T0 .. W13",
-      "I0 C1 X0 W01 C1 W22 D3",
-      "T1* X0 T1 C1 I0 I0 X0",
-      "G1 I1 I1 C2 D3 W01 C3",
-      "W12 I1 I1 C3 C0 C2 I0"
+      "I1 I0 C2 S2 I0 .. T2",
+      "I1 D3 -- I0 T0 I1 T1",
+      "I0 W32 X0 W01 I0 T2 I0",
+      "-- C1 G1 I1 C3 C1 C3",
+      "T2 W12 I0 C2 C0 W01 I0",
+      "-- T3 -- D1* D2 C1 D0"
     ],
-    "scramble": "DDRUL",
-    "flameSpeed": 1.15,
-    "timeLimit": 50,
+    "scramble": "RDDDD",
+    "flameSpeed": 1.13,
+    "timeLimit": 70,
     "lookahead": 2,
     "baseScore": 3250,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 3.5,
+    "fuelPerTile": 3.4,
     "pickups": [
       {
-        "x": 1,
-        "y": 4,
+        "x": 4,
+        "y": 0,
         "kind": "wood"
       },
       {
-        "x": 2,
-        "y": 4,
+        "x": 0,
+        "y": 1,
+        "kind": "wood"
+      },
+      {
+        "x": 1,
+        "y": 1,
         "kind": "oil"
       },
       {
         "x": 4,
+        "y": 3,
+        "kind": "oil"
+      },
+      {
+        "x": 6,
         "y": 4,
+        "kind": "wood"
+      },
+      {
+        "x": 4,
+        "y": 5,
+        "kind": "ember"
+      },
+      {
+        "x": 6,
+        "y": 5,
         "kind": "oil"
       }
     ],
@@ -1603,20 +1470,20 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 56,
-    "name": "Pyre 2",
+    "name": "Blaze 2",
     "width": 7,
     "height": 6,
     "rows": [
-      "W22 I1 W23 C2 D2 X0 I1",
-      "W01 I0 C1 I1 X0 C3 T3",
-      "I0 C1 I1 W23 T1 D1 D2",
-      "C0 C3 G1 I1 I1 W32 I1",
-      "X0 C0 W11 I1 I1 S3 I0*",
-      "C2 .. D3 C2 C3 T3 C1"
+      "C0 C2 -- T2 X0 X0 T2",
+      "W22 W01 D3 .. C2 C0 C2",
+      "C2 C2 -- I1 X0 -- D3",
+      "W12 T2 C2 D0 C1 -- --",
+      "I1 D3 S1 I1 W31 C1 T1",
+      "T1 I1 D3 G1 I1 C3 C0"
     ],
-    "scramble": "RULDR",
-    "flameSpeed": 1.16,
-    "timeLimit": 40,
+    "scramble": "DRDRD",
+    "flameSpeed": 1.14,
+    "timeLimit": 65,
     "lookahead": 2,
     "baseScore": 3300,
     "initialFuel": 100,
@@ -1624,14 +1491,29 @@ export const GENERATED_LEVELS: LevelDef[] = [
     "fuelPerTile": 3.5,
     "pickups": [
       {
-        "x": 3,
-        "y": 3,
+        "x": 0,
+        "y": 4,
+        "kind": "wood"
+      },
+      {
+        "x": 1,
+        "y": 4,
         "kind": "oil"
       },
       {
-        "x": 4,
-        "y": 3,
+        "x": 1,
+        "y": 5,
+        "kind": "wood"
+      },
+      {
+        "x": 2,
+        "y": 5,
         "kind": "oil"
+      },
+      {
+        "x": 5,
+        "y": 5,
+        "kind": "wood"
       }
     ],
     "tags": [
@@ -1641,25 +1523,25 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 57,
-    "name": "Backdraft 2",
+    "name": "Wildfire 2",
     "width": 7,
     "height": 6,
     "rows": [
-      "C0 C1 W31 I0 I0 X0 ..",
-      "S1 C3 C3 I1 I0 I0* C2",
-      "C2 D1 W13 C2 C0 G3 C0",
-      "C0 X0* X0 I1 C3 I0 W22",
-      "W31 D3 C0 C3 W22 W23 C0",
-      "D3 C1 C0 D1 I0 T0 D0"
+      "I1 C1 W31 W03 T0 I1 W23",
+      "S1 C3 D0 I0 I0 C3* --",
+      "T1 I0 D1 .. G0 X0 D3",
+      "I1 I1 T0 I1 -- C3 W22",
+      "W31 C1 C0 C3 W22 I1 C0",
+      "C3 -- I0 X0* I0 I1 X0"
     ],
-    "scramble": "DDDDL",
-    "flameSpeed": 1.17,
+    "scramble": "DRDDR",
+    "flameSpeed": 1.16,
     "timeLimit": 45,
     "lookahead": 2,
     "baseScore": 3350,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 3.6,
+    "fuelPerTile": 3.5,
     "pickups": [
       {
         "x": 4,
@@ -1667,9 +1549,9 @@ export const GENERATED_LEVELS: LevelDef[] = [
         "kind": "wood"
       },
       {
-        "x": 6,
-        "y": 4,
-        "kind": "wood"
+        "x": 4,
+        "y": 5,
+        "kind": "oil"
       }
     ],
     "tags": [
@@ -1679,20 +1561,20 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 58,
-    "name": "Flashover 2",
+    "name": "Inferno 2",
     "width": 7,
     "height": 6,
     "rows": [
-      "I0 C1 I1 T3 I1 C2 W02",
-      "T1 W01 X0 W02 I0 I0 T2",
-      "I0 S2 X0 C3 C3 I0 T2*",
-      "C2 C0 I1 I1 W31 G0 C0",
-      "C2 I1 C1 I1 X0 C3 D1",
-      "I0 C2 .. C3 C3 D2 C2"
+      "I0 C1 I1 I1 T3 C2 C3",
+      "-- W01 I0 C0 I0 C0 G3",
+      "I1 S2 -- X0 T0 -- X0",
+      "X0 C0 I1 I1 W31 I0 --",
+      "D1 C2 C3 C2 C1 C2 W12",
+      ".. C2 C3 C1 W22 X0* T3"
     ],
-    "scramble": "LURRU",
-    "flameSpeed": 1.18,
-    "timeLimit": 50,
+    "scramble": "RURRU",
+    "flameSpeed": 1.17,
+    "timeLimit": 45,
     "lookahead": 2,
     "baseScore": 3400,
     "initialFuel": 100,
@@ -1705,9 +1587,9 @@ export const GENERATED_LEVELS: LevelDef[] = [
         "kind": "oil"
       },
       {
-        "x": 5,
-        "y": 2,
-        "kind": "oil"
+        "x": 3,
+        "y": 3,
+        "kind": "wood"
       }
     ],
     "tags": [
@@ -1717,19 +1599,19 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 59,
-    "name": "Scorch 2",
+    "name": "Torchlight 2",
     "width": 7,
     "height": 6,
     "rows": [
-      "I1 G3 T3 I1 W12 I1 I1",
-      "X0 X0 W21 C2 C2 I0 C3",
-      "I0 C0 W02 T2 C1 I0 C0",
-      "T0 T1 C3 T3 W13 I0 C2",
+      "I1 G3 X0 I1 W12 I1 I1",
+      "D0 D2 W21 C2 C2 I0 C3",
+      "C2 C0 W02 D2 C1 I0 C0",
+      "X0 X0 C3 X0 W13 I0 C2",
       "W23 I1 I1 I0 I1 .. C0",
-      "S1 I1 I1 W31 T1 D2 D0"
+      "S1 I1 I1 W31 D1 -- --"
     ],
     "scramble": "RUUUU",
-    "flameSpeed": 1.19,
+    "flameSpeed": 1.18,
     "timeLimit": 40,
     "lookahead": 2,
     "baseScore": 3450,
@@ -1755,25 +1637,25 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 60,
-    "name": "Sear 2",
+    "name": "Pyre 2",
     "width": 7,
     "height": 6,
     "rows": [
-      "T3 I0 I1 T1 C1 G3 W22",
-      "X0 I1 C0 W21 I0 W11 C3",
-      "I0 I0 D2 I0 W02 C2 X0",
-      "C2 W33 C1 I0 .. T2 C0",
-      "W03 C2 C3 I0 X0* T0 T1",
-      "C2 D0 C2 S0 I1 C0 C3"
+      "X0 I0 C3 X0 C1 G3 W22",
+      "-- I1 C0 W21 I0 W11 C3",
+      "I0 I0 -- I0 W02 C2 D2",
+      "C2 W33 C1 I0 .. X0 X0",
+      "W03 T2 C3 I0 D2* X0 X0",
+      "C2 -- C2 S0 I1 T0 T3"
     ],
     "scramble": "ULUUR",
-    "flameSpeed": 1.2,
+    "flameSpeed": 1.19,
     "timeLimit": 40,
     "lookahead": 2,
     "baseScore": 3500,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 3.7,
+    "fuelPerTile": 3.6,
     "pickups": [
       {
         "x": 6,
@@ -1793,19 +1675,19 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 61,
-    "name": "Char 2",
+    "name": "Backdraft 2",
     "width": 7,
     "height": 6,
     "rows": [
-      "X0 G1 I1 C2 I1 D3 D3",
-      "C2 D3 X0 I0 T1 T2 D3",
-      ".. C1 I1 C3 C3 T1 D1",
-      "C3 W01 X0 I1 T3 C0 X0",
-      "S3 I1 T3 D2 C1 W11 I1",
-      "X0 W02 C3 I1* W22 I1 C2"
+      "D0 G1 I1 C2 I1 D3 --",
+      "T2 -- D2 I0 T1 X0 --",
+      ".. C1 I1 C3 C3 D1 --",
+      "T3 W01 D2 C1 D3 T0 --",
+      "S3 I1 X0 -- T1 W11 I1",
+      "D2 W02 C3 I1* W22 C3 X0"
     ],
-    "scramble": "RURDRD",
-    "flameSpeed": 1.21,
+    "scramble": "RURDR",
+    "flameSpeed": 1.2,
     "timeLimit": 40,
     "lookahead": 2,
     "baseScore": 3550,
@@ -1841,19 +1723,19 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 62,
-    "name": "Smoke Signal 2",
+    "name": "Flashover 2",
     "width": 7,
     "height": 6,
     "rows": [
-      "X0 W23 .. I1 W11 I1 C2",
-      "C2 C1 G3 X0 I1* D1 W02",
-      "W13 I0 C1 X0 C2 X0 T3",
-      "S2 C0 W32 I0 I0* C0 C1",
-      "C0 W31 C0 T1 I1 T1* X0",
-      "D2 C2 C2 I1* I1 C2 T3*"
+      "-- W23 .. I1 W11 I1 C2",
+      "X0 C1 G3 D1 I1* -- W02",
+      "W13 I0 C1 -- C2 -- D3",
+      "S2 C0 W32 C2 I0* T0 C1",
+      "C0 W31 C0 D1 I1 X0* --",
+      "-- T2 T2 I1* I1 C2 D3*"
     ],
     "scramble": "RDDLDD",
-    "flameSpeed": 1.22,
+    "flameSpeed": 1.21,
     "timeLimit": 40,
     "lookahead": 2,
     "baseScore": 3600,
@@ -1879,25 +1761,25 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 63,
-    "name": "Firebreak 2",
+    "name": "Scorch 2",
     "width": 7,
     "height": 6,
     "rows": [
-      "W13 W12 T1 W31 D2* D2 C1",
-      "D1 I1 C1 I1 I1 I1 T2",
-      "C0 D1 X0 C1 W23 X0 C2",
-      "T3 G1 I1 I1 I1 W32 C3*",
-      "C1 C0 S1 C2 I0 I0 C1",
-      "C3 C3 C2 W01 .. T0 X0"
+      "W13 W12 T1 W31 --* -- T1",
+      "-- I1 C1 I1 I1 I1 D2",
+      "T0 -- D1 C1 W23 -- T2",
+      "X0 G1 I1 I1 I1 W32 C3",
+      "T1 T0 S1 C2 I0 I0 C1",
+      "T3 X0 C2 W01 .. X0 D3"
     ],
-    "scramble": "RRULUU",
-    "flameSpeed": 1.23,
+    "scramble": "RRULUR",
+    "flameSpeed": 1.22,
     "timeLimit": 40,
     "lookahead": 2,
     "baseScore": 3650,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 3.8,
+    "fuelPerTile": 3.7,
     "pickups": [
       {
         "x": 2,
@@ -1917,19 +1799,19 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 64,
-    "name": "Flare 2",
+    "name": "Sear 2",
     "width": 8,
     "height": 6,
     "rows": [
-      "G2 X0 W33 C1 I0 I1 I0 C0",
-      "T2 I1 C3* X0 I0 W22 C1 T0",
-      "C0 C2 I1 C0 I1 I0 X0 X0",
-      ".. C0 I1 I1 I1 C3 C1 X0",
-      "X0 W12 W31 C1 C2* S1 C2 X0",
-      "T0 I1 C1 X0 W03 W11 C3 T0"
+      "G2 D0 W33 X0 I0 I1 I0 C0",
+      "T2 C3 C3* -- C0 W22 C1 X0",
+      "C0 C2 I1 C0 I1 I0 D3 D0",
+      ".. C0 I1 I1 I1 C3 T1 --",
+      "D1 W12 W31 C1 T2* S1 C2 D1",
+      "X0 I1 C1 -- W03 W11 C3 D0"
     ],
     "scramble": "DDRURU",
-    "flameSpeed": 1.24,
+    "flameSpeed": 1.23,
     "timeLimit": 55,
     "lookahead": 2,
     "baseScore": 3700,
@@ -1955,19 +1837,19 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 65,
-    "name": "Combustion 2",
+    "name": "Char 2",
     "width": 8,
     "height": 6,
     "rows": [
-      "C1 W13 G2 C0 I1 X0 C2 D1",
-      "W11 W32 C0 I1 I1 W32 T0 C2",
-      "C2 C3 C3 .. I0 I0 I1 T2",
-      "T0 T1 W11 I1 I1 I1 C2 W03",
-      "I1 I1* C0 C1 X0* T2 I0 C2",
-      "C0 I0 T3 T3 D2 I0 S0 C3"
+      "T1 W13 G2 C0 I1 -- T2 --",
+      "W11 W32 C0 I1 I1 W32 X0 T2",
+      "T2 C3 T3 .. I0 I0 I1 D2",
+      "D0 D1 W11 I1 I1 I1 C2 W03",
+      "I1 C3* C0 C1 D2* X0 I0 C2",
+      "T0 I0 D3 X0 -- I0 S0 C3"
     ],
     "scramble": "RULLDL",
-    "flameSpeed": 1.25,
+    "flameSpeed": 1.24,
     "timeLimit": 45,
     "lookahead": 2,
     "baseScore": 3750,
@@ -1993,39 +1875,54 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 66,
-    "name": "Ignition 2",
+    "name": "Smoke Signal 2",
     "width": 8,
     "height": 6,
     "rows": [
-      "C2 I1 C0 W02 X0 T0 W22 I1",
-      "I1 X0 W33 X0 D1* .. I0 C1",
-      "T3 X0 G2 T1 I1 T2 I0 X0",
-      "T3 C2 C0 I1 I1 I1 C3 D1",
-      "I1 W31 W23 D2 S1 I1 I1 I1",
-      "C0 T0 I1 T0 W31 I1 C3 T2"
+      "W22 G1 C2 I1 D3 X0 .. I1",
+      "C0 I1 C3 C0 C0 D3 D1 I1",
+      "C0 T2 W12 W31 C1 C3 -- C2",
+      "C1 C0 I1 D0 W33 T3 C0 C1",
+      "W21 -- W33 I1 -- D2 C3 C0",
+      "C3 T3 I1 C2 -- T1 S1 I1"
     ],
-    "scramble": "URRDDD",
-    "flameSpeed": 1.26,
-    "timeLimit": 60,
+    "scramble": "LDDLLD",
+    "flameSpeed": 1.25,
+    "timeLimit": 40,
     "lookahead": 2,
     "baseScore": 3800,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 3.9,
+    "fuelPerTile": 3.8,
     "pickups": [
       {
-        "x": 4,
-        "y": 3,
-        "kind": "oil"
+        "x": 2,
+        "y": 0,
+        "kind": "wood"
       },
       {
         "x": 3,
-        "y": 4,
+        "y": 0,
+        "kind": "wood"
+      },
+      {
+        "x": 4,
+        "y": 0,
         "kind": "oil"
       },
       {
+        "x": 2,
+        "y": 1,
+        "kind": "wood"
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "kind": "ember"
+      },
+      {
         "x": 7,
-        "y": 4,
+        "y": 1,
         "kind": "wood"
       }
     ],
@@ -2036,19 +1933,19 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 67,
-    "name": "Heatwave 2",
+    "name": "Firebreak 2",
     "width": 8,
     "height": 6,
     "rows": [
-      "C0 X0 X0 C2 D1 T0 C2 W22",
-      "C0 I1 D2 D2 I0 .. W11 T2",
-      "I0 X0 I0 I0 X0 I0 W13 I0",
-      "I0 W21 T0 C1 T1 I1 D3 D0",
-      "I0 C0 C2 G0 I0 X0 T1 C2",
-      "C3 S1 C3 C3 W02 W03 T2 T2"
+      "C0 D2 D2 C2 -- X0 W13 W22",
+      "T0 I1 -- I0 C3 C0 W11 T2",
+      "D3 C2 .. C2 C2 I0 W03 I0",
+      "I0 W21 -- G1 T1 I1 D3 D0",
+      "D1 C0 C2 D3 T2 X0 C2 C3",
+      "D2 S1 C3 D2 W02 T1 D2 --"
     ],
-    "scramble": "RRDDDD",
-    "flameSpeed": 1.27,
+    "scramble": "RRDRUU",
+    "flameSpeed": 1.26,
     "timeLimit": 60,
     "lookahead": 2,
     "baseScore": 3850,
@@ -2057,28 +1954,8 @@ export const GENERATED_LEVELS: LevelDef[] = [
     "fuelPerTile": 3.9,
     "pickups": [
       {
-        "x": 3,
-        "y": 1,
-        "kind": "oil"
-      },
-      {
-        "x": 7,
-        "y": 1,
-        "kind": "oil"
-      },
-      {
-        "x": 3,
-        "y": 2,
-        "kind": "wood"
-      },
-      {
         "x": 7,
         "y": 2,
-        "kind": "wood"
-      },
-      {
-        "x": 3,
-        "y": 3,
         "kind": "wood"
       },
       {
@@ -2095,6 +1972,21 @@ export const GENERATED_LEVELS: LevelDef[] = [
         "x": 7,
         "y": 3,
         "kind": "oil"
+      },
+      {
+        "x": 1,
+        "y": 4,
+        "kind": "oil"
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "kind": "oil"
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "kind": "wood"
       }
     ],
     "tags": [
@@ -2104,19 +1996,19 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 68,
-    "name": "Afterglow 2",
+    "name": "Flare 2",
     "width": 8,
     "height": 6,
     "rows": [
-      "I0 C0* W03 I0 C2 I1 C3 D2",
-      "T1 T3 I1 D0 I1 W13 C2 X0",
-      "D3* X0 .. I1 T2 C3 I1 C3",
-      "S1 C2 I1* C1 I1 I1 C2 T2",
-      "W22 W01 I0 I0 C0 X0 G0 W21",
+      "I0 T0* W03 I0 T2 I1 T3 --",
+      "D1 X0 I1 D0 I1 W13 T2 --",
+      "--* D0 .. I1 D2 T3 C1 C3",
+      "S1 C2 I1* C1 I1 I1 C2 D2",
+      "W22 W01 I0 I0 T0 D3 G0 W21",
       "C0 T1 I1 T2 I0 C2 C3 W02"
     ],
     "scramble": "RRULLU",
-    "flameSpeed": 1.28,
+    "flameSpeed": 1.27,
     "timeLimit": 60,
     "lookahead": 2,
     "baseScore": 3900,
@@ -2152,25 +2044,25 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 69,
-    "name": "Ember 3",
+    "name": "Combustion 2",
     "width": 8,
     "height": 6,
     "rows": [
-      "T0 C2 I1 C2 I0 D3 C3 X0",
-      "T2 S0 T3 D2 C3 I0 T3 T3",
-      "C0 C2 W21 D3 W02 I1 D1 I1",
-      "I1 C0 T2 I0 C3 C1* I1 D1",
-      "D2 X0 I0 X0 D1 .. W22 D3",
+      "T0 C2 I1 T2 I0 -- T3 --",
+      "T2 S0 X0 -- C3 I0 T3 T3",
+      "C0 C2 W21 -- W02 C1 D1 I1",
+      "I1 C0 T2 C2 C3 C1* I1 D1",
+      "D2 D0 I0 -- -- .. W22 --",
       "I0 C1 D0 W11 I1 T1 I1 G3"
     ],
     "scramble": "DRUURU",
-    "flameSpeed": 1.29,
+    "flameSpeed": 1.28,
     "timeLimit": 65,
     "lookahead": 2,
     "baseScore": 3950,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 4,
+    "fuelPerTile": 3.9,
     "pickups": [
       {
         "x": 1,
@@ -2230,19 +2122,19 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 70,
-    "name": "Kindling 3",
+    "name": "Ignition 2",
     "width": 8,
     "height": 6,
     "rows": [
       "W21 D1 T3 T1 I1 I1 G3 C0",
-      "X0 .. C3 C1 I1 C0 C0 T3",
-      "I0 W13 I1 D2 T1 C1 I0* D3",
-      "S0 C3 C1 D2 X0 C1 W11 W32",
-      "I1 C2* W22 C1 C2 X0 I0 W33",
-      "X0 C3 X0 I0 C2 C1 I1 D0"
+      "X0 .. C3 C1 C1 C0 C0 X0",
+      "I0 W13 I1 -- D1 C1 I0* --",
+      "S0 X0 T1 -- -- T1 W11 W32",
+      "I1 C2* W22 C1 C2 D0 C2 W33",
+      "-- C3 X0 C2 C2 C1 I1 --"
     ],
     "scramble": "RRRRUL",
-    "flameSpeed": 1.3,
+    "flameSpeed": 1.29,
     "timeLimit": 45,
     "lookahead": 2,
     "baseScore": 4000,
@@ -2273,19 +2165,19 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 71,
-    "name": "Tinder 3",
+    "name": "Heatwave 2",
     "width": 8,
     "height": 6,
     "rows": [
-      "X0 T0 D1 C1 S2 C0 T0 I0",
-      "I1 D1* C0 W13 C0 C2 D0 W01",
-      ".. T2 I0 I1 T0* T0 X0 C3",
-      "C2 G2 D1 W23 C2 I0 T0 C1*",
-      "C3 C0 I1 I1 C2 W01 I1 C2",
-      "W12 I1 I1 I1 C3 C2 C2 W22"
+      "-- X0 -- C1 S2 T0 X0 I0",
+      "I1 --* C0 W13 C0 C2 -- W01",
+      ".. X0 I0 I1 X0* T0 -- C3",
+      "C2 G2 -- W23 C2 I0 D0 C1*",
+      "C3 C0 I1 I1 C2 W01 I1 X0",
+      "W12 I1 I1 I1 C3 T2 T2 W22"
     ],
     "scramble": "DDDRRR",
-    "flameSpeed": 1.31,
+    "flameSpeed": 1.3,
     "timeLimit": 55,
     "lookahead": 2,
     "baseScore": 4050,
@@ -2311,25 +2203,25 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 72,
-    "name": "Smoulder 3",
+    "name": "Afterglow 2",
     "width": 8,
     "height": 6,
     "rows": [
-      "D3 C2 C2 X0 W21 C1* D2 T0",
-      "C0 I1 T1 C1 C0 I1 S3 I1",
-      ".. C1 D2 C1 W23 I1 C3 C0",
-      "C1 I1 I0 C2 W22 W03 T0 T3",
-      "T2 W22 C1 C2 X0 C2 C2 I0",
-      "I1 W01 G0 C0 C3 I1* D2 X0"
+      "-- C2 C2 D3 W21 C1* -- X0",
+      "T0 I1 D1 C1 C0 I1 S3 I1",
+      ".. C1 D2 C1 W23 I1 C3 T0",
+      "T1 C1 I0 C2 W22 W03 T0 D3",
+      "X0 W22 C1 C2 X0 C2 X0 I0",
+      "I1 W01 G0 C0 C3 I1* -- --"
     ],
-    "scramble": "DRULDDR",
-    "flameSpeed": 1.32,
+    "scramble": "DDRULD",
+    "flameSpeed": 1.31,
     "timeLimit": 40,
     "lookahead": 2,
     "baseScore": 4100,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 4.1,
+    "fuelPerTile": 4,
     "pickups": [
       {
         "x": 2,
@@ -2359,19 +2251,19 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 73,
-    "name": "Flicker 3",
+    "name": "Ember 3",
     "width": 8,
     "height": 6,
     "rows": [
       "D1 I1 T3 C2 C1 T3 I0 C1",
-      "C1 I1 I1 C3 I0 T3 I1 G2",
-      "C3 .. W21 C3 C0 X0 W33 C0",
+      "C1 I1 I1 C3 I0 X0 C1 G2",
+      "C3 .. W21 T3 C0 -- W33 C0",
       "D1 I1 C0 I1 W32 S2 C1 T3",
-      "W23 I0 C1 C1 C1 I0 C0 C2",
-      "C3 I0 W22 D1 I1 C0 W31 I0"
+      "W23 I0 T1 T1 C1 I0 C0 T2",
+      "T3 I0 W22 D1 I1 C0 W31 I0"
     ],
     "scramble": "LDRRRUU",
-    "flameSpeed": 1.33,
+    "flameSpeed": 1.32,
     "timeLimit": 60,
     "lookahead": 2,
     "baseScore": 4150,
@@ -2427,19 +2319,19 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 74,
-    "name": "Spark Trail 3",
+    "name": "Kindling 3",
     "width": 8,
     "height": 6,
     "rows": [
-      "I1 X0* D2 X0 X0 I0 C1 C3",
-      "W33 D1 C1* I0 W33 X0 C1 G3",
-      "C1 T3 T2 T0* C2 X0 I0 I0",
+      "I1 --* -- D1 D3 I0 T1 C3",
+      "W33 -- C1* C0 W33 D3 C1 G3",
+      "C1 D3 X0 X0* T2 D1 I0 I0",
       "W32 I0 I0 I0 C0* C3 C0 I1",
-      "I0 T3 C1 C3* W12 C2 W21 X0*",
+      "I0 D3 C1 C3* W12 C2 W21 --*",
       "S1 I1 W31 .. C0 C0 C3 I1"
     ],
     "scramble": "RRRULDR",
-    "flameSpeed": 1.34,
+    "flameSpeed": 1.33,
     "timeLimit": 45,
     "lookahead": 2,
     "baseScore": 4200,
@@ -2465,45 +2357,45 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 75,
-    "name": "Hearth 3",
+    "name": "Tinder 3",
     "width": 8,
     "height": 6,
     "rows": [
-      "C2 C0 I0 W21 X0 D1 S1 I1",
-      "W01 C1 C1 W02 I0 I0 C2 C0",
-      "D2 W13 X0 C0 G0 C3 C1 D2",
-      "C1 W32 .. C1* T0 T2 D2 D3",
-      "I0 C0 C1 C1 C2 C0 W33 X0",
-      "T3 I1 I1 C3 I0 I1 D1 I1"
+      "C2 X0 -- W21 I0 C0 S1 I1",
+      "W01 C0 .. W02 G0 C1* C0 I0",
+      "D2 -- W23 I1 C3 W33 X0 C2",
+      "C1 W32 T1 C0 X0 -- -- T3",
+      "I0 I0 T0 C1 C2 C0 D2 T1",
+      "T3 I1 I1 C3 I0 -- D1 I1"
     ],
-    "scramble": "LDRDRUL",
-    "flameSpeed": 1.35,
-    "timeLimit": 65,
+    "scramble": "RDDRURR",
+    "flameSpeed": 1.34,
+    "timeLimit": 60,
     "lookahead": 2,
     "baseScore": 4250,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 4.2,
+    "fuelPerTile": 4.1,
     "pickups": [
       {
         "x": 0,
         "y": 2,
-        "kind": "ember"
-      },
-      {
-        "x": 0,
-        "y": 5,
         "kind": "oil"
       },
       {
         "x": 3,
-        "y": 5,
+        "y": 4,
         "kind": "wood"
+      },
+      {
+        "x": 1,
+        "y": 5,
+        "kind": "oil"
       },
       {
         "x": 6,
         "y": 5,
-        "kind": "ember"
+        "kind": "oil"
       },
       {
         "x": 7,
@@ -2518,19 +2410,19 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 76,
-    "name": "Wick 3",
+    "name": "Smoulder 3",
     "width": 8,
     "height": 6,
     "rows": [
-      "I1 D3 C1 I0 W11 W32 C1 C2",
-      "D3 C2 C1 D1 C3 W13 T2 I0",
-      "I1 C0 I1 C3 I1* G1 C3 I0",
-      "X0 X0 X0 T1 I0 W23 S2 I0",
-      "C0 T1 C0 C0 C0 D0 I0 I0",
-      "T1 I0 D0* C3 .. C1 W01 W02"
+      "I1 D3 T1 I0 W11 W32 C1 C2",
+      "-- T2 C1 -- C3 W13 T2 I0",
+      "I1 C0 I1 T3 C3* G1 C3 I0",
+      "-- -- D2 X0 I0 W23 S2 I0",
+      "C0 D1 C0 C0 C0 -- I0 I0",
+      "T1 I0 --* C3 .. T1 W01 W02"
     ],
     "scramble": "LUUUURU",
-    "flameSpeed": 1.36,
+    "flameSpeed": 1.35,
     "timeLimit": 45,
     "lookahead": 2,
     "baseScore": 4300,
@@ -2566,19 +2458,19 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 77,
-    "name": "Brazier 3",
+    "name": "Flicker 3",
     "width": 8,
     "height": 6,
     "rows": [
-      "C2 D2 I1 I0 T0 C0 C1 C2",
+      "T2 D2 I1 I0 T0 C0 C1 C2",
       "C1 I0 I1 I0 S2 C3 I0 W01",
-      "X0 C1 W32 T0 C0 I1 C3 I1",
-      "C1 T2 C0 W02 T1 T2 I0 ..",
-      "X0 T0 I1 W21 D2 W23 D0 D2",
-      "W13 G0 I1 I0 T2 C3 I0 D1"
+      "D0 C1 W32 T0 C0 I1 C3 I1",
+      "C1 T2 C0 W02 D1 T2 I0 ..",
+      "-- T0 I1 W21 -- W23 D0 --",
+      "W13 G0 I1 I0 D2 T3 I0 --"
     ],
     "scramble": "ULDRUUL",
-    "flameSpeed": 1.37,
+    "flameSpeed": 1.36,
     "timeLimit": 55,
     "lookahead": 2,
     "baseScore": 4350,
@@ -2624,25 +2516,25 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 78,
-    "name": "Lantern 3",
+    "name": "Spark Trail 3",
     "width": 8,
     "height": 6,
     "rows": [
-      "C0 C0 D0 T3 T0 W12 X0 C0",
-      "C0 C1 I1 I1 I1 I1 C2 I0",
-      "C2 I0 X0 .. X0 C1* I0 I1",
-      "C2 S0 C2 D1 I1 I1 C0 W31",
-      "I0 C3 G2 C3 C1 C1 C0 C3",
-      "W11 I1 T2 C3 W32 T2 I0 I0"
+      "I1 I1 D0 T3 C2 W32 -- X0",
+      "C0 C1 I1 I1 I1 I1 C2 X0",
+      "C1 I0 I0 .. C3 D2 I0 I0",
+      "--* S0 T2 X0 D1 I1 C0 W31",
+      "C3 I1 G2 I0 C0 I1 T1 C1",
+      "W11 I1 T2 I1 W22 D0* I0 D3"
     ],
-    "scramble": "LDRULUU",
-    "flameSpeed": 1.38,
+    "scramble": "DRURRDR",
+    "flameSpeed": 1.37,
     "timeLimit": 50,
     "lookahead": 2,
     "baseScore": 4400,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 4.3,
+    "fuelPerTile": 4.2,
     "pickups": [
       {
         "x": 2,
@@ -2660,14 +2552,9 @@ export const GENERATED_LEVELS: LevelDef[] = [
         "kind": "oil"
       },
       {
-        "x": 3,
-        "y": 3,
-        "kind": "oil"
-      },
-      {
         "x": 4,
         "y": 3,
-        "kind": "wood"
+        "kind": "oil"
       },
       {
         "x": 5,
@@ -2682,19 +2569,19 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 79,
-    "name": "Furnace 3",
+    "name": "Hearth 3",
     "width": 8,
     "height": 6,
     "rows": [
-      "D1 I1 I1 T3 I1 C2 D3* D0",
-      "C3 W11 I1 I1 S3 I0 I0 C1",
-      ".. T0 X0 I0 W03 I0 C0 C3",
-      "C2 I0 X0 W22 I0 I0 D3 X0",
+      "D1 I1 I1 T3 I1 C2 --* --",
+      "T3 W11 I1 I1 S3 I0 I0 T1",
+      ".. D0 D0 I0 W03 I0 C0 C3",
+      "C2 C0 -- W22 I0 I0 -- D1",
       "W11 C2 I1 I0 W23 G0 I0 C3",
-      "W12 C3 C2 T2 D2 D0 I1 C1"
+      "W12 C3 C2 T2 -- -- I1 C1"
     ],
     "scramble": "UURRRRR",
-    "flameSpeed": 1.39,
+    "flameSpeed": 1.38,
     "timeLimit": 65,
     "lookahead": 2,
     "baseScore": 4450,
@@ -2735,19 +2622,19 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 80,
-    "name": "Cinder 3",
+    "name": "Wick 3",
     "width": 8,
     "height": 6,
     "rows": [
-      "C0 I1 C3 C2 C2 X0 I1 I0",
-      "W21 C2 C1 T3 W32 I0 C2 T3",
-      "C0 C2 I0 W12 W31 I0 C0 D2",
-      "S1 C3 I0 I1 C2 I1 I0 X0",
-      "C1 G3 I0 X0 W13 X0 I0 I0",
-      "T0 X0 I0 W13 I0 C0 .. T3"
+      "C0 I1 C3 C2 X0 D2 I1 I0",
+      "W21 C2 C1 T3 W32 I0 C2 X0",
+      "C0 C2 I0 W12 W31 I0 C0 --",
+      "S1 C3 I0 I1 C2 C3 I0 --",
+      "C1 G3 I0 -- W13 -- I0 C2",
+      "T0 -- I0 W13 I0 C0 .. D3"
     ],
-    "scramble": "LLLLLLU",
-    "flameSpeed": 1.4,
+    "scramble": "ULLDLLL",
+    "flameSpeed": 1.39,
     "timeLimit": 55,
     "lookahead": 2,
     "baseScore": 4500,
@@ -2773,54 +2660,54 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 81,
-    "name": "Ashfall 3",
+    "name": "Brazier 3",
     "width": 8,
     "height": 6,
     "rows": [
-      "C2 W33 X0* C1 W32 C3 I0 W11",
-      "S0 C0 T3 I0 I1 D1 I0 ..",
-      "W11 I1 W32 I0 C3 X0 I0 C1",
-      "D1 I1 I1 C0 I1 I1 C3 C2",
-      "C2 I1 I0 W23 I1 C0 D0 C0",
-      "C0 I0* C2 T2 C3 C2 G2 X0"
+      "C2 C1 -- C1 W32 W23 G2 W11",
+      "S0 I0 W03 I0 X0 C1 I0 T0*",
+      "W11 I1 W32 I0 I1 D3 I0 X0",
+      "I1 C1 X0 C0 I1 I1 C3 C0",
+      "T2 C2 T2 D2 T0 -- I0 ..",
+      "-- C0 T1 I0 I1* T3 D0 T0"
     ],
-    "scramble": "LULDRRD",
-    "flameSpeed": 1.41,
+    "scramble": "DLULUUR",
+    "flameSpeed": 1.4,
     "timeLimit": 50,
     "lookahead": 2,
     "baseScore": 4550,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 4.4,
+    "fuelPerTile": 4.3,
     "pickups": [
       {
         "x": 3,
         "y": 0,
-        "kind": "wood"
-      },
-      {
-        "x": 3,
-        "y": 1,
-        "kind": "wood"
-      },
-      {
-        "x": 0,
-        "y": 3,
         "kind": "oil"
       },
       {
-        "x": 1,
-        "y": 3,
-        "kind": "wood"
+        "x": 3,
+        "y": 2,
+        "kind": "oil"
       },
       {
-        "x": 2,
-        "y": 3,
-        "kind": "wood"
+        "x": 3,
+        "y": 4,
+        "kind": "ember"
       },
       {
         "x": 6,
         "y": 4,
+        "kind": "wood"
+      },
+      {
+        "x": 3,
+        "y": 5,
+        "kind": "wood"
+      },
+      {
+        "x": 6,
+        "y": 5,
         "kind": "oil"
       }
     ],
@@ -2831,19 +2718,19 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 82,
-    "name": "Blaze 3",
+    "name": "Lantern 3",
     "width": 8,
     "height": 6,
     "rows": [
-      "D2 I0 I0 C2 T2 T3 T1 W21",
-      "I0 I0 I1* I1 W03 I0 C2 X0",
+      "D2 I0 I0 C2 T2 D3 X0 W21",
+      "I0 I0 I1* C3 W03 I0 T2 X0",
       "I0 D0 W11 C2 .. I0 C2 I0",
-      "T0 T1 D3 W02 C1 C1 S1 C3",
-      "G0 T0 I1 C1 C0 C0 I1 C3",
-      "W12 C3 C1 I0 C2 C2* T1 W23"
+      "T0 T1 D3 W02 C1 T1 S1 C3",
+      "G0 T0 I1 C1 C0 C0 C1 T3",
+      "W12 C3 C1 I0 C2 C2* X0 W23"
     ],
     "scramble": "RDDLUUL",
-    "flameSpeed": 1.42,
+    "flameSpeed": 1.41,
     "timeLimit": 60,
     "lookahead": 2,
     "baseScore": 4600,
@@ -2904,19 +2791,19 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 83,
-    "name": "Wildfire 3",
+    "name": "Furnace 3",
     "width": 8,
     "height": 6,
     "rows": [
-      ".. T1 S2 I1 I1 X0 I1 T0*",
-      "D3 C0 I0 I1 W33 C1 T3 C2",
-      "I0 C0 T2 C3 T3* I0 D0 I0",
+      ".. D1 S2 I1 I1 -- I1 X0*",
+      "-- C0 I0 I1 W33 C1 T3 C2",
+      "C2 C0 T2 C3 X0* I0 -- I0",
       "D1 I1 T3 W31 I0 I0 G1 C3",
-      "I0 T2 C0 D1 I1 W02 D1 I0",
-      "C1 W12 W31 D1 X0 I1 W33 T2"
+      "I0 X0 C0 -- I1 W02 -- I0",
+      "C1 W12 W31 -- -- C1 W33 X0"
     ],
-    "scramble": "DDDRRRDL",
-    "flameSpeed": 1.43,
+    "scramble": "DDDRRRD",
+    "flameSpeed": 1.42,
     "timeLimit": 55,
     "lookahead": 2,
     "baseScore": 4650,
@@ -2952,25 +2839,25 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 84,
-    "name": "Inferno 3",
+    "name": "Cinder 3",
     "width": 8,
     "height": 6,
     "rows": [
-      "I0 T3 W33 W11 I1 I1 W32 I0",
-      "I1 C0 D3 I0 D2 T2 C1 X0*",
-      "C3 T2 D1 G2 I0 T2 I0 X0*",
-      "C2* D1 D1 I0 I0 W33 S2 C2",
-      "T1 W12 T1 C3 T0 I1 C3 T1",
-      ".. I0 C1 W11 C3 C2 C3 D2"
+      "I0 X0 W33 W11 I1 I1 W32 I0",
+      "I1 C0 -- I0 D2 X0 C1 --*",
+      "C3 X0 -- G2 I0 D2 I0 D0*",
+      "C2* -- -- I0 I0 W33 S2 X0",
+      "D1 W12 T1 C3 T0 I1 C3 X0",
+      ".. I0 T1 W11 C3 C2 X0 --"
     ],
     "scramble": "RURRDLLL",
-    "flameSpeed": 1.44,
+    "flameSpeed": 1.43,
     "timeLimit": 55,
     "lookahead": 2,
     "baseScore": 4700,
     "initialFuel": 100,
     "maxFuel": 100,
-    "fuelPerTile": 4.5,
+    "fuelPerTile": 4.4,
     "pickups": [
       {
         "x": 4,
@@ -3005,20 +2892,20 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 85,
-    "name": "Torchlight 3",
+    "name": "Ashfall 3",
     "width": 8,
     "height": 6,
     "rows": [
-      "D3 C3 C0* D0 C1 X0 X0 I0",
-      "C2 G2 X0 C0 C0 I1 I1 S0",
-      "D3 C0 I1 I1 I1 W32 W11 T1",
-      "X0 D1 X0* C2 I0 I0 C0 I0",
-      "T3 C1 W32 .. W13 C3 I1 I0",
-      "T0 C0 W31 X0 C1 C2* W23 T2"
+      "C1 I1 -- I1 I1 C1* I0 D0",
+      "C2 C1 C3* T0 D1 X0 I0 G2",
+      "-- C3 I1 D3 C0 W12 C3 X0",
+      "W12 W31 W03 I1 I1 C3 C1 C3",
+      "-- I0 I1 -- C0 W33 T2 I0",
+      "S1 I1 W31 C2 .. T2 I0 I0"
     ],
-    "scramble": "LDLLURUU",
-    "flameSpeed": 1.45,
-    "timeLimit": 50,
+    "scramble": "RRULLUUR",
+    "flameSpeed": 1.44,
+    "timeLimit": 45,
     "lookahead": 2,
     "baseScore": 4750,
     "initialFuel": 100,
@@ -3026,19 +2913,29 @@ export const GENERATED_LEVELS: LevelDef[] = [
     "fuelPerTile": 4.5,
     "pickups": [
       {
-        "x": 0,
-        "y": 2,
-        "kind": "ember"
-      },
-      {
-        "x": 7,
-        "y": 2,
+        "x": 6,
+        "y": 0,
         "kind": "wood"
       },
       {
         "x": 7,
+        "y": 0,
+        "kind": "ember"
+      },
+      {
+        "x": 7,
         "y": 4,
-        "kind": "oil"
+        "kind": "wood"
+      },
+      {
+        "x": 6,
+        "y": 5,
+        "kind": "wood"
+      },
+      {
+        "x": 7,
+        "y": 5,
+        "kind": "wood"
       }
     ],
     "tags": [
@@ -3048,16 +2945,16 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 86,
-    "name": "Pyre 3",
+    "name": "Blaze 3",
     "width": 8,
     "height": 6,
     "rows": [
       "X0 C2 C0 C2 I0 C2 C1 X0",
       "D1 T3 I1 C3 C0 S3 C0 W32",
-      "X0 C2 W33 I0 C0 I1 X0 X0",
-      "T0 I1 C3 I0 C2 W12 W31 C0",
-      "C3 X0 .. D0 D0 T2 X0 C3",
-      "D0 D2 C1 G3 W21 I1 T1 W23"
+      "-- C2 W33 I0 C0 I1 D2 D3",
+      "X0 I1 C3 I0 C2 W12 W31 C0",
+      "C3 -- .. D0 -- T2 D1 C3",
+      "-- -- C1 G3 W21 I1 D1 W23"
     ],
     "scramble": "RRURDLDR",
     "flameSpeed": 1.46,
@@ -3106,16 +3003,16 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 87,
-    "name": "Backdraft 3",
+    "name": "Wildfire 3",
     "width": 8,
     "height": 6,
     "rows": [
-      "D3 D0 W32 I1 D3 .. C0 C3",
-      "C0 C2 C3 I1 D2 C3 T0 X0",
-      "I1 I1 D3 C0 G1 I1 X0 T1",
-      "C2 T3 C1 I1 W31 I1 X0 I0",
-      "T1 I1* X0 C2 W12 S2 X0 W01",
-      "X0 C3* C0 I1 I1 C3 C1 I1"
+      "-- -- W32 I1 -- .. C0 T3",
+      "C0 C2 C3 C1 -- T3 X0 --",
+      "I1 I1 D3 X0 G1 I1 X0 T1",
+      "C2 D3 C1 I1 W31 I1 D2 I0",
+      "X0 I1* X0 X0 W12 S2 D1 W01",
+      "D1 C3* C0 I1 I1 C3 C1 I1"
     ],
     "scramble": "RDLLLDLU",
     "flameSpeed": 1.47,
@@ -3159,16 +3056,16 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 88,
-    "name": "Flashover 3",
+    "name": "Inferno 3",
     "width": 8,
     "height": 6,
     "rows": [
-      "I1 C1 I1 T0 D3* W23 C0 W33",
-      "I1 C0 I1 C2 I1 I0* C2 ..",
-      "T3 I0 T2* W12 W31 C3 X0 C2",
-      "C3 T1 C1* C1 G3 W22 T0 C1",
+      "C1 C1 I1 X0 --* W23 T0 W33",
+      "C3 C0 I1 C2 C3 C0* C2 ..",
+      "X0 I0 X0* W12 W31 C3 -- C2",
+      "C3 X0 C1* C1 G3 W22 X0 X0",
       "I1* C0 I0 C0 T1 C3 S1 C2",
-      "C2 W11 I1 X0 X0 I1 I1 C3"
+      "T2 W11 I1 X0 X0 I1 I1 C3"
     ],
     "scramble": "LURDDLDL",
     "flameSpeed": 1.48,
@@ -3197,19 +3094,19 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 89,
-    "name": "Scorch 3",
+    "name": "Torchlight 3",
     "width": 9,
     "height": 7,
     "rows": [
-      "G2 W13 C1 W02 I0 C1 C2* I0 I1",
-      "I0 C1 I1 C1 I0 X0 X0 I1 C0",
-      "C0 I1 T3 C2 D0 C1 I1 W31 C0",
-      "I1* C1 T3 I0 W03 I0 I0 .. X0",
-      "C0 I1 D0* C0 C2 S0 C2 W22 C2",
-      "C3 T2 I0 I0* I0 D0* D2 W01 C3",
-      "X0 I1 C1 C1 C3 C1 C2 D3 I1*"
+      "-- W03 C0 W22 I0 C1 C3 C1 ..",
+      "I1 D3 D1 C0 I1 C3 C1 C2 I1",
+      "D3 S1 I1 W31 C0 D2 T0 C0 C2",
+      "W23 -- I0 C3 D0* C1 C3 D3 W01",
+      "I0* I0 T0 X0 I1 W02 G2 C2 C1",
+      "D1* I0 T1 X0 C2 X0 T2 T1 C2",
+      "X0 T3 C2 D1 X0 C0 I0 T2 T0"
     ],
-    "scramble": "URDLLDDR",
+    "scramble": "LLDDRRUL",
     "flameSpeed": 1.49,
     "timeLimit": 55,
     "lookahead": 1,
@@ -3219,29 +3116,44 @@ export const GENERATED_LEVELS: LevelDef[] = [
     "fuelPerTile": 4.6,
     "pickups": [
       {
-        "x": 4,
-        "y": 0,
-        "kind": "wood"
-      },
-      {
-        "x": 4,
+        "x": 0,
         "y": 1,
         "kind": "wood"
       },
       {
-        "x": 4,
+        "x": 1,
+        "y": 1,
+        "kind": "ember"
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "kind": "oil"
+      },
+      {
+        "x": 8,
+        "y": 1,
+        "kind": "wood"
+      },
+      {
+        "x": 0,
         "y": 2,
         "kind": "oil"
       },
       {
-        "x": 3,
-        "y": 3,
-        "kind": "wood"
+        "x": 5,
+        "y": 2,
+        "kind": "ember"
       },
       {
-        "x": 4,
-        "y": 6,
+        "x": 5,
+        "y": 3,
         "kind": "oil"
+      },
+      {
+        "x": 6,
+        "y": 6,
+        "kind": "wood"
       }
     ],
     "tags": [
@@ -3251,17 +3163,17 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 90,
-    "name": "Sear 3",
+    "name": "Pyre 3",
     "width": 9,
     "height": 7,
     "rows": [
-      "C1 I0 D1 W22 C0 C3 C1 I1 W31",
-      "T0 X0 I0* I0 D1 I1 T3 W32 X0",
-      "I1 S2 W33 I0 C3* T1 I0 C2 ..",
-      "X0 I0 D1 T0 X0 D1 C0 T2 W23",
-      "C2 W01 C0 I0 T0 D0 D2 C1 C2*",
-      "I1 C1* G2 I0 C1 T0 I0 I0 C2",
-      "X0 T0 C0 C3 I1 I1 I0 I0 C0"
+      "T1 I0 -- W22 C0 X0 C1 I1 W31",
+      "T0 -- C0* I0 D1 I1 T3 W32 --",
+      "I1 S2 W33 I0 X0* X0 I0 C2 ..",
+      "-- I0 -- T0 -- -- C0 D2 W23",
+      "C2 W01 C0 I0 D0 -- D2 C1 T2*",
+      "C3 C1* G2 I0 C1 X0 I0 C0 C2",
+      "-- X0 C0 C3 I1 C1 I0 I0 C0"
     ],
     "scramble": "DLLDLUUU",
     "flameSpeed": 1.5,
@@ -3315,21 +3227,21 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 91,
-    "name": "Char 3",
+    "name": "Backdraft 3",
     "width": 9,
     "height": 7,
     "rows": [
-      "C1 X0 I1 I1 I1 C2 C3 C0 W03",
-      "W02 D3 C0 C1 I1 C3 C0 T1 C1",
-      "C2 W12 W31 I0 I1 C1 W31 X0 C1",
-      "I0 C1 G1 C3 T3* S0 D1 X0 C1",
-      "C2 I0* C3 D1 D1* I0 X0 X0 X0",
-      "D2 I1 C1 C0* .. C1 D1* C2 T0",
-      "I1 T3 I0 C2 C1 I0 W33 X0 C1"
+      "C2 I0 I1 C3 -- W12 C2 I1 C0",
+      "I1* T2 C3 C3 C3 -- I0 C1 G3",
+      "D3 W21 I0 I0 C2 -- I0 C0 C2",
+      "-- I0 D0* W21 D1 I1 T3 I1 C3",
+      "S1 C3 -- I0 T3 T1 I1 C2 I0",
+      "-- D2 C0 W02 C3* I1 -- C2* I0",
+      "W33 .. C0 I1 W23 -- C3 I1 D0"
     ],
-    "scramble": "DLLUURUU",
+    "scramble": "URDRULUR",
     "flameSpeed": 1.51,
-    "timeLimit": 50,
+    "timeLimit": 55,
     "lookahead": 1,
     "baseScore": 5050,
     "initialFuel": 100,
@@ -3337,14 +3249,44 @@ export const GENERATED_LEVELS: LevelDef[] = [
     "fuelPerTile": 4.7,
     "pickups": [
       {
-        "x": 2,
+        "x": 6,
         "y": 0,
+        "kind": "oil"
+      },
+      {
+        "x": 0,
+        "y": 2,
+        "kind": "oil"
+      },
+      {
+        "x": 6,
+        "y": 2,
         "kind": "wood"
       },
       {
-        "x": 3,
-        "y": 2,
+        "x": 4,
+        "y": 3,
+        "kind": "oil"
+      },
+      {
+        "x": 5,
+        "y": 3,
         "kind": "wood"
+      },
+      {
+        "x": 8,
+        "y": 4,
+        "kind": "wood"
+      },
+      {
+        "x": 8,
+        "y": 5,
+        "kind": "wood"
+      },
+      {
+        "x": 8,
+        "y": 6,
+        "kind": "ember"
       }
     ],
     "tags": [
@@ -3354,21 +3296,21 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 92,
-    "name": "Smoke Signal 3",
+    "name": "Flashover 3",
     "width": 9,
     "height": 7,
     "rows": [
-      "W21 I1* I1 C1 C2 S2 C1 T0* X0",
-      "C3 D2 .. X0 I0 I0 I1 C2 W12",
-      "I1 D1 W03 X0 D0 X0 D1* I1 T3",
-      "C2 C2 C3 I1 T1 I0 I1 G1 I1",
-      "I0 X0 D1 D3 C3 W01 X0 C2 W22",
-      "I0 X0 C0 C1 I0 T1 I0 W33 X0",
-      "C3 I1 C0 X0 X0 D1 I1 I1 C0"
+      "C2 I1 I1 D3 -- T1 S1 C2 C1",
+      "W02 X0 C1 T0 I1 T1 W23 I0 I0",
+      "C1 T0 -- D3 -- C0 I1 W01 T2",
+      "X0 C3 I1 I1 --* C2 G1 C2 T2",
+      "T0 -- C3 .. X0 -- W22 C0 C3",
+      "W23 X0 -- T2* I1 X0 X0 I1 D2",
+      "C1 -- W11 I1 X0 I1 C3 C3 I0"
     ],
-    "scramble": "DDDLDLDR",
+    "scramble": "RRUUURDR",
     "flameSpeed": 1.52,
-    "timeLimit": 45,
+    "timeLimit": 55,
     "lookahead": 1,
     "baseScore": 5100,
     "initialFuel": 100,
@@ -3376,27 +3318,37 @@ export const GENERATED_LEVELS: LevelDef[] = [
     "fuelPerTile": 4.7,
     "pickups": [
       {
-        "x": 0,
-        "y": 1,
+        "x": 1,
+        "y": 0,
         "kind": "wood"
       },
       {
-        "x": 5,
+        "x": 2,
+        "y": 0,
+        "kind": "wood"
+      },
+      {
+        "x": 3,
+        "y": 0,
+        "kind": "ember"
+      },
+      {
+        "x": 8,
         "y": 3,
-        "kind": "wood"
-      },
-      {
-        "x": 5,
-        "y": 6,
         "kind": "oil"
       },
       {
-        "x": 6,
-        "y": 6,
+        "x": 8,
+        "y": 4,
         "kind": "wood"
       },
       {
-        "x": 7,
+        "x": 8,
+        "y": 5,
+        "kind": "oil"
+      },
+      {
+        "x": 8,
         "y": 6,
         "kind": "wood"
       }
@@ -3408,17 +3360,17 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 93,
-    "name": "Firebreak 3",
+    "name": "Scorch 3",
     "width": 9,
     "height": 7,
     "rows": [
-      "W21 C2 D1 I1 X0* D1 X0 I0 C3*",
-      "T0 W22 T1 C1* C1 C2* X0 C2 D3",
-      "T2 I0 X0 D3 D0 I0 I1 T3 I1",
-      "C3 I0 C0 T2 C0 W13 T3 I1 S1",
-      "C1 C3 W13 I1 C2 I1 W21 I0 I1",
-      "I0 I1 I1 D1 I1 I1 C0 I1 W32",
-      "C0 G3 D1 .. I0 D2 D1 I1 I1"
+      "W21 C2 -- I1 D0* -- -- C0 T3*",
+      "T0 W22 D1 X0* C1 T2* D3 T2 --",
+      "T2 I0 -- -- -- I0 I1 T3 I1",
+      "C3 I0 T0 X0 C0 W13 T3 I1 S1",
+      "C1 C3 W13 I1 T2 I1 W21 I0 I1",
+      "I0 I1 C1 D1 I1 I1 C0 I1 W32",
+      "C0 G3 -- .. I0 -- D1 I1 I1"
     ],
     "scramble": "URRRUULD",
     "flameSpeed": 1.53,
@@ -3477,17 +3429,17 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 94,
-    "name": "Flare 3",
+    "name": "Sear 3",
     "width": 9,
     "height": 7,
     "rows": [
-      "X0 I0 C0 C2 I0 W03 S2 I1* C1",
-      "C1 X0 I1 I1 C3 W11 C3 T3 I1",
-      "T2 X0 C0 D1 I0 T2 C1 I0 C3",
-      "I0 I0 W22 C0 I0 C3 C3 W23 T2",
-      "C0 T3 C3 C0 D0 X0 C2 I1 I0",
-      "W12 W31 .. X0 C3 D1 I1 C3 C0*",
-      "C1 I0 D3 T2 G2 T0 D3 I1 D3"
+      "-- I0 C0 T2 I0 W03 S2 I1* T1",
+      "C1 X0 I1 I1 C3 W11 C3 X0 I1",
+      "T2 -- C0 -- I0 T2 C1 I0 C3",
+      "I0 I0 W22 X0 I0 X0 C3 W23 D2",
+      "C0 T3 C3 C0 D0 -- C2 I1 I0",
+      "W12 W31 .. D0 T3 -- I1 T3 T0*",
+      "C1 I0 -- X0 G2 X0 -- I1 --"
     ],
     "scramble": "RDLLLURD",
     "flameSpeed": 1.54,
@@ -3531,17 +3483,17 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 95,
-    "name": "Combustion 3",
+    "name": "Char 3",
     "width": 9,
     "height": 7,
     "rows": [
-      "W33 D1 I0 I0 C0 C2 X0 X0 I0",
-      "I1 .. C1 T3 I1 C2 C3 C2 S0",
-      "W32 C0* I0 C2 I0 I0 C0 C1 W11",
-      "I0 C3 T2 T1 D0 I0 C0 X0 X0",
-      "C0 W13 W02 D1 D1 G0 C2 I1 W21",
-      "C1 X0 D3* I0 I1 C2* I0 X0 I0",
-      "I1 X0 T1 I1* I1* D0 I0 T1 I0"
+      "W33 -- I0 I0 C0 C2 -- D2 I0",
+      "I1 .. C1 T3 I1 C2 T3 C2 S0",
+      "W32 C0* I0 C2 C2 I0 C0 C1 W11",
+      "I0 C3 T2 X0 -- I0 T0 -- D2",
+      "C0 W13 W02 -- -- G0 T2 I1 W21",
+      "T1 -- --* I0 I1 C2* I0 -- I0",
+      "I1 D2 X0 I1* C3* -- I0 X0 I0"
     ],
     "scramble": "LDDRRRRUU",
     "flameSpeed": 1.55,
@@ -3570,17 +3522,17 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 96,
-    "name": "Ignition 3",
+    "name": "Smoke Signal 3",
     "width": 9,
     "height": 7,
     "rows": [
-      "W33 T2 W02 C0 T1 C2 D3 W01 I1",
-      "I0 C1 I0 G1 X0 C3 C1 T2 I1",
-      "I1 I0 X0 I1 C1 C1 X0 W31 D1",
-      "T0 C3 I1 D2 I0 S0 X0 D0 D1",
-      "W13 .. I0 I0 I0 I1 I1 C2 T0",
-      "I0 D1* C3 T2 C2 D0 I1 C1 W32",
-      "C0 T1 C1 C2 C2 X0 I0 T2 C0*"
+      "W33 D2 W02 C0 T1 C2 -- W01 I1",
+      "I0 C1 I0 G1 X0 C3 C1 D2 I1",
+      "I1 I0 -- I1 C1 C1 X0 W31 --",
+      "X0 C3 I1 -- I0 S0 D3 -- --",
+      "W13 .. I0 I0 I0 I1 I1 C2 X0",
+      "I0 --* C3 D2 C2 -- I1 C1 W32",
+      "C0 D1 C1 C2 C2 -- I0 T2 X0*"
     ],
     "scramble": "LDDRRRRRR",
     "flameSpeed": 1.56,
@@ -3609,17 +3561,17 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 97,
-    "name": "Heatwave 3",
+    "name": "Firebreak 3",
     "width": 9,
     "height": 7,
     "rows": [
-      "C0 T3 X0 T1 T3 I1 I1 W32 T3",
-      "C0 D2 T0 I1 X0 C3 I0 C3 T0",
-      "C1 I0 D3 I0* C3 I1 D3 C0 C1",
-      "C3 I0 I0 X0 W22 I0 I0* .. X0",
-      "I0 C1 C2 D3 W01 W13 C0 C1 D3",
-      "T1 G0 I0 T1 T0 S1 C2 D0 I0",
-      "C1 I1 C3 C2 X0 I0 W01 W23 T2"
+      "C0 T3 X0 T1 T3 I1 I1 W32 X0",
+      "T0 D2 D0 C3 D0 C3 I0 C3 T0",
+      "T1 I0 -- I0* C3 C1 -- X0 C1",
+      "C3 I0 I0 -- W22 C2 I0* .. D2",
+      "I0 C1 C2 D3 W01 W13 C0 C1 --",
+      "D1 G0 I0 T1 X0 S1 C2 -- I0",
+      "C1 I1 C3 C2 -- C0 W01 W23 X0"
     ],
     "scramble": "RULURULDD",
     "flameSpeed": 1.57,
@@ -3668,19 +3620,19 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 98,
-    "name": "Afterglow 3",
+    "name": "Flare 3",
     "width": 9,
     "height": 7,
     "rows": [
-      "X0 T3 C3 X0 T2 C1 C3 I1 W33",
-      "I0* X0 D0 C2 C3 X0 T0 C3 T3",
+      "D3 X0 C3 D1 X0 C1 C3 I1 W33",
+      "I0* -- -- X0 X0 -- D0 X0 D3",
       "T1 I1 I1 C2 W22 I0 I0 I1 C1",
-      "I1 D2* C2 X0 I0 I1 C0* I0 I0",
-      "T3 C3 D3 G0 X0 W21 X0 W23 I0",
-      "D3 C1* S2 C2 I0 I0 T0 T2 W02",
-      "D1 .. C0 W31 C0 C3 X0 X0 D1"
+      "I1 --* T2 X0 I0 I1 C0* C2 I0",
+      "D3 C3 -- G0 X0 W21 -- W23 I0",
+      "-- C1* S2 T2 I0 I0 D0 X0 W02",
+      "-- .. C0 W31 C0 C3 -- -- --"
     ],
-    "scramble": "LUURRURRD",
+    "scramble": "LUUUURUUL",
     "flameSpeed": 1.58,
     "timeLimit": 50,
     "lookahead": 1,
@@ -3707,21 +3659,21 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 99,
-    "name": "Ember 4",
+    "name": "Combustion 3",
     "width": 9,
     "height": 7,
     "rows": [
-      "I1* C1 S3 I0 C0 D0 X0 X0 T1",
-      "T3 T0 T2* I0 I1 C3* C3 T0 I0",
-      "T3 W01 X0 T3* C3 I1 .. X0 C1",
-      "C3 C1 C2 I1 C0 W33 C0 C0 D0",
-      "T3 W02 I0 I1 T0 W03 X0 C1 C0",
-      "C2 I1 I0 X0 W12 W31 X0 X0 I1",
-      "D1 I1 C0 I1 I1 X0 I1 I1 G3"
+      "I0 D0 C3* .. I0 T3 D1 C0 C2",
+      "C1* C1 C3 -- C0 C2 --* --* C0*",
+      "I0 W23 C3 C1 C1 S3 C1* I1 C1",
+      "W22 C3* W11 I1 C3 W22 C2 I0 X0",
+      "I0 D0 T1 C1 I1 C3 C2 D3 X0",
+      "C3 C0 W03 W01 C1 I1 T3 I1 I1",
+      "T1 I1 -- I1* G0 C3 C3 D3* C0"
     ],
-    "scramble": "LDLDRRDDR",
+    "scramble": "RDLLDDDRU",
     "flameSpeed": 1.59,
-    "timeLimit": 45,
+    "timeLimit": 50,
     "lookahead": 1,
     "baseScore": 5450,
     "initialFuel": 100,
@@ -3729,23 +3681,13 @@ export const GENERATED_LEVELS: LevelDef[] = [
     "fuelPerTile": 5,
     "pickups": [
       {
-        "x": 2,
-        "y": 3,
-        "kind": "oil"
-      },
-      {
-        "x": 0,
-        "y": 6,
-        "kind": "ember"
-      },
-      {
-        "x": 1,
-        "y": 6,
+        "x": 3,
+        "y": 4,
         "kind": "wood"
       },
       {
-        "x": 4,
-        "y": 6,
+        "x": 0,
+        "y": 5,
         "kind": "wood"
       }
     ],
@@ -3756,17 +3698,17 @@ export const GENERATED_LEVELS: LevelDef[] = [
   },
   {
     "id": 100,
-    "name": "Kindling 4",
+    "name": "Ignition 3",
     "width": 9,
     "height": 7,
     "rows": [
-      "T3 W11 W32 D0 T3 C1 I1 I1 C3",
-      "X0 C0 I1 C1 T1 I0 X0* C2 G2",
-      "W03 T0* C1 C1 I1 I0 C3 C2 I0",
-      "C2 W03 C1 X0 C2* W02 X0 C0 I0",
-      "I0 C2 C3 T2 C2 D3 C1 S3 I0",
-      "I0 I0 T2 I0 C3 C2 W01 X0 X0",
-      "I0 D3 C2 C2 I0 .. I0* I0 T2"
+      "D3 W11 W32 -- X0 C1 I1 I1 C3",
+      "D2 C0 C3 C1 X0 I0 D0* C2 G2",
+      "W03 X0* C1 C1 I1 I0 C3 T2 I0",
+      "C2 W03 T1 D2 C2* W02 -- T0 I0",
+      "C2 C2 X0 D2 C2 -- C1 S3 I0",
+      "C0 C2 X0 C2 C3 T2 W01 D1 X0",
+      "I0 -- C2 C2 C2 .. C0* I0 T2"
     ],
     "scramble": "LUURUUUUR",
     "flameSpeed": 1.6,
