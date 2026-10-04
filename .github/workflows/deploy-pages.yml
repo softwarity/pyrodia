@@ -1,9 +1,12 @@
 name: Deploy to GitHub Pages
 
 on:
-  # Deploys from any branch: the most recent push wins (one Pages site per repo).
+  # Automatic deploy on main only.
   push:
-    branches: ['**']
+    branches: [main]
+  # Manual deploy from any branch or tag: Actions tab > "Deploy to GitHub Pages" >
+  # "Run workflow" and pick the ref. (The github-pages environment must allow
+  # that ref: Settings > Environments > github-pages > Deployment branches and tags.)
   workflow_dispatch:
 
 permissions:

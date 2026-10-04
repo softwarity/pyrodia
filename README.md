@@ -31,10 +31,12 @@ game with `?debug=1`.
 
 ### Deploying to GitHub Pages
 
-`.github/workflows/deploy-pages.yml` builds the game and deploys `dist/` to GitHub Pages on
-every push to **any branch** (the latest push wins, there is one Pages site per repository),
-or manually from the Actions tab. One-time setup in the repository:
-**Settings → Pages → Build and deployment → Source: GitHub Actions**. The Vite `base` is
+`.github/workflows/deploy-pages.yml` builds the game and deploys `dist/` to GitHub Pages
+automatically on every push to `main`. It can also be run manually from the Actions tab
+(*Deploy to GitHub Pages → Run workflow*) on **any branch or tag**. One-time setup in the
+repository: **Settings → Pages → Build and deployment → Source: GitHub Actions**, and to allow
+manual deploys from other refs, **Settings → Environments → github-pages → Deployment
+branches and tags → No restriction** (or add a pattern such as `claude/*` and `v*`). The Vite `base` is
 relative (`./`) so the build works from any sub-path such as `https://<user>.github.io/pyrodia/`.
 
 ---
