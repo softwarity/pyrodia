@@ -214,6 +214,21 @@ describe('simulation', () => {
     expect(session.slide(1, 1)).toBe(false);
   });
 
+  it('fast-forward multiplies the flame speed without changing fuel per tile', () => {
+    const session = new LevelSession(LEVELS[0]);
+    session.start();
+    const base = session.flame.speed;
+    session.setFastForwardHeld(true);
+    expect(session.flame.speed).toBeCloseTo(base * 3);
+    expect(session.fastForward).toBe(true);
+    session.setFastForwardHeld(false);
+    expect(session.flame.speed).toBeCloseTo(base);
+    session.toggleFastForwardLock();
+    expect(session.fastForward).toBe(true);
+    session.toggleFastForwardLock();
+    expect(session.fastForward).toBe(false);
+  });
+
   it('the flame dies when fuel runs out', () => {
     const def = { ...LEVELS[0], initialFuel: 2, fuelPerTile: 2, pickups: [] };
     const session = new LevelSession(def);

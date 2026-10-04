@@ -843,7 +843,7 @@ export class CanvasRenderer {
 
     // embers trail
     this.emberTimer += dt;
-    if ((f.status === 'moving' || f.status === 'falling') && this.emberTimer > 0.04) {
+    if ((f.status === 'moving' || f.status === 'falling') && this.emberTimer > (session.fastForward ? 0.015 : 0.04)) {
       this.emberTimer = 0;
       this.particles.spawn({
         x: f.wx + (Math.random() - 0.5) * 0.15,
@@ -996,6 +996,11 @@ export class CanvasRenderer {
     } else {
       ctx.fillStyle = ratio < 0.25 ? THEME.timeBarLow : THEME.hudText;
       ctx.fillText(`${session.timeRemaining.toFixed(1)}s`, w / 2, row2);
+      if (session.fastForward) {
+        ctx.fillStyle = `rgba(255, 213, 74, ${0.6 + 0.4 * Math.sin(this.time * 12)})`;
+        ctx.font = font(800, fontSize * 0.7);
+        ctx.fillText('⏩ FAST', w / 2 + fontSize * 3.2, row2);
+      }
     }
 
     ctx.textAlign = 'right';

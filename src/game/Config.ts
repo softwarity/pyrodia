@@ -10,6 +10,8 @@ export const CONFIG = {
   autoStartDelay: 0,
   /** Seconds the death screen stays before the level restarts. */
   deathDelay: 1.9,
+  /** Flame speed multiplier while the player holds the fast-forward control (Blodia's "speed up" button). */
+  fastForwardMultiplier: 3,
   /** Fixed simulation step (seconds) for deterministic movement. */
   simStep: 1 / 120,
   /** Slide animation duration in seconds (visual only). */

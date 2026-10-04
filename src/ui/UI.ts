@@ -411,6 +411,19 @@ export class UI {
     this.hintEl.style.display = 'none';
     g.appendChild(this.hintEl);
     const boosts = el('div', 'boosts');
+    const ff = el('button', 'ff-btn', '<b>⏩ FAST</b><small>hold · or tap the hearth</small>');
+    ff.setAttribute('aria-label', 'Speed up the flame');
+    const hold = (on: boolean) => {
+      this.game.setFastForward(on);
+      ff.classList.toggle('on', on);
+    };
+    ff.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      this.game.audio.unlock();
+      hold(true);
+    });
+    for (const evt of ['pointerup', 'pointercancel', 'pointerleave']) ff.addEventListener(evt, () => hold(false));
+    ff.addEventListener('contextmenu', (e) => e.preventDefault());
     for (const use of EMBER_USES) {
       const b = el('button', 'boost-btn', `<b>${use.description}</b><small>${use.cost} ✦ embers</small>`);
       b.dataset.cost = String(use.cost);
@@ -420,6 +433,7 @@ export class UI {
         this.game.useBoost(use.id);
       });
       boosts.appendChild(b);
+      if (boosts.childElementCount === 1) boosts.appendChild(ff);
     }
     g.appendChild(boosts);
     this.ingame = g;

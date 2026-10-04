@@ -128,6 +128,10 @@ export class Game {
     return this.progress.embers;
   }
 
+  setFastForward(on: boolean): void {
+    this.session?.setFastForwardHeld(on && this.state === 'PLAYING');
+  }
+
   private createSession(): void {
     const def = this.currentLevel;
     const session = new LevelSession(def, this.isDebugLevel ? [] : this.progress.collectedPickups(def.id));

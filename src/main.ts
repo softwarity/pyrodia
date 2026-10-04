@@ -38,6 +38,10 @@ game.events.on('levelLoaded', () => {
   s.events.on('started', () => audio.ready());
   s.events.on('enterTile', () => audio.flameMove());
   s.events.on('bounce', () => audio.flameBounce());
+  s.events.on('fastForward', ({ on }) => {
+    if (on) audio.buttonClick();
+    document.querySelector('.ff-btn')?.classList.toggle('on', on);
+  });
   s.events.on('warp', ({ from, to }) => {
     audio.warp();
     renderer.particles.burst(from.x + 0.5, from.y + 0.5, 12, ['#4fd1ff', '#ffffff'], 1.2, 0.06, 0, 0.5);
@@ -112,6 +116,11 @@ new PointerInput(canvas, {
 });
 
 window.addEventListener('keydown', (e) => {
+  if (e.key === ' ' || e.key === 'Shift') {
+    if (e.key === ' ') e.preventDefault();
+    game.setFastForward(true);
+    return;
+  }
   if (e.key === 'p' || e.key === 'P' || e.key === 'Escape') {
     if (game.state === 'PLAYING' || game.state === 'PAUSED') game.togglePause();
   } else if ((e.key === 'r' || e.key === 'R') && game.state === 'PLAYING') {
@@ -120,6 +129,11 @@ window.addEventListener('keydown', (e) => {
     debugPanel.toggle();
   }
 });
+
+window.addEventListener('keyup', (e) => {
+  if (e.key === ' ' || e.key === 'Shift') game.setFastForward(false);
+});
+window.addEventListener('blur', () => game.setFastForward(false));
 
 document.addEventListener('visibilitychange', () => {
   if (document.hidden && game.state === 'PLAYING') game.pause();

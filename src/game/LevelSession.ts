@@ -28,6 +28,7 @@ export interface SessionEvents {
   warp: { from: Cell; to: Cell };
   lowFuel: undefined;
   boost: { id: EmberUseId };
+  fastForward: { on: boolean };
 }
 
 /** Visual slide animation (not part of the simulation). */
@@ -74,6 +75,10 @@ export class LevelSession {
   private dangerWarned = false;
   private lowFuelWarned = false;
   private speedMultiplier = 1;
+  /** Held fast-forward (button / key). */
+  private ffHeld = false;
+  /** Sticky fast-forward (toggled by tapping the hearth). */
+  private ffLocked = false;
 
   /** The primary flame (levels have exactly one for now). */
   get flame(): Flame {
@@ -174,7 +179,30 @@ export class LevelSession {
 
   setSpeedMultiplier(m: number): void {
     this.speedMultiplier = m;
-    this.flame.speed = this.def.flameSpeed * m;
+    this.applySpeed();
+  }
+
+  get fastForward(): boolean {
+    return this.ffHeld || this.ffLocked;
+  }
+
+  /** Hold-to-speed-up control. */
+  setFastForwardHeld(on: boolean): void {
+    if (this.ffHeld === on) return;
+    this.ffHeld = on;
+    this.applySpeed();
+    this.events.emit('fastForward', { on: this.fastForward });
+  }
+
+  /** Sticky speed-up, toggled by tapping the hearth. */
+  toggleFastForwardLock(): void {
+    this.ffLocked = !this.ffLocked;
+    this.applySpeed();
+    this.events.emit('fastForward', { on: this.fastForward });
+  }
+
+  private applySpeed(): void {
+    this.flame.speed = this.def.flameSpeed * this.speedMultiplier * (this.fastForward ? CONFIG.fastForwardMultiplier : 1);
   }
 
   get speedMultiplierValue(): number {
@@ -202,6 +230,12 @@ export class LevelSession {
     if (this.phase === 'ready' && (tile.kind === 'source' || this.flame.occupies(x, y))) {
       // tapping the flame releases it without moving anything
       this.start();
+      return false;
+    }
+    if (tile.kind === 'goal') {
+      // tapping the hearth toggles fast-forward (Blodia's speed-up button)
+      if (this.phase === 'ready') this.start();
+      this.toggleFastForwardLock();
       return false;
     }
     if (tile.locked) {
