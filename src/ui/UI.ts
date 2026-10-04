@@ -88,11 +88,6 @@ export class UI {
         this.bannerEl = null;
       }
     }
-    const s = this.game.session;
-    if (this.ingame && s) {
-      const ready = this.ingame.querySelector<HTMLElement>('.ready');
-      if (ready) ready.style.display = s.phase === 'ready' && this.game.state === 'PLAYING' ? '' : 'none';
-    }
   }
 
   private refreshBoostButtons(): void {
@@ -412,8 +407,6 @@ export class UI {
       this.game.pause();
     });
     g.appendChild(pause);
-    const ready = el('div', 'banner ready', 'READY<small>study the board · your first slide (or a tap on the flame) starts the clock</small>');
-    g.appendChild(ready);
     this.hintEl = el('div', 'hint');
     this.hintEl.style.display = 'none';
     g.appendChild(this.hintEl);

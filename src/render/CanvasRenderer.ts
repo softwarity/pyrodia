@@ -987,8 +987,16 @@ export class CanvasRenderer {
     ctx.textAlign = 'center';
     ctx.font = font(700, fontSize);
     const ratio = Math.max(0, Math.min(1, session.timeRemaining / session.def.timeLimit));
-    ctx.fillStyle = ratio < 0.25 ? THEME.timeBarLow : THEME.hudText;
-    ctx.fillText(`${session.timeRemaining.toFixed(1)}s`, w / 2, row2);
+    if (session.phase === 'ready') {
+      // the clock only starts with the player's first move
+      const pulse = 0.65 + 0.35 * Math.sin(this.time * 5);
+      ctx.fillStyle = `rgba(255, 213, 74, ${pulse})`;
+      ctx.font = font(800, fontSize * 0.9);
+      ctx.fillText(w < 520 ? 'TAP TO START' : 'READY · SLIDE A TILE OR TAP THE FLAME', w / 2, row2);
+    } else {
+      ctx.fillStyle = ratio < 0.25 ? THEME.timeBarLow : THEME.hudText;
+      ctx.fillText(`${session.timeRemaining.toFixed(1)}s`, w / 2, row2);
+    }
 
     ctx.textAlign = 'right';
     ctx.fillStyle = THEME.hudText;
