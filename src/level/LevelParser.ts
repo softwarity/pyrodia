@@ -6,6 +6,8 @@ import type { LevelDef, ParsedLevel } from './LevelDef';
 export function parseToken(token: string): Tile {
   const t = token.trim();
   if (t === '..' || t === '.') return makeTile('empty');
+  const wm = /^W([0-3])([1-9])(\*?)$/.exec(t);
+  if (wm) return makeTile('warp', parseInt(wm[1], 10), wm[3] === '*', parseInt(wm[2], 10));
   const m = /^([ICTXDSG])([0-3])(\*?)$/.exec(t);
   if (!m) throw new Error(`Bad tile token "${token}"`);
   const kind = CODE_KINDS[m[1]];
@@ -15,10 +17,11 @@ export function parseToken(token: string): Tile {
 export function tileToToken(tile: Tile): string {
   if (tile.kind === 'empty') return '..';
   const lockedMark = tile.locked && tile.kind !== 'source' && tile.kind !== 'goal' ? '*' : '';
+  if (tile.kind === 'warp') return `W${tile.rotation}${tile.warpId ?? 1}${lockedMark}`;
   return `${KIND_CODES[tile.kind]}${tile.rotation}${lockedMark}`;
 }
 
-export function parseRows(rows: string[], width: number, height: number): Grid {
+export function parseRows(rows: string[], width: number, height: number, wrap = true): Grid {
   if (rows.length !== height) throw new Error(`Level has ${rows.length} rows, expected ${height}`);
   const cells: Tile[] = [];
   rows.forEach((row, y) => {
@@ -26,7 +29,7 @@ export function parseRows(rows: string[], width: number, height: number): Grid {
     if (tokens.length !== width) throw new Error(`Row ${y} has ${tokens.length} tokens, expected ${width}`);
     for (const tok of tokens) cells.push(parseToken(tok));
   });
-  return new Grid(width, height, cells);
+  return new Grid(width, height, cells, wrap);
 }
 
 export function gridToRows(grid: Grid): string[] {
@@ -71,7 +74,7 @@ export function applyScramble(grid: Grid, scramble: string): SlideMove[] {
 }
 
 export function parseLevel(def: LevelDef): ParsedLevel {
-  const solvedGrid = parseRows(def.rows, def.width, def.height);
+  const solvedGrid = parseRows(def.rows, def.width, def.height, def.wrap ?? true);
   // attach pickups to tiles of the solved board
   (def.pickups ?? []).forEach((p, i) => {
     const t = solvedGrid.tryGet(p.x, p.y);

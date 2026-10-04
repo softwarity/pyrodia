@@ -190,6 +190,7 @@ export class CanvasRenderer {
     // shadow
     ctx.fillStyle = THEME.boardShadow;
     ctx.fillRect(l.originX - 4, l.originY - 4, l.boardW + 8, l.boardH + 12);
+    if (session.grid.wrap) this.drawWrapMarkers(session, l);
 
     session.grid.forEach((tile, x, y) => {
       const px = l.originX + x * ts;
@@ -229,6 +230,40 @@ export class CanvasRenderer {
       this.drawPickupIcon(a.kind, ts * 0.3);
       this.ctx.restore();
     }
+  }
+
+  /** Small chevrons outside the board where a pipe opens onto an edge: the route continues on the other side. */
+  private drawWrapMarkers(session: LevelSession, l: BoardLayout): void {
+    const ctx = this.ctx;
+    const ts = l.tileSize;
+    const g = session.grid;
+    ctx.save();
+    ctx.fillStyle = 'rgba(255, 200, 90, 0.55)';
+    const chevron = (cx: number, cy: number, dir: Dir) => {
+      const { dx, dy } = dirDelta(dir);
+      const size = ts * 0.14;
+      ctx.beginPath();
+      ctx.moveTo(cx + dx * size, cy + dy * size);
+      ctx.lineTo(cx - dy * size * 0.8 - dx * size * 0.4, cy - dx * size * 0.8 - dy * size * 0.4);
+      ctx.lineTo(cx + dy * size * 0.8 - dx * size * 0.4, cy + dx * size * 0.8 - dy * size * 0.4);
+      ctx.closePath();
+      ctx.fill();
+    };
+    g.forEach((t, x, y) => {
+      if (t.kind === 'empty') return;
+      const mask = tileMask(t);
+      const edges: Dir[] = [];
+      if (y === 0 && mask & 1) edges.push(1 as Dir);
+      if (x === g.width - 1 && mask & 2) edges.push(2 as Dir);
+      if (y === g.height - 1 && mask & 4) edges.push(4 as Dir);
+      if (x === 0 && mask & 8) edges.push(8 as Dir);
+      for (const d of edges) {
+        const m = sideMid(d);
+        const { dx, dy } = dirDelta(d);
+        chevron(l.originX + (x + m.x) * ts + dx * ts * 0.16, l.originY + (y + m.y) * ts + dy * ts * 0.16, d);
+      }
+    });
+    ctx.restore();
   }
 
   private isLit(session: LevelSession, x: number, y: number): boolean {
@@ -286,10 +321,53 @@ export class CanvasRenderer {
       case 'goal':
         this.drawGoal(ts);
         break;
+      case 'warp':
+        this.drawPipe(mask, 'straight', ts, tile.locked, lit);
+        ctx.rotate(-baseRotation * (Math.PI / 2)); // keep the number upright
+        this.drawWarpRing(ts, tile.warpId ?? 1, lit);
+        break;
       default:
         this.drawPipe(mask, tile.kind, ts, tile.locked, lit);
     }
     ctx.restore();
+  }
+
+  private static WARP_COLORS = ['#4fd1ff', '#ff6ad5', '#7dff8a', '#ffd54a', '#b48bff', '#ff9a4a', '#4affd0', '#ff4a6a', '#d0ff4a'];
+
+  /** Numbered ring of a warp tile: enter here, come out of the twin with the same number. */
+  private drawWarpRing(ts: number, id: number, lit: boolean): void {
+    const ctx = this.ctx;
+    const color = CanvasRenderer.WARP_COLORS[(id - 1) % CanvasRenderer.WARP_COLORS.length];
+    const r = ts * 0.26;
+    const spin = this.time * 1.2;
+    const glow = ctx.createRadialGradient(0, 0, r * 0.3, 0, 0, r * 1.6);
+    glow.addColorStop(0, `${color}55`);
+    glow.addColorStop(1, `${color}00`);
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(0, 0, r * 1.6, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#0c1020';
+    ctx.beginPath();
+    ctx.arc(0, 0, r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = Math.max(2, ts * 0.05);
+    ctx.setLineDash([r * 0.6, r * 0.35]);
+    ctx.lineDashOffset = -spin * r;
+    ctx.beginPath();
+    ctx.arc(0, 0, r * 0.82, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.lineWidth = Math.max(1.5, ts * 0.03);
+    ctx.beginPath();
+    ctx.arc(0, 0, r, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.fillStyle = lit ? '#fff7c2' : color;
+    ctx.font = `800 ${Math.max(10, ts * 0.3)}px 'Rubik', 'Segoe UI', sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(String(id), 0, ts * 0.01);
   }
 
   private pipeWidths(ts: number): { outer: number; inner: number } {
@@ -339,15 +417,17 @@ export class CanvasRenderer {
     ctx.globalAlpha = 1;
 
     if (kind === 'cap') {
-      // cap: rounded end at the centre
+      // dead end: a flat plug bolted across the pipe (base orientation opens North)
       ctx.fillStyle = outerColor;
-      ctx.beginPath();
-      ctx.arc(0, 0, outer * 0.55, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = lit ? THEME.pipeLitInner : '#2a2f44';
-      ctx.beginPath();
-      ctx.arc(0, 0, outer * 0.3, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.fillRect(-outer * 0.75, -outer * 0.15, outer * 1.5, outer * 0.42);
+      ctx.fillStyle = '#1a1e2e';
+      ctx.fillRect(-outer * 0.75, outer * 0.27, outer * 1.5, outer * 0.08);
+      ctx.fillStyle = '#c9d2e8';
+      for (const bx of [-outer * 0.5, outer * 0.5]) {
+        ctx.beginPath();
+        ctx.arc(bx, outer * 0.06, outer * 0.08, 0, Math.PI * 2);
+        ctx.fill();
+      }
     }
     // flange rings at the openings
     ctx.fillStyle = outerColor;
@@ -476,8 +556,10 @@ export class CanvasRenderer {
 
   // ----- preview / debug overlays --------------------------------------------
 
-  private pathPoints(session: LevelSession, pred: PathPrediction, l: BoardLayout): { x: number; y: number }[] {
-    const pts: { x: number; y: number }[] = [];
+  /** Preview polylines in canvas px; a new polyline starts whenever the route wraps around the board. */
+  private pathPolylines(session: LevelSession, pred: PathPrediction, l: BoardLayout): { x: number; y: number }[][] {
+    const lines: { x: number; y: number }[][] = [[]];
+    let pts = lines[0];
     const ts = l.tileSize;
     const f = session.flame;
     const push = (wx: number, wy: number) => pts.push({ x: l.originX + wx * ts, y: l.originY + wy * ts });
@@ -491,13 +573,19 @@ export class CanvasRenderer {
     }
     for (const s of pred.steps) {
       const tile = session.grid.get(s.x, s.y);
+      if (s.wrapped) {
+        pts = [];
+        lines.push(pts);
+        const p0 = tileLocalPosition(tile.kind, s.entry, s.exit, 0);
+        push(s.x + p0.x, s.y + p0.y);
+      }
       const n = usesArc(tile.kind, s.entry, s.exit) ? 6 : 2;
       for (let i = 1; i <= n; i++) {
         const p = tileLocalPosition(tile.kind, s.entry, s.exit, i / n);
         push(s.x + p.x, s.y + p.y);
       }
     }
-    return pts;
+    return lines;
   }
 
   private drawPreview(session: LevelSession, l: BoardLayout): void {
@@ -505,8 +593,7 @@ export class CanvasRenderer {
     if (!pred || session.def.lookahead <= 0) return;
     if (session.flame.status !== 'moving' && session.flame.status !== 'waiting') return;
     const ctx = this.ctx;
-    const pts = this.pathPoints(session, pred, l);
-    if (pts.length < 2) return;
+    const lines = this.pathPolylines(session, pred, l);
     const danger = pred.end.type === 'fall';
     ctx.save();
     ctx.setLineDash([l.tileSize * 0.12, l.tileSize * 0.14]);
@@ -515,9 +602,12 @@ export class CanvasRenderer {
     ctx.lineWidth = Math.max(2, l.tileSize * 0.07);
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-    ctx.beginPath();
-    pts.forEach((p, i) => (i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)));
-    ctx.stroke();
+    for (const pts of lines) {
+      if (pts.length < 2) continue;
+      ctx.beginPath();
+      pts.forEach((p, i) => (i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)));
+      ctx.stroke();
+    }
     ctx.setLineDash([]);
     if (danger) {
       const end = pred.end as { x: number; y: number; dir: Dir };
@@ -545,14 +635,17 @@ export class CanvasRenderer {
     const f = session.flame;
     if (f.status !== 'moving' && f.status !== 'waiting') return;
     const pred = predictPath(session.grid, f.x, f.y, f.exit, CONFIG.debugPathSteps);
-    const pts = this.pathPoints(session, pred, l);
+    const lines = this.pathPolylines(session, pred, l);
     const ctx = this.ctx;
     ctx.save();
     ctx.strokeStyle = THEME.debugPath;
     ctx.lineWidth = 3;
-    ctx.beginPath();
-    pts.forEach((p, i) => (i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)));
-    ctx.stroke();
+    for (const pts of lines) {
+      if (pts.length < 2) continue;
+      ctx.beginPath();
+      pts.forEach((p, i) => (i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)));
+      ctx.stroke();
+    }
     ctx.restore();
   }
 

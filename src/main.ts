@@ -38,6 +38,11 @@ game.events.on('levelLoaded', () => {
   s.events.on('started', () => audio.ready());
   s.events.on('enterTile', () => audio.flameMove());
   s.events.on('bounce', () => audio.flameBounce());
+  s.events.on('warp', ({ from, to }) => {
+    audio.warp();
+    renderer.particles.burst(from.x + 0.5, from.y + 0.5, 12, ['#4fd1ff', '#ffffff'], 1.2, 0.06, 0, 0.5);
+    renderer.particles.burst(to.x + 0.5, to.y + 0.5, 12, ['#4fd1ff', '#ffffff'], 1.2, 0.06, 0, 0.5);
+  });
   s.events.on('danger', () => {
     audio.flameDanger();
     renderer.flash('#ff3030', 0.12);

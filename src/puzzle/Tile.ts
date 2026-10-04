@@ -16,6 +16,7 @@ export type TileKind =
   | 'tee'
   | 'cross'
   | 'cap' // dead-end: the flame bounces back
+  | 'warp' // numbered pipe: the flame comes out of the twin with the same number
   | 'source' // where the flame is born (fixed)
   | 'goal'; // where the flame must arrive (fixed)
 
@@ -29,6 +30,8 @@ export interface Tile {
   pickup?: PickupKind;
   /** Stable id of the pickup inside its level (for "collected once" tracking). */
   pickupId?: number;
+  /** Warp number (1-9); two warps with the same number are linked. */
+  warpId?: number;
 }
 
 /** Base connection masks at rotation 0. */
@@ -39,6 +42,7 @@ export const BASE_MASK: Record<TileKind, Mask> = {
   tee: N | E | S,
   cross: N | E | S | W,
   cap: N,
+  warp: N,
   source: N,
   goal: N,
 };
@@ -51,6 +55,7 @@ export const DISTINCT_ROTATIONS: Record<TileKind, number> = {
   tee: 4,
   cross: 1,
   cap: 4,
+  warp: 4,
   source: 4,
   goal: 4,
 };
@@ -62,6 +67,7 @@ export const KIND_CODES: Record<TileKind, string> = {
   tee: 'T',
   cross: 'X',
   cap: 'D',
+  warp: 'W',
   source: 'S',
   goal: 'G',
 };
@@ -70,10 +76,12 @@ export const CODE_KINDS: Record<string, TileKind> = Object.fromEntries(
   Object.entries(KIND_CODES).map(([k, v]) => [v, k as TileKind]),
 ) as Record<string, TileKind>;
 
-export function makeTile(kind: TileKind, rotation = 0, locked = false): Tile {
+export function makeTile(kind: TileKind, rotation = 0, locked = false, warpId?: number): Tile {
   const n = DISTINCT_ROTATIONS[kind];
   const r = ((rotation % 4) + 4) % 4;
-  return { kind, rotation: n === 1 ? 0 : n === 2 ? r % 2 : r, locked: locked || kind === 'source' || kind === 'goal' || kind === 'empty' };
+  const t: Tile = { kind, rotation: n === 1 ? 0 : n === 2 ? r % 2 : r, locked: locked || kind === 'source' || kind === 'goal' || kind === 'empty' };
+  if (kind === 'warp') t.warpId = warpId ?? 1;
+  return t;
 }
 
 export function tileMask(tile: Tile): Mask {
@@ -99,6 +107,7 @@ export function cloneTile(t: Tile): Tile {
     c.pickup = t.pickup;
     c.pickupId = t.pickupId;
   }
+  if (t.warpId !== undefined) c.warpId = t.warpId;
   return c;
 }
 
@@ -106,5 +115,5 @@ export function cloneTile(t: Tile): Tile {
 export function tileSymbol(t: Tile): string {
   const kindIndex = Object.keys(BASE_MASK).indexOf(t.kind);
   const code = 48 + kindIndex * 8 + t.rotation * 2 + (t.locked ? 1 : 0);
-  return String.fromCharCode(code);
+  return String.fromCharCode(code) + (t.warpId !== undefined ? String(t.warpId) : '');
 }

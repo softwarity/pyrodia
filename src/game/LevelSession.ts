@@ -25,6 +25,7 @@ export interface SessionEvents {
   death: { cause: DeathCause; wx: number; wy: number };
   won: { timeRemaining: number };
   pickup: { x: number; y: number; kind: PickupKind; fuelAdded: number; embers: number; firstTime: boolean };
+  warp: { from: Cell; to: Cell };
   lowFuel: undefined;
   boost: { id: EmberUseId };
 }
@@ -107,6 +108,10 @@ export class LevelSession {
       this.events.emit('enterTile', { x: p.x, y: p.y });
     });
     flame.on('bounce', (p) => this.events.emit('bounce', p));
+    flame.on('warp', (p) => {
+      this.dangerWarned = false;
+      this.events.emit('warp', p);
+    });
     flame.on('fall', (p) => this.events.emit('fall', p));
     flame.on('splash', (p) => {
       if (this.phase !== 'running') return;

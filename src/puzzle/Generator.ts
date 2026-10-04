@@ -32,6 +32,14 @@ export interface GeneratorParams {
   fuelPerTile?: number;
   /** Pickups placed on the main route itself. */
   pathPickups?: number;
+  /** Torus board: the route may cross the edges. */
+  wrap?: boolean;
+  /** Probability that a walk step crosses an edge when it can. */
+  wrapChance?: number;
+  /** Max numbered warp pairs on the main route. */
+  routeWarps?: number;
+  /** Extra decoy warp pairs off the route. */
+  decoyWarps?: number;
 }
 
 export interface GeneratedLevel {
@@ -79,49 +87,89 @@ export function deriveParams(p: GeneratorParams): Required<GeneratorParams> {
     maxFuel: p.maxFuel ?? 100,
     fuelPerTile: p.fuelPerTile ?? Number(lerp(2, 5, d).toFixed(1)),
     pathPickups: p.pathPickups ?? (d < 0.15 ? 0 : Math.round(lerp(1, 2, d))),
+    wrap: p.wrap ?? true,
+    wrapChance: p.wrapChance ?? (d < 0.2 ? 0 : lerp(0.15, 0.5, d)),
+    routeWarps: p.routeWarps ?? (d < 0.12 ? 0 : d < 0.5 ? 1 : 2),
+    decoyWarps: p.decoyWarps ?? (d < 0.35 ? 0 : 1),
   };
 }
 
 type Cell = { x: number; y: number };
 
-/** Random self-avoiding walk with a target length. Returns null when stuck. */
-function randomWalk(rng: Rng, w: number, h: number, start: Cell, minLen: number, maxLen: number): Cell[] | null {
+/**
+ * Random self-avoiding walk with a target length. Each step records the
+ * direction taken so that wrap-around steps are unambiguous. Returns null when stuck.
+ */
+function randomWalk(
+  rng: Rng,
+  w: number,
+  h: number,
+  start: Cell,
+  minLen: number,
+  maxLen: number,
+  wrap: boolean,
+  wrapChance: number,
+  warps: number,
+): { cells: Cell[]; dirs: (Dir | null)[] } | null {
   const target = rng.int(minLen, maxLen);
   const visited = new Set<number>();
-  const path: Cell[] = [start];
+  const cells: Cell[] = [start];
+  /** dirs[i] = direction from cells[i] to cells[i+1]; null = warp jump. */
+  const dirs: (Dir | null)[] = [];
   visited.add(start.y * w + start.x);
   let cur = start;
+  let warpsLeft = warps;
   for (let i = 0; i < target; i++) {
-    const options: Cell[] = [];
+    // Warp jump: land on a far, unvisited cell. Never right after the start,
+    // never twice in a row, and leave room for the landing tile + one more.
+    if (warpsLeft > 0 && i >= 2 && i <= target - 3 && dirs[dirs.length - 1] !== null && rng.chance(0.35)) {
+      const far: Cell[] = [];
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          if (visited.has(y * w + x)) continue;
+          if (Math.abs(x - cur.x) + Math.abs(y - cur.y) < 2) continue;
+          far.push({ x, y });
+        }
+      }
+      if (far.length > 0) {
+        const land = rng.pick(far);
+        cells.push(land);
+        dirs.push(null);
+        visited.add(land.y * w + land.x);
+        cur = land;
+        warpsLeft--;
+        continue;
+      }
+    }
+    const options: { cell: Cell; dir: Dir; wraps: boolean }[] = [];
     for (const d of DIRS) {
       const { dx, dy } = dirDelta(d);
-      const nx = cur.x + dx;
-      const ny = cur.y + dy;
-      if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
+      let nx = cur.x + dx;
+      let ny = cur.y + dy;
+      let wraps = false;
+      if (nx < 0 || ny < 0 || nx >= w || ny >= h) {
+        if (!wrap || !rng.chance(wrapChance)) continue;
+        nx = (nx + w) % w;
+        ny = (ny + h) % h;
+        wraps = true;
+      }
       if (visited.has(ny * w + nx)) continue;
-      options.push({ x: nx, y: ny });
+      options.push({ cell: { x: nx, y: ny }, dir: d, wraps });
     }
-    if (options.length === 0) return path.length >= minLen + 1 ? path : null;
-    let next: Cell;
-    if (path.length >= 2 && rng.chance(0.4)) {
-      const prev = path[path.length - 2];
-      const straight = options.find((o) => o.x === cur.x + (cur.x - prev.x) && o.y === cur.y + (cur.y - prev.y));
-      next = straight ?? rng.pick(options);
+    if (options.length === 0) return cells.length >= minLen + 1 ? { cells, dirs } : null;
+    let pick: { cell: Cell; dir: Dir };
+    if (dirs.length >= 1 && dirs[dirs.length - 1] !== null && rng.chance(0.4)) {
+      const straight = options.find((o) => o.dir === dirs[dirs.length - 1]);
+      pick = straight ?? rng.pick(options);
     } else {
-      next = rng.pick(options);
+      pick = rng.pick(options);
     }
-    path.push(next);
-    visited.add(next.y * w + next.x);
-    cur = next;
+    cells.push(pick.cell);
+    dirs.push(pick.dir);
+    visited.add(pick.cell.y * w + pick.cell.x);
+    cur = pick.cell;
   }
-  return path;
-}
-
-function dirBetween(a: Cell, b: Cell): Dir {
-  if (b.x === a.x + 1) return 2;
-  if (b.x === a.x - 1) return 8;
-  if (b.y === a.y + 1) return 4;
-  return 1;
+  return { cells, dirs };
 }
 
 function rotationForMask(kind: TileKind, mask: number): number {
@@ -145,30 +193,51 @@ export function generateLevel(params: GeneratorParams): GeneratedLevel {
 
   for (let attempt = 0; attempt < 300; attempt++) {
     const start: Cell = { x: rng.int(0, w - 1), y: rng.int(0, h - 1) };
-    const walk = randomWalk(rng, w, h, start, p.minPathLength + 1, p.maxPathLength + 1);
-    if (!walk || walk.length < p.minPathLength + 2) continue;
+    const walkResult = randomWalk(rng, w, h, start, p.minPathLength + 1, p.maxPathLength + 1, p.wrap, p.wrapChance, p.routeWarps);
+    if (!walkResult || walkResult.cells.length < p.minPathLength + 2) continue;
+    const walk = walkResult.cells;
+    const walkDirs = walkResult.dirs; // walkDirs[i] = direction from walk[i] to walk[i+1], null = warp
     const goal = walk[walk.length - 1];
     if (Math.abs(goal.x - start.x) + Math.abs(goal.y - start.y) < 2) continue;
+    if (walkDirs[0] === null || walkDirs[walkDirs.length - 1] === null) continue;
 
-    const solved = new Grid(w, h);
+    const solved = new Grid(w, h, undefined, p.wrap);
     const used = new Set<number>();
     const key = (c: Cell) => c.y * w + c.x;
-    const sourceDir = dirBetween(walk[0], walk[1]);
+    const sourceDir = walkDirs[0];
     solved.set(start.x, start.y, makeTile('source', dirIndex(sourceDir)));
-    solved.set(goal.x, goal.y, makeTile('goal', dirIndex(dirBetween(goal, walk[walk.length - 2]))));
+    solved.set(goal.x, goal.y, makeTile('goal', dirIndex(opposite(walkDirs[walkDirs.length - 1]!))));
     used.add(key(start));
     used.add(key(goal));
 
-    // Main route tiles.
+    // Main route tiles. Warp jumps become a numbered pair: the departure warp
+    // opens towards the previous tile, the arrival warp towards the next one.
     const pathTiles: Tile[] = [];
     const pathInfo: { cell: Cell; entry: Dir; exit: Dir; heading: Dir }[] = [];
+    let nextWarpId = 1;
     for (let i = 1; i < walk.length - 1; i++) {
       const cur = walk[i];
-      const entry = dirBetween(cur, walk[i - 1]);
-      const exit = dirBetween(cur, walk[i + 1]);
+      const dIn = walkDirs[i - 1];
+      const dOut = walkDirs[i];
+      used.add(key(cur));
+      if (dOut === null) {
+        // departure warp; the landing cell is walk[i+1] with its own exit
+        const t = makeTile('warp', dirIndex(opposite(dIn!)), false, nextWarpId);
+        solved.set(cur.x, cur.y, t);
+        pathTiles.push(t);
+        continue;
+      }
+      if (dIn === null) {
+        const t = makeTile('warp', dirIndex(dOut), false, nextWarpId);
+        solved.set(cur.x, cur.y, t);
+        pathTiles.push(t);
+        nextWarpId++;
+        continue;
+      }
+      const entry = opposite(dIn);
+      const exit = dOut;
       const t = tileForMask(entry | exit);
       solved.set(cur.x, cur.y, t);
-      used.add(key(cur));
       pathTiles.push(t);
       pathInfo.push({ cell: cur, entry, exit, heading: opposite(entry) });
     }
@@ -180,12 +249,12 @@ export function generateLevel(params: GeneratorParams): GeneratedLevel {
       const info = pathInfo[i];
       if (info.exit !== turnLeft(info.heading) || !rng.chance(p.detourChance)) continue;
       const r = turnRight(info.heading);
-      const { dx, dy } = dirDelta(r);
       const branch: Cell[] = [];
+      let bc: Cell | null = info.cell;
       for (let len = 1; len <= p.detourMaxLength; len++) {
-        const c = { x: info.cell.x + dx * len, y: info.cell.y + dy * len };
-        if (!solved.inBounds(c.x, c.y) || used.has(key(c))) break;
-        branch.push(c);
+        bc = solved.step(bc.x, bc.y, r);
+        if (!bc || used.has(key(bc)) || branch.some((b) => b.x === bc!.x && b.y === bc!.y)) break;
+        branch.push(bc);
       }
       if (branch.length === 0) continue;
       const teeTile = tileForMask(info.entry | info.exit | r);
@@ -233,6 +302,13 @@ export function generateLevel(params: GeneratorParams): GeneratedLevel {
       const c = free.pop()!;
       solved.set(c.x, c.y, alt);
     }
+    for (let k = 0; k < p.decoyWarps && free.length >= 2; k++) {
+      const a = free.pop()!;
+      const b = free.pop()!;
+      solved.set(a.x, a.y, makeTile('warp', rng.int(0, 3), false, nextWarpId));
+      solved.set(b.x, b.y, makeTile('warp', rng.int(0, 3), false, nextWarpId));
+      nextWarpId++;
+    }
     const decoyKinds: TileKind[] = ['straight', 'straight', 'corner', 'corner', 'corner', 'tee', 'cross', 'cap'];
     for (const c of free) {
       const kind = rng.pick(decoyKinds);
@@ -250,7 +326,7 @@ export function generateLevel(params: GeneratorParams): GeneratedLevel {
     for (let tries = 0; tries < 30 && !result; tries++) {
       const g = solved.clone();
       // clone() copies tiles, so re-resolve the protected ones by position
-      const prot = new Set<Tile>(pathInfo.slice(0, p.minSafeIndex).map((i) => g.get(i.cell.x, i.cell.y)));
+      const prot = new Set<Tile>(walk.slice(1, 1 + p.minSafeIndex).map((c) => g.get(c.x, c.y)));
       let v = { ...voidCell };
       let last: Dir | null = null;
       let scramble = '';

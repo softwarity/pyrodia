@@ -102,6 +102,12 @@ export class WebAudioBackend implements AudioBackend {
       case 'boost':
         this.notes([{ freq: 400, endFreq: 1200, dur: 0.25, type: 'sawtooth', gain: 0.2 }]);
         break;
+      case 'warp':
+        this.notes([
+          { freq: 900, endFreq: 300, dur: 0.12, type: 'sine', gain: 0.22 },
+          { freq: 300, endFreq: 1200, dur: 0.16, type: 'sine', gain: 0.22, delay: 0.1 },
+        ]);
+        break;
       case 'ready':
         this.notes([{ freq: 660, dur: 0.1, type: 'triangle', gain: 0.25 }, { freq: 990, dur: 0.18, type: 'triangle', gain: 0.25, delay: 0.12 }]);
         break;

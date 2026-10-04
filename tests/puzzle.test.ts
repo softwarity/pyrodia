@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { LevelSession } from '../src/game/LevelSession';
 import { LEVELS } from '../src/level/levels';
-import { applyScramble, parseLevel, parseRows } from '../src/level/LevelParser';
+import { applyScramble, gridToRows, parseLevel, parseRows } from '../src/level/LevelParser';
 import { FUEL_CONFIG } from '../src/player/Fuel';
 import { computeLevelScore } from '../src/player/Scoring';
 import { E, N, S, W, opposite, rotateMaskCW, turnLeft, turnRight } from '../src/puzzle/Direction';
 import { generateLevel } from '../src/puzzle/Generator';
-import { chooseExit } from '../src/puzzle/PathSim';
+import { chooseExit, predictPath } from '../src/puzzle/PathSim';
 import { solve } from '../src/puzzle/Solver';
 import { makeTile, tileMask } from '../src/puzzle/Tile';
 import { tileLocalPosition } from '../src/puzzle/TileGeometry';
@@ -72,6 +72,49 @@ describe('sliding grid', () => {
     expect(grid.slide(0, 0)).toBeNull(); // source
     expect(grid.slide(2, 1)).toBeNull(); // locked
     expect(grid.slide(2, 0)).toBeNull(); // goal
+  });
+});
+
+describe('wrap-around', () => {
+  it('the flame leaving one edge re-enters from the opposite edge', () => {
+    // source opens West on the left edge; the pipe continues from the right edge
+    const grid = parseRows(['S3 .. G3', 'I1 I1 I1'], 3, 2);
+    // row 0: source at (0,0) opens W -> wraps to (2,0) goal which opens W: not matching (needs E)
+    expect(grid.step(0, 0, W)).toEqual({ x: 2, y: 0 });
+    const p = predictPath(grid, 0, 0, W, 10);
+    expect(p.end.type).toBe('fall');
+    const grid2 = parseRows(['S3 .. G1', 'I1 I1 I1'], 3, 2);
+    const p2 = predictPath(grid2, 0, 0, W, 10);
+    expect(p2.end).toEqual({ type: 'goal', x: 2, y: 0 });
+    expect(p2.steps[0].wrapped).toBe(true);
+  });
+  it('can be disabled per level', () => {
+    const grid = parseRows(['S3 .. G1'], 3, 1, false);
+    expect(grid.step(0, 0, W)).toBeNull();
+    expect(predictPath(grid, 0, 0, W, 10).end.type).toBe('fall');
+  });
+});
+
+describe('warps', () => {
+  it('the flame entering warp n comes out of the other warp n', () => {
+    // source -> straight -> warp 1 ... warp 1 -> goal (board wrap disabled to keep it simple)
+    const grid = parseRows(['S1 I1 W31 ..', 'G1 W31 .. ..'], 4, 2, false);
+    // (2,0) warp opens W (entry side); twin (1,1) opens W towards the goal at (0,1)
+    const p = predictPath(grid, 0, 0, E, 10);
+    expect(p.end).toEqual({ type: 'goal', x: 0, y: 1 });
+    expect(p.steps.map((st) => `${st.x},${st.y}`)).toEqual(['1,0', '2,0', '1,1', '0,1']);
+    expect(p.steps[2].wrapped).toBe(true);
+  });
+  it('an unpaired warp behaves like a dead end', () => {
+    const grid = parseRows(['S1 I1 W31 ..'], 4, 1, false);
+    const p = predictPath(grid, 0, 0, E, 10);
+    expect(p.end.type).toBe('loop'); // bounces back to the source and loops
+  });
+  it('round-trips through the level notation', () => {
+    const grid = parseRows(['W12 W02*'], 2, 1);
+    expect(grid.get(0, 0)).toMatchObject({ kind: 'warp', rotation: 1, warpId: 2 });
+    expect(grid.get(1, 0).locked).toBe(true);
+    expect(gridToRows(grid)).toEqual(['W12 W02*']);
   });
 });
 

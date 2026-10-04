@@ -1,5 +1,5 @@
 import { FUEL_CONFIG } from '../player/Fuel';
-import { dirDelta, indexDir } from './Direction';
+import { indexDir } from './Direction';
 import type { Grid, SlideMove } from './Grid';
 import { predictPath, type PathStep } from './PathSim';
 import { solve, type Solution } from './Solver';
@@ -51,20 +51,23 @@ export function validateGrid(grid: Grid, opts: ValidatorOptions): ValidationResu
   if (goals.length < 1) errors.push('no goal tile');
   if (voids.length < 1) errors.push('no void: nothing can slide');
 
+  const warpCounts = new Map<number, number>();
   grid.forEach((t, x, y) => {
     if (t.pickup && (t.kind === 'empty' || t.kind === 'source' || t.kind === 'goal')) {
       errors.push(`pickup on a ${t.kind} tile at (${x},${y})`);
     }
+    if (t.kind === 'warp') warpCounts.set(t.warpId ?? 1, (warpCounts.get(t.warpId ?? 1) ?? 0) + 1);
   });
+  for (const [id, n] of warpCounts) {
+    if (n !== 2) errors.push(`warp ${id} appears ${n} time(s); warps come in pairs`);
+  }
 
   if (sources.length === 1 && goals.length >= 1) {
     const s = sources[0];
     const startDir = indexDir(grid.get(s.x, s.y).rotation);
-    const { dx, dy } = dirDelta(startDir);
-    if (!grid.inBounds(s.x + dx, s.y + dy)) errors.push('source opens outside the board');
+    if (!grid.step(s.x, s.y, startDir)) errors.push('source opens outside the board');
     for (const g of goals) {
-      const d = dirDelta(indexDir(grid.get(g.x, g.y).rotation));
-      if (!grid.inBounds(g.x + d.dx, g.y + d.dy)) errors.push(`goal at (${g.x},${g.y}) opens outside the board`);
+      if (!grid.step(g.x, g.y, indexDir(grid.get(g.x, g.y).rotation))) errors.push(`goal at (${g.x},${g.y}) opens outside the board`);
     }
 
     const maxSteps = grid.width * grid.height * 4;

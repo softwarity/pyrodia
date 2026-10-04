@@ -31,6 +31,8 @@ export interface ObjectiveDef {
  *
  *   Kind:      . void   I straight   C corner   T tee   X cross
  *              D cap (dead-end, bounces)   S source (flame start)   G goal
+ *              W<rot><n> warp: a numbered pipe end; the flame entering warp n
+ *              comes out of the other warp n (e.g. W31 opens West, number 1)
  *   Rotation:  0..3 quarter turns clockwise from the base orientation
  *              I0 = vertical, I1 = horizontal
  *              C0 = N+E (└)  C1 = E+S (┌)  C2 = S+W (┐)  C3 = W+N (┘)
@@ -52,6 +54,8 @@ export interface LevelDef {
   scramble: string;
   /** Flame speed in tiles per second. */
   flameSpeed: number;
+  /** The flame re-enters from the opposite edge when it leaves the board (default true). */
+  wrap?: boolean;
   /** Survival time limit in seconds. */
   timeLimit: number;
   /** How many tiles ahead the flame's route is previewed. 0 disables. */

@@ -61,6 +61,12 @@ Rules in one breath: keep the fire in the pipes, feed it, get it to the hearth.
 * **You cannot slide the tile the flame is currently in** (it shakes and refuses).
 * **Water** is under everything. A pipe opening that leads nowhere, including into the hole,
   drops the flame into the water: SPLASH, one life lost, level restarts.
+* **Numbered warps.** A pipe ending in a numbered ring is linked to the other ring with the
+  same number: the flame enters one and comes out of its twin. Warps slide like any other
+  tile, so a pair can be rearranged to open new routes.
+* **The board wraps around.** A pipe that opens onto an edge continues from the opposite edge
+  (small chevrons mark those openings), so routes can loop across the board. A level can turn
+  this off with `wrap: false`.
 * **You do not have to visit every pipe.** Reaching the hearth is enough. Many levels offer a
   short route and a longer detour (a T-junction into a dead-end branch) that holds extra fuel
   and rare embers: the short way is safe, the detour pays.
@@ -174,6 +180,7 @@ Token = `<Kind><Rotation>[*]`:
 | `T` | T-junction | `T0` ├ (N+E+S), `T1` ┬, `T2` ┤, `T3` ┴ |
 | `X` | cross | `X0` |
 | `D` | dead end (bounces) | opening `D0` N, `D1` E, `D2` S, `D3` W |
+| `W<rot><n>` | numbered warp (pairs) | `W31` opens West, number 1; `W12` opens East, number 2 |
 | `S` | source (flame start, fixed) | opening direction as above |
 | `G` | goal / hearth (fixed) | opening direction as above |
 | `*` | suffix: fixed tile (cannot slide) | e.g. `C1*` |

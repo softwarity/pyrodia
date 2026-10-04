@@ -19,6 +19,7 @@ export type SoundEvent =
   | 'lowFuel'
   | 'perfectLevel'
   | 'boost'
+  | 'warp'
   | 'ready';
 
 export interface AudioBackend {
@@ -95,6 +96,9 @@ export class AudioManager {
   }
   boost(): void {
     this.play('boost');
+  }
+  warp(): void {
+    this.play('warp');
   }
 }
 

@@ -1,5 +1,5 @@
 import { CONFIG } from '../game/Config';
-import { dirDelta, opposite, type Dir } from '../puzzle/Direction';
+import { dirDelta, indexDir, opposite, type Dir } from '../puzzle/Direction';
 import type { Grid } from '../puzzle/Grid';
 import { chooseExit } from '../puzzle/PathSim';
 import { sideMid, tileLocalPosition } from '../puzzle/TileGeometry';
@@ -16,6 +16,7 @@ export interface FlameEvents {
   arrived: { x: number; y: number };
   /** The flame crossed the centre of tile (x,y): pickups are collected here. */
   centre: { x: number; y: number };
+  warp: { from: { x: number; y: number }; to: { x: number; y: number } };
   fuelEmpty: { wx: number; wy: number };
   extinguished: { wx: number; wy: number };
 }
@@ -109,6 +110,20 @@ export class Flame extends Entity {
       if (!this.centreCrossed && this.progress >= 0.5) {
         this.centreCrossed = true;
         this.emit('centre', { x: this.x, y: this.y });
+        const here = this.grid.get(this.x, this.y);
+        if (here.kind === 'warp') {
+          const pair = this.grid.warpPair(this.x, this.y);
+          if (pair) {
+            const from = { x: this.x, y: this.y };
+            this.x = pair.x;
+            this.y = pair.y;
+            const out = indexDir(this.grid.get(pair.x, pair.y).rotation);
+            this.entry = out;
+            this.exit = out;
+            this.heading = out;
+            this.emit('warp', { from, to: pair });
+          }
+        }
       }
       while (this.status === 'moving' && this.progress >= 1) {
         this.advance();
@@ -143,18 +158,18 @@ export class Flame extends Entity {
     }
   }
 
-  /** Cross into the next tile (or fall). */
+  /** Cross into the next tile (or fall). Wraps around the board edges when the grid allows it. */
   private advance(): void {
-    const { dx, dy } = dirDelta(this.exit);
-    const nx = this.x + dx;
-    const ny = this.y + dy;
+    const next = this.grid.step(this.x, this.y, this.exit);
     const entry = opposite(this.exit);
-    const tile = this.grid.tryGet(nx, ny);
-    const mask = this.grid.maskAt(nx, ny);
-    if (!tile || tile.kind === 'empty' || !(mask & entry)) {
+    const tile = next ? this.grid.get(next.x, next.y) : null;
+    const mask = next ? this.grid.maskAt(next.x, next.y) : 0;
+    if (!next || !tile || tile.kind === 'empty' || !(mask & entry)) {
       this.beginFall();
       return;
     }
+    const nx = next.x;
+    const ny = next.y;
     this.progress -= 1;
     this.x = nx;
     this.y = ny;

@@ -150,7 +150,7 @@ export const HANDMADE_LEVELS: LevelDef[] = [
   },
   {
     id: 7,
-    name: 'Long Way Round',
+    name: 'Warp Zone',
     width: 7,
     height: 5,
     flameSpeed: 1.0,
@@ -159,19 +159,20 @@ export const HANDMADE_LEVELS: LevelDef[] = [
     baseScore: 800,
     fuelPerTile: 3,
     pickups: [
-      { x: 2, y: 0, kind: 'wood' },
-      { x: 5, y: 2, kind: 'oil' },
-      { x: 6, y: 0, kind: 'ember' },
+      { x: 1, y: 0, kind: 'wood' },
+      { x: 6, y: 3, kind: 'oil' },
+      { x: 5, y: 2, kind: 'ember' },
     ],
+    hint: 'Numbered pipes are linked: enter one, come out of its twin with the same number.',
     tags: ['tutorial'],
     rows: [
-      'S1 I1 I1 C2 X0 I0 D2', //
-      'C1 D1 .. I0 C1 D2 I1',
-      'I0 T0 C1 C0 I1 I1 C2',
-      'C3 I1 X0 D1 I1 C1 I0',
-      'D0 I1 C3 C0 D3 C3 G0',
+      'S1 I1 I1 W31 C2 I0 D2', //
+      'C1 D1 I0 X0 I1 C2 G2',
+      'I0 T0 C1 C0 W02 I1 I0',
+      'C3 I1 X0 D1 .. W11 C3',
+      'D0 I1 C3 W22 I1 C1 I0',
     ],
-    scramble: 'RDRRU',
+    scramble: 'URDL',
   },
   {
     id: 8,

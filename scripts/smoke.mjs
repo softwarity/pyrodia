@@ -81,7 +81,11 @@ await page.click('.level-btn:not(.locked) >> nth=1');
 await page.waitForTimeout(600);
 await page.screenshot({ path: `${out}/08-mobile.png` });
 
-// a late level for visuals
+// the warp tutorial and a late level for visuals
+await page.setViewportSize({ width: 1100, height: 700 });
+await page.evaluate(() => window.pyrodia.game.startRun(6));
+await page.waitForTimeout(600);
+await page.screenshot({ path: `${out}/10-level7-warps.png` });
 await page.evaluate(() => window.pyrodia.game.startRun(84));
 await page.waitForTimeout(800);
 await page.setViewportSize({ width: 1100, height: 700 });

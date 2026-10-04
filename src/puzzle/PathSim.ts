@@ -1,4 +1,4 @@
-import { dirDelta, opposite, turnLeft, turnRight, type Dir, type Mask } from './Direction';
+import { indexDir, opposite, turnLeft, turnRight, type Dir, type Mask } from './Direction';
 import type { Grid } from './Grid';
 
 /**
@@ -29,6 +29,8 @@ export interface PathStep {
   y: number;
   entry: Dir;
   exit: Dir;
+  /** True when the flame did not arrive from the adjacent tile (board wrap or warp). */
+  wrapped?: boolean;
 }
 
 export type PathEnd =
@@ -53,24 +55,40 @@ export function predictPath(grid: Grid, x: number, y: number, exit: Dir, maxStep
   let cy = y;
   let cexit = exit;
   for (let i = 0; i < maxSteps; i++) {
-    const { dx, dy } = dirDelta(cexit);
-    const nx = cx + dx;
-    const ny = cy + dy;
+    const next = grid.step(cx, cy, cexit);
     const entry = opposite(cexit);
-    const tile = grid.tryGet(nx, ny);
-    if (!tile) return { steps, end: { type: 'fall', x: cx, y: cy, dir: cexit } };
+    if (!next) return { steps, end: { type: 'fall', x: cx, y: cy, dir: cexit } };
+    const { x: nx, y: ny } = next;
+    const wrapped = Math.abs(nx - cx) + Math.abs(ny - cy) !== 1;
+    const tile = grid.get(nx, ny);
     const mask = grid.maskAt(nx, ny);
     if (!(mask & entry)) return { steps, end: { type: 'fall', x: cx, y: cy, dir: cexit } };
     if (tile.kind === 'goal') {
-      steps.push({ x: nx, y: ny, entry, exit: entry });
+      steps.push({ x: nx, y: ny, entry, exit: entry, wrapped });
       return { steps, end: { type: 'goal', x: nx, y: ny } };
     }
     const key = `${nx},${ny},${entry}`;
     if (seen.has(key)) return { steps, end: { type: 'loop' } };
     seen.add(key);
+    if (tile.kind === 'warp') {
+      const pair = grid.warpPair(nx, ny);
+      if (pair) {
+        // in: entry side to the centre; out: centre of the twin to its opening
+        steps.push({ x: nx, y: ny, entry, exit: entry, wrapped });
+        const out = indexDir(grid.get(pair.x, pair.y).rotation);
+        const pkey = `${pair.x},${pair.y},out`;
+        if (seen.has(pkey)) return { steps, end: { type: 'loop' } };
+        seen.add(pkey);
+        steps.push({ x: pair.x, y: pair.y, entry: out, exit: out, wrapped: true });
+        cx = pair.x;
+        cy = pair.y;
+        cexit = out;
+        continue;
+      }
+    }
     const nextExit = chooseExit(mask, entry);
     if (nextExit === null) return { steps, end: { type: 'fall', x: cx, y: cy, dir: cexit } };
-    steps.push({ x: nx, y: ny, entry, exit: nextExit });
+    steps.push({ x: nx, y: ny, entry, exit: nextExit, wrapped });
     cx = nx;
     cy = ny;
     cexit = nextExit;
