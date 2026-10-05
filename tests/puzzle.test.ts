@@ -152,13 +152,15 @@ describe('levels', () => {
     }
   });
 
-  it('level 1 is solved by a single slide', () => {
-    const parsed = parseLevel(LEVELS[0]);
+  it('"First Slide" is solved by a single slide', () => {
+    const parsed = parseLevel(LEVELS.find((l) => l.name === 'First Slide')!);
     const sol = solve(parsed.grid, parsed.start.x, parsed.start.y, parsed.start.dir)!;
     expect(sol.moves.length).toBe(1);
     expect(sol.moves[0]).toEqual({ from: { x: 2, y: 2 }, to: { x: 2, y: 1 } });
   });
 });
+
+const FIRST_SLIDE = () => LEVELS.find((l) => l.name === 'First Slide')!;
 
 describe('simulation', () => {
   const run = (session: LevelSession, seconds: number) => {
@@ -166,16 +168,16 @@ describe('simulation', () => {
   };
 
   it('waits for the player before moving', () => {
-    const session = new LevelSession(LEVELS[0]);
+    const session = new LevelSession(FIRST_SLIDE());
     run(session, 5);
     expect(session.phase).toBe('ready');
-    expect(session.timeRemaining).toBe(LEVELS[0].timeLimit);
+    expect(session.timeRemaining).toBe(FIRST_SLIDE().timeLimit);
     session.start();
     expect(session.phase).toBe('running');
   });
 
   it('the flame falls into the hole when the path is broken', () => {
-    const session = new LevelSession(LEVELS[0]);
+    const session = new LevelSession(FIRST_SLIDE());
     session.start();
     let death: string | null = null;
     session.events.on('death', (d) => (death = d.cause));
@@ -185,7 +187,7 @@ describe('simulation', () => {
   });
 
   it('the flame reaches the goal and collects fuel after the slide', () => {
-    const session = new LevelSession(LEVELS[0]);
+    const session = new LevelSession(FIRST_SLIDE());
     expect(session.slide(2, 2)).toBe(true); // first slide starts the level
     expect(session.phase).toBe('running');
     let won = false;
@@ -200,7 +202,7 @@ describe('simulation', () => {
   });
 
   it('a pickup collected on a previous attempt gives fuel but no reward', () => {
-    const session = new LevelSession(LEVELS[0], [0]);
+    const session = new LevelSession(FIRST_SLIDE(), [0]);
     session.slide(2, 2);
     let embers = -1;
     let firstTime: boolean | null = null;
@@ -216,7 +218,7 @@ describe('simulation', () => {
   });
 
   it('refuses to slide the tile the flame is in', () => {
-    const session = new LevelSession(LEVELS[0]);
+    const session = new LevelSession(FIRST_SLIDE());
     session.start();
     run(session, 2.0); // flame is in tile (1,1)
     expect(session.flame.x).toBe(1);
@@ -225,7 +227,7 @@ describe('simulation', () => {
   });
 
   it('fast-forward multiplies the flame speed without changing fuel per tile', () => {
-    const session = new LevelSession(LEVELS[0]);
+    const session = new LevelSession(FIRST_SLIDE());
     session.start();
     const base = session.flame.speed;
     session.setFastForwardHeld(true);
@@ -240,7 +242,7 @@ describe('simulation', () => {
   });
 
   it('the flame dies when fuel runs out', () => {
-    const def = { ...LEVELS[0], initialFuel: 2, fuelPerTile: 2, pickups: [] };
+    const def = { ...FIRST_SLIDE(), initialFuel: 2, fuelPerTile: 2, pickups: [] };
     const session = new LevelSession(def);
     session.start();
     let cause: string | null = null;

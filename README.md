@@ -46,8 +46,8 @@ relative (`./`) so the build works from any sub-path such as `https://<user>.git
 | Action | Desktop | Touch |
 | --- | --- | --- |
 | Slide a tile into the hole | click a tile next to the hole | tap it, or swipe it towards the hole |
-| Speed the flame up (×3) | hold `Space` / `Shift`, or the ⏩ button | hold the ⏩ button |
-| Lock the speed-up on/off | click the hearth | tap the hearth |
+| Speed the flame up (×3) | hold `Space` / `Shift`, the ⏩ button, or the mouse button on the hearth | hold the ⏩ button or the hearth |
+| Lock the speed-up on/off | short click on the hearth | short tap on the hearth |
 | Pause | ❚❚ button, `P` or `Esc` | ❚❚ button |
 | Restart level | pause menu or `R` | pause menu |
 
@@ -55,8 +55,9 @@ Rules in one breath: keep the fire in the pipes, feed it, get it to the hearth.
 
 * **The flame never waits.** It moves at the level's speed from the moment the short READY
   phase ends. You can already slide tiles during READY.
-* **Fast-forward.** Like Blodia's speed button: when the route is ready, hold ⏩ (or tap the
-  hearth to lock it) and the flame travels three times faster. Fuel is burnt per tile, so
+* **Fast-forward.** Like Blodia's speed button: when the route is ready, hold ⏩ or keep the
+  hearth pressed (a short tap on the hearth locks it on) and the flame travels three times
+  faster. Fuel is burnt per tile, so
   speed is free; it only saves time, which means a bigger time bonus.
 * **Only tiles next to the hole can move** (they have a faint glowing rim). Sliding a tile
   moves the hole to where the tile was, like a 15-puzzle. The source and the hearth are fixed,
@@ -144,7 +145,8 @@ Key objects:
 ## Level data
 
 Levels are pure data (`LevelDef`). Hand-made levels live in `src/level/data/handmade.ts`:
-a tutorial set (1–8) and a "classic" set (9–12) whose layouts echo the first Blodia boards;
+a "classic" set (1–4) whose 14×8 layouts echo the first Blodia boards, then a tutorial set
+(5–12) introducing one mechanic at a time;
 levels 13–100 are generated deterministically and **baked** into `src/level/data/generated.ts`
 so the shipped game uses static data.
 

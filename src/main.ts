@@ -91,6 +91,15 @@ game.events.on('levelComplete', ({ breakdown }) => {
 // ----- input --------------------------------------------------------------------
 
 new PointerInput(canvas, {
+  onPress(x, y) {
+    // holding the hearth speeds the flame up for as long as the press lasts
+    if (game.state !== 'PLAYING' || !game.session) return;
+    const cell = renderer.cellAt(x, y, game.session);
+    if (cell && game.session.grid.get(cell.x, cell.y).kind === 'goal') game.setFastForward(true);
+  },
+  onRelease() {
+    game.setFastForward(false);
+  },
   onTap(x, y) {
     audio.unlock();
     if (game.state !== 'PLAYING' || !game.session) return;

@@ -1,5 +1,9 @@
 export interface PointerHandler {
-  /** Tap / click at CSS pixel coordinates. `button` 0 = primary, 2 = secondary. */
+  /** Pointer went down at CSS pixel coordinates (before we know if it is a tap, a hold or a swipe). */
+  onPress?(x: number, y: number): void;
+  /** Pointer released or cancelled, whatever happened in between. */
+  onRelease?(): void;
+  /** Short tap / click at CSS pixel coordinates. `button` 0 = primary, 2 = secondary. */
   onTap(x: number, y: number, button: number): void;
   /** Swipe starting at (x,y) in a cardinal direction (dx,dy) with |dx|+|dy| = 1. */
   onSwipe(x: number, y: number, dx: number, dy: number): void;
@@ -34,6 +38,7 @@ export class PointerInput {
     const p = this.local(e);
     this.start = { ...p, t: performance.now(), id: e.pointerId };
     this.moved = false;
+    this.handler.onPress?.(p.x, p.y);
     try {
       this.el.setPointerCapture(e.pointerId);
     } catch {
@@ -54,17 +59,23 @@ export class PointerInput {
     const dy = p.y - this.start.y;
     const dist = Math.hypot(dx, dy);
     const s = this.start;
+    const held = performance.now() - s.t;
     this.start = null;
+    this.handler.onRelease?.();
     if (dist > 30) {
       if (Math.abs(dx) > Math.abs(dy)) this.handler.onSwipe(s.x, s.y, dx > 0 ? 1 : -1, 0);
       else this.handler.onSwipe(s.x, s.y, 0, dy > 0 ? 1 : -1);
-    } else if (!this.moved) {
+    } else if (!this.moved && held < PointerInput.TAP_MAX_MS) {
       this.handler.onTap(s.x, s.y, e.button);
     }
   };
 
+  /** Presses longer than this are holds (e.g. speed-up on the hearth), not taps. */
+  static readonly TAP_MAX_MS = 350;
+
   private onCancel = (): void => {
     this.start = null;
+    this.handler.onRelease?.();
   };
 
   dispose(): void {

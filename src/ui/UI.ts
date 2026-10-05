@@ -411,7 +411,7 @@ export class UI {
     this.hintEl.style.display = 'none';
     g.appendChild(this.hintEl);
     const boosts = el('div', 'boosts');
-    const ff = el('button', 'ff-btn', '<b>⏩ FAST</b><small>hold · or tap the hearth</small>');
+    const ff = el('button', 'ff-btn', '<b>⏩ FAST</b><small>hold here or on the hearth</small>');
     ff.setAttribute('aria-label', 'Speed up the flame');
     const hold = (on: boolean) => {
       this.game.setFastForward(on);

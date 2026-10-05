@@ -28,10 +28,16 @@ await page.goto(url, { waitUntil: 'load' });
 await page.waitForTimeout(600);
 await page.screenshot({ path: `${out}/01-title.png` });
 
-// Title -> play
+// Title -> play (level 1 = the classic "Twin Loops" board)
 await page.click('button.btn:has-text("PLAY")');
 await page.waitForTimeout(400);
 await page.screenshot({ path: `${out}/02-level1-ready.png` });
+// Mechanics checks run on the one-slide tutorial board "First Slide"
+await page.evaluate(() => {
+  const { game, LEVELS } = window.pyrodia;
+  game.startRun(LEVELS.findIndex((l) => l.name === 'First Slide'));
+});
+await page.waitForTimeout(300);
 
 // Tap the flame to start, then let it fall (no slide) -> death
 const src = await page.evaluate(() => {
@@ -57,11 +63,26 @@ console.log('restart', cell.state);
 await page.mouse.click(cell.x, cell.y);
 await page.waitForTimeout(300);
 await page.screenshot({ path: `${out}/04-rotated.png` });
+// hold the mouse on the hearth: speed x3 while pressed, back to normal on release
+const hearth = await page.evaluate(() => {
+  const { game, renderer } = window.pyrodia;
+  const l = renderer.layout;
+  const g = game.session.parsed.goals[0];
+  return { x: l.originX + (g.x + 0.5) * l.tileSize, y: l.originY + (g.y + 0.5) * l.tileSize, base: game.session.def.flameSpeed };
+});
+await page.mouse.move(hearth.x, hearth.y);
+await page.mouse.down();
+await page.waitForTimeout(500);
+const whileHeld = await page.evaluate(() => window.pyrodia.game.session.flame.speed);
+await page.mouse.up();
+await page.waitForTimeout(100);
+const afterRelease = await page.evaluate(() => window.pyrodia.game.session.flame.speed);
+console.log('hearth hold speed', { base: hearth.base, whileHeld, afterRelease });
 await page.waitForTimeout(9000);
 await page.screenshot({ path: `${out}/05-complete.png` });
 const result = await page.evaluate(() => {
   const { game, progress } = window.pyrodia;
-  return { state: game.state, score: game.score, stars: game.lastBreakdown?.stars, embers: progress.embers, rec: progress.record(1) };
+  return { state: game.state, score: game.score, stars: game.lastBreakdown?.stars, embers: progress.embers, rec: progress.record(game.currentLevel.id) };
 });
 console.log('after win', JSON.stringify(result));
 
@@ -86,11 +107,11 @@ await page.setViewportSize({ width: 1100, height: 700 });
 await page.evaluate(() => window.pyrodia.game.startRun(6));
 await page.waitForTimeout(600);
 await page.screenshot({ path: `${out}/10-level7-warps.png` });
-await page.evaluate(() => window.pyrodia.game.startRun(8));
+await page.evaluate(() => window.pyrodia.game.startRun(0));
 await page.waitForTimeout(600);
-await page.screenshot({ path: `${out}/11-level9-classic.png` });
+await page.screenshot({ path: `${out}/11-level1-classic.png` });
 await page.setViewportSize({ width: 390, height: 844 });
-await page.evaluate(() => window.pyrodia.game.startRun(11));
+await page.evaluate(() => window.pyrodia.game.startRun(3));
 await page.waitForTimeout(600);
 await page.screenshot({ path: `${out}/12-level12-mobile.png` });
 await page.setViewportSize({ width: 1100, height: 700 });
