@@ -10,6 +10,8 @@ import type { Dir } from '../puzzle/Direction';
 import type { Cell, Grid, SlideMove } from '../puzzle/Grid';
 import { predictPath, type PathPrediction } from '../puzzle/PathSim';
 import { tileSegments, type Tile } from '../puzzle/Tile';
+import { solve } from '../puzzle/Solver';
+import { HINT_CONFIG, hintTierCount, movesRevealed } from '../player/Hints';
 import { CONFIG } from './Config';
 
 export type SessionPhase = 'ready' | 'running' | 'won' | 'lost';
@@ -32,6 +34,8 @@ export interface SessionEvents {
   fastForward: { on: boolean };
   /** A new pipe segment was travelled (Blodia 'cover' levels). */
   covered: { x: number; y: number; count: number; total: number };
+  /** The revealed solution changed (purchase, a hinted move played, or a recompute). */
+  hint: { tier: number; revealed: SlideMove[]; total: number; ok: boolean };
 }
 
 /** Visual slide animation (not part of the simulation). */
@@ -70,6 +74,17 @@ export class LevelSession {
   readonly segmentsTotal: number;
   /** Covered segments, keyed "tileUid:sideMask" so they follow their tile when it slides. */
   readonly coveredSegments = new Set<string>();
+  /** Solution hints: tiers bought (0 = none). */
+  hintTier = 0;
+  /** Moves bought so far (counted against the solution length at purchase time). */
+  private hintBudget = 0;
+  /** Current solution from the live board; the first `hintRemaining` moves are shown. */
+  hintMoves: SlideMove[] = [];
+  hintRemaining = 0;
+  /** Solution length when the first tier was bought (the base for the percentages). */
+  hintTotal = 0;
+  /** False when no solution could be found from the current board. */
+  hintOk = true;
   phase: SessionPhase = 'ready';
   /** Seconds until the flame starts moving automatically (unused when the level waits for the player). */
   readyTimer: number;
@@ -180,6 +195,77 @@ export class LevelSession {
     }
   }
 
+  /** Hints need a static solution: Blodia 'cover' boards are solved live and have none yet. */
+  get hintsAvailable(): boolean {
+    return !this.coverMode;
+  }
+
+  get canBuyHint(): boolean {
+    return this.hintsAvailable && this.hintTier < hintTierCount() && (this.phase === 'ready' || this.phase === 'running');
+  }
+
+  /** The moves currently shown to the player, in order. */
+  get revealedMoves(): SlideMove[] {
+    return this.hintMoves.slice(0, this.hintRemaining);
+  }
+
+  /** Solve from the live board: from the source before the start, from the flame afterwards. */
+  private computeSolution(): SlideMove[] | null {
+    const f = this.flame;
+    const fromFlame = this.phase === 'running' && (f.status === 'moving' || f.status === 'waiting');
+    const sx = fromFlame ? f.x : this.parsed.start.x;
+    const sy = fromFlame ? f.y : this.parsed.start.y;
+    const dir = fromFlame ? f.exit : this.parsed.start.dir;
+    const depth = Math.max(6, this.knownSolution.length + HINT_CONFIG.extraDepth);
+    const sol = solve(this.grid, sx, sy, dir, { maxDepth: depth, budget: HINT_CONFIG.solverBudget });
+    return sol ? sol.moves : null;
+  }
+
+  /** Buy the next tier: reveal the next share of the moves needed from here. Returns false if unavailable. */
+  buyHint(): boolean {
+    if (!this.canBuyHint) return false;
+    const moves = this.computeSolution();
+    if (!moves) {
+      this.hintOk = false;
+      this.emitHint();
+      return false;
+    }
+    this.hintOk = true;
+    this.hintMoves = moves;
+    if (this.hintTier === 0) this.hintTotal = moves.length;
+    this.hintTier++;
+    const target = movesRevealed(this.hintTier, Math.max(this.hintTotal, moves.length));
+    // moves already played from earlier tiers are spent; reveal what remains of the new tier
+    const spent = this.hintBudget - this.hintRemaining;
+    this.hintBudget = target;
+    this.hintRemaining = Math.min(moves.length, Math.max(0, target - spent));
+    if (this.hintTier >= hintTierCount()) this.hintRemaining = moves.length;
+    this.emitHint();
+    return true;
+  }
+
+  private emitHint(): void {
+    this.events.emit('hint', { tier: this.hintTier, revealed: this.revealedMoves, total: this.hintTotal, ok: this.hintOk });
+  }
+
+  /** Keep the revealed moves in sync with what the player actually did. */
+  private updateHintAfterSlide(from: Cell, to: Cell): void {
+    if (this.hintTier === 0) return;
+    const next = this.hintMoves[0];
+    if (next && next.from.x === from.x && next.from.y === from.y && next.to.x === to.x && next.to.y === to.y) {
+      this.hintMoves = this.hintMoves.slice(1);
+      if (this.hintRemaining > 0) this.hintRemaining--;
+    } else {
+      // the player left the plan: recompute from the new board, keep the number of moves still owed
+      const moves = this.computeSolution();
+      this.hintOk = !!moves;
+      this.hintMoves = moves ?? [];
+      this.hintRemaining = Math.min(this.hintRemaining, this.hintMoves.length);
+      if (this.hintTier >= hintTierCount()) this.hintRemaining = this.hintMoves.length;
+    }
+    this.emitHint();
+  }
+
   /** The intended solution: slides that undo the scramble (for debug / hints). */
   get knownSolution(): SlideMove[] {
     return this.parsed.solution;
@@ -223,6 +309,7 @@ export class LevelSession {
       pickupsTotal: this.pickupsTotal,
       newPickups: this.newPickups,
       boostsUsed: this.boostsUsed,
+      hintsUsed: this.hintTier,
       segmentsCovered: this.coverMode ? this.coveredSegments.size : 0,
     };
   }
@@ -308,6 +395,7 @@ export class LevelSession {
     this.slideAnims.set(target.y * this.grid.width + target.x, { dx: x - target.x, dy: y - target.y, t: 0 });
     this.refreshPrediction();
     this.events.emit('slide', { from: { x, y }, to: target });
+    this.updateHintAfterSlide({ x, y }, target);
     // without a countdown the first move starts the flame; with one, slides are preparation
     if (this.phase === 'ready' && this.countdown <= 0) this.start();
     return true;

@@ -49,6 +49,7 @@ relative (`./`) so the build works from any sub-path such as `https://<user>.git
 | Slide a tile into the hole | click a tile next to the hole | tap it, or swipe it towards the hole |
 | Speed the flame up (×3) | hold `Space` / `Shift`, the ⏩ button, or the mouse button on the hearth | hold the ⏩ button or the hearth |
 | Lock the speed-up on/off | short click on the hearth | short tap on the hearth |
+| Buy the next solution tier | 💡 button or `H` | 💡 button |
 | Pause | ❚❚ button, `P` or `Esc` | ❚❚ button |
 | Restart level | pause menu or `R` | pause menu |
 
@@ -98,6 +99,14 @@ Rules in one breath: keep the fire in the pipes, feed it, get it to the hearth.
 * **Embers** (✦) are a persistent currency earned by finishing levels. During play you can
   spend them on *Emergency Fuel* (+30 fuel) or *Emergency Time* (+5 s). Using a boost forfeits
   the PERFECT rating for that attempt.
+* **Solution hints by tier** (💡 button or `H`). Each tap buys the next tier: 30%, then 60%,
+  then 100% of the moves needed from the current board. The bought moves are drawn live on the
+  board: the next one pulses in gold with an arrow into the hole, the following ones are
+  numbered. Play the shown move and it disappears; play something else and the solution is
+  recomputed from the new board, keeping the moves you already bought. Hints are free in the
+  prototype; prices live in `HINT_CONFIG.cost` (`src/player/Hints.ts`) for the future credit
+  system. Any hint forfeits the PERFECT rating. Not available yet on the Blodia boards (1–20),
+  which are solved live while the flame moves and have no static solution.
 * **Rewards are not cumulative across replays.** A pickup always refuels the flame, but its
   score bonus and its Embers are granted only the first time it is collected on that level.
   Pickups you already collected on an earlier attempt are drawn greyed out; collecting one you

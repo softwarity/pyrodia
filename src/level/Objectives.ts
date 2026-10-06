@@ -12,6 +12,8 @@ export interface LevelOutcome {
   boostsUsed: number;
   /** Pipe segments the flame travelled through (Blodia 'cover' levels). */
   segmentsCovered?: number;
+  /** Solution tiers bought on this attempt. */
+  hintsUsed?: number;
 }
 
 export interface ObjectiveResult {

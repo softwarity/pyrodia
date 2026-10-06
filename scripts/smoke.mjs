@@ -136,5 +136,25 @@ await page.setViewportSize({ width: 1100, height: 700 });
 await page.waitForTimeout(300);
 await page.screenshot({ path: `${out}/09-level85.png` });
 
+// tiered solution hint on a hearth level: tap the hint button twice
+await page.setViewportSize({ width: 1100, height: 700 });
+await page.evaluate(() => {
+  const { game, LEVELS } = window.pyrodia;
+  game.startRun(LEVELS.findIndex((l) => l.name === 'Pressure'));
+  document.querySelector('.debug-panel')?.remove();
+});
+await page.waitForTimeout(300);
+await page.click('.hint-btn');
+await page.waitForTimeout(200);
+const hint1 = await page.evaluate(() => ({ tier: window.pyrodia.game.session.hintTier, shown: window.pyrodia.game.session.revealedMoves.length, label: document.querySelector('.hint-btn').textContent }));
+await page.click('.hint-btn');
+await page.waitForTimeout(300);
+const hint2 = await page.evaluate(() => ({ tier: window.pyrodia.game.session.hintTier, shown: window.pyrodia.game.session.revealedMoves.length, total: window.pyrodia.game.session.hintTotal }));
+console.log('hints', JSON.stringify({ hint1, hint2 }));
+await page.screenshot({ path: `${out}/13-hint.png` });
+await page.setViewportSize({ width: 390, height: 844 });
+await page.waitForTimeout(300);
+await page.screenshot({ path: `${out}/14-hint-mobile.png` });
+
 console.log('errors:', errors.length ? errors : 'none');
 await browser.close();

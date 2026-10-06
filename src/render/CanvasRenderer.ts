@@ -139,6 +139,7 @@ export class CanvasRenderer {
     this.drawWater(layout, w, h);
     this.drawBoard(session, layout);
     this.drawPreview(session, layout);
+    this.drawHint(session, layout);
     if (this.debug.showPath) this.drawDebugPath(session, layout);
     if (this.debug.showSolution && this.debug.solution) this.drawSolution(this.debug.solution, layout);
     if (this.debug.showConnections) this.drawConnections(session, layout);
@@ -682,6 +683,66 @@ export class CanvasRenderer {
       ctx.moveTo(ex + r * 0.5, ey - r * 0.5);
       ctx.lineTo(ex - r * 0.5, ey + r * 0.5);
       ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  /** Bought solution moves, live: the next one pulses, the following ones are numbered. */
+  private drawHint(session: LevelSession, l: BoardLayout): void {
+    const moves = session.revealedMoves;
+    if (moves.length === 0) return;
+    const ctx = this.ctx;
+    const ts = l.tileSize;
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    // later moves first so the next one is drawn on top
+    for (let i = moves.length - 1; i >= 0; i--) {
+      const m = moves[i];
+      const fx = l.originX + (m.from.x + 0.5) * ts;
+      const fy = l.originY + (m.from.y + 0.5) * ts;
+      const tx = l.originX + (m.to.x + 0.5) * ts;
+      const ty = l.originY + (m.to.y + 0.5) * ts;
+      const next = i === 0;
+      const pulse = 0.55 + 0.45 * Math.sin(this.time * 6);
+      if (next) {
+        ctx.strokeStyle = `rgba(255, 213, 74, ${0.5 + 0.5 * pulse})`;
+        ctx.lineWidth = Math.max(3, ts * 0.07);
+        ctx.strokeRect(l.originX + m.from.x * ts + 3, l.originY + m.from.y * ts + 3, ts - 6, ts - 6);
+      }
+      const alpha = next ? 0.95 : 0.55;
+      const ang = Math.atan2(ty - fy, tx - fx);
+      const len = Math.hypot(tx - fx, ty - fy);
+      const sx = fx + Math.cos(ang) * ts * 0.18;
+      const sy = fy + Math.sin(ang) * ts * 0.18;
+      const ex = fx + Math.cos(ang) * (len - ts * 0.22);
+      const ey = fy + Math.sin(ang) * (len - ts * 0.22);
+      ctx.strokeStyle = `rgba(255, 213, 74, ${alpha})`;
+      ctx.fillStyle = `rgba(255, 213, 74, ${alpha})`;
+      ctx.lineWidth = Math.max(2, ts * (next ? 0.08 : 0.05));
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(sx, sy);
+      ctx.lineTo(ex, ey);
+      ctx.stroke();
+      const head = ts * (next ? 0.16 : 0.11);
+      ctx.beginPath();
+      ctx.moveTo(ex + Math.cos(ang) * head * 0.6, ey + Math.sin(ang) * head * 0.6);
+      ctx.lineTo(ex + Math.cos(ang + 2.4) * head, ey + Math.sin(ang + 2.4) * head);
+      ctx.lineTo(ex + Math.cos(ang - 2.4) * head, ey + Math.sin(ang - 2.4) * head);
+      ctx.closePath();
+      ctx.fill();
+      const r = ts * (next ? 0.17 : 0.13);
+      ctx.fillStyle = next ? '#ffd54a' : 'rgba(20, 16, 10, 0.85)';
+      ctx.beginPath();
+      ctx.arc(fx, fy, r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = `rgba(255, 213, 74, ${alpha})`;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.fillStyle = next ? '#1a0f0a' : '#ffd54a';
+      ctx.font = `800 ${Math.max(10, r * 1.2)}px 'Rubik', 'Segoe UI', sans-serif`;
+      ctx.fillText(String(i + 1), fx, fy + 1);
     }
     ctx.restore();
   }

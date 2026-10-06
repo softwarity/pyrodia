@@ -2,6 +2,7 @@ import type { Game } from '../game/Game';
 import type { GameState } from '../game/GameStates';
 import type { LevelDef } from '../level/LevelDef';
 import { EMBER_USES } from '../player/Embers';
+import { HINT_CONFIG, hintCost } from '../player/Hints';
 import { formatScore, type ScoreBreakdown } from '../player/Scoring';
 
 function el<K extends keyof HTMLElementTagNameMap>(tag: K, className = '', html = ''): HTMLElementTagNameMap[K] {
@@ -55,6 +56,16 @@ export class UI {
     });
     game.events.on('boostRefused', ({ cost }) => this.banner('NOT ENOUGH EMBERS', `this boost costs ${cost} embers`, true, 1.2));
     game.events.on('embersChanged', () => this.refreshBoostButtons());
+    game.events.on('hintBought', () => this.refreshHintButton());
+    game.events.on('hintRefused', ({ reason, cost }) => {
+      if (reason === 'noSolution') this.banner('NO SOLUTION FROM HERE', 'restart the level or keep trying', true, 1.6);
+      else if (reason === 'credits') this.banner('NOT ENOUGH CREDITS', `this hint costs ${cost}`, true, 1.4);
+    });
+    game.events.on('levelLoaded', () => {
+      this.refreshHintButton();
+      // keep the button label in sync with live hint updates
+      game.session?.events.on('hint', () => this.refreshHintButton());
+    });
     this.show(game.state);
   }
 
@@ -88,6 +99,23 @@ export class UI {
         this.bannerEl = null;
       }
     }
+  }
+
+  /** Label shows the next tier ("💡 30%"), hidden on boards without a computable solution. */
+  private refreshHintButton(): void {
+    const b = this.ingame?.querySelector<HTMLButtonElement>('.hint-btn');
+    const s = this.game.session;
+    if (!b || !s) return;
+    b.style.display = s.hintsAvailable ? '' : 'none';
+    const tiers = HINT_CONFIG.tiers;
+    const done = s.hintTier >= tiers.length;
+    const nextShare = done ? 1 : tiers[s.hintTier];
+    const cost = hintCost(s.hintTier + 1);
+    const left = s.revealedMoves.length;
+    b.innerHTML = done
+      ? `<b>💡 SOLUTION</b><small>${left} move${left === 1 ? '' : 's'} shown</small>`
+      : `<b>💡 ${Math.round(nextShare * 100)}%</b><small>${cost > 0 ? `${cost} credits` : 'free'}${s.hintTier > 0 ? ` · ${left} shown` : ' · solution'}</small>`;
+    b.disabled = done;
   }
 
   private refreshBoostButtons(): void {
@@ -437,9 +465,17 @@ export class UI {
       boosts.appendChild(b);
       if (boosts.childElementCount === 1) boosts.appendChild(ff);
     }
+    const hint = el('button', 'boost-btn hint-btn', '<b>💡 30%</b><small>free · solution</small>');
+    hint.title = 'Reveal part of the solution';
+    hint.addEventListener('click', () => {
+      this.click();
+      this.game.buyHint();
+    });
+    boosts.insertBefore(hint, boosts.lastChild);
     g.appendChild(boosts);
     this.ingame = g;
     this.refreshBoostButtons();
+    this.refreshHintButton();
     this.root.appendChild(g);
     this.onLevelLoaded(this.game.currentLevel);
   }

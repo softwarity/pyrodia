@@ -41,7 +41,8 @@ export interface ScoreBreakdown {
 
 export function computeLevelScore(def: LevelDef, outcome: LevelOutcome, lives: number, maxFuel: number): ScoreBreakdown {
   const objectives = evaluateObjectives(def, outcome);
-  const stars = starsFor(objectives, outcome.boostsUsed);
+  // any assistance (ember boost or solution hint) forfeits the PERFECT rating
+  const stars = starsFor(objectives, outcome.boostsUsed + (outcome.hintsUsed ?? 0));
   const timeRatio = def.timeLimit > 0 ? clamp01(outcome.timeRemaining / def.timeLimit) : 0;
   const fuelRatio = maxFuel > 0 ? clamp01(outcome.fuelRemaining / maxFuel) : 0;
   const base = def.baseScore;

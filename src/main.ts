@@ -84,6 +84,7 @@ game.events.on('levelLoaded', () => {
   });
 });
 game.events.on('gameOver', () => audio.gameOver());
+game.events.on('hintBought', () => audio.boost());
 game.events.on('levelComplete', ({ breakdown }) => {
   if (breakdown.stars === 3) audio.perfectLevel();
 });
@@ -134,6 +135,8 @@ window.addEventListener('keydown', (e) => {
     if (game.state === 'PLAYING' || game.state === 'PAUSED') game.togglePause();
   } else if ((e.key === 'r' || e.key === 'R') && game.state === 'PLAYING') {
     game.restartLevel();
+  } else if ((e.key === 'h' || e.key === 'H') && game.state === 'PLAYING') {
+    game.buyHint();
   } else if ((e.key === 'd' || e.key === 'D') && debugPanel) {
     debugPanel.toggle();
   }

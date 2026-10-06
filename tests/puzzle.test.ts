@@ -316,6 +316,64 @@ describe('simulation', () => {
   });
 });
 
+describe('solution hints', () => {
+  const byName = (n: string) => LEVELS.find((l) => l.name === n)!;
+
+  it('each tier reveals the next share of the moves, following the player live', () => {
+    const def = LEVELS.find((l) => l.win !== 'cover' && parseLevel(l).solution.length >= 6)!;
+    const session = new LevelSession(def);
+    expect(session.canBuyHint).toBe(true);
+    expect(session.buyHint()).toBe(true);
+    const total = session.hintTotal;
+    expect(total).toBeGreaterThan(0);
+    expect(session.revealedMoves.length).toBe(Math.max(1, Math.ceil(total * 0.3)));
+    // play the first revealed move: it leaves the list, the rest stays
+    const before = session.revealedMoves.length;
+    const m = session.revealedMoves[0];
+    expect(session.slide(m.from.x, m.from.y)).toBe(true);
+    expect(session.revealedMoves.length).toBe(before - 1);
+    // buy the remaining tiers: the whole remaining solution is shown
+    session.buyHint();
+    session.buyHint();
+    expect(session.hintTier).toBe(3);
+    expect(session.canBuyHint).toBe(false);
+    expect(session.revealedMoves.length).toBe(session.hintMoves.length);
+  });
+
+  it('following every revealed move solves the level', () => {
+    const session = new LevelSession(byName('Pressure'));
+    session.buyHint();
+    session.buyHint();
+    session.buyHint();
+    let guard = 20;
+    while (session.revealedMoves.length > 0 && guard-- > 0) {
+      const m = session.revealedMoves[0];
+      expect(session.slide(m.from.x, m.from.y)).toBe(true);
+    }
+    let won = false;
+    session.events.on('won', () => (won = true));
+    for (let t = 0; t < 60 && !won; t += 1 / 60) session.update(1 / 60);
+    expect(won).toBe(true);
+  });
+
+  it('is not offered on Blodia boards (solved live, no static solution)', () => {
+    const session = new LevelSession(LEVELS[0]);
+    expect(session.hintsAvailable).toBe(false);
+    expect(session.buyHint()).toBe(false);
+  });
+
+  it('a hint forfeits the PERFECT rating', () => {
+    const def = byName('Pressure');
+    const b = computeLevelScore(
+      def,
+      { elapsed: 5, timeRemaining: def.timeLimit - 5, fuelRemaining: 100, deathsThisLevel: 0, pickupsCollected: 4, pickupsTotal: 4, newPickups: 4, boostsUsed: 0, hintsUsed: 1 },
+      3,
+      100,
+    );
+    expect(b.stars).toBeLessThan(3);
+  });
+});
+
 describe('scoring', () => {
   it('rewards a perfect run with every bonus', () => {
     const def = LEVELS[2];

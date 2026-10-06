@@ -2,6 +2,7 @@ import type { AudioManager } from '../audio/AudioManager';
 import { EventEmitter } from '../core/EventEmitter';
 import type { LevelDef } from '../level/LevelDef';
 import { emberUse, type EmberUseId } from '../player/Embers';
+import { hintCost } from '../player/Hints';
 import { Lives } from '../player/Lives';
 import type { Progress } from '../player/Progress';
 import { computeLevelScore, type ScoreBreakdown } from '../player/Scoring';
@@ -20,6 +21,8 @@ export interface GameEvents {
   embersChanged: { embers: number };
   boostUsed: { id: EmberUseId; cost: number };
   boostRefused: { id: EmberUseId; cost: number };
+  hintBought: { tier: number; cost: number; revealed: number };
+  hintRefused: { reason: 'unavailable' | 'credits' | 'noSolution'; cost: number };
 }
 
 /**
@@ -126,6 +129,31 @@ export class Game {
 
   get embers(): number {
     return this.progress.embers;
+  }
+
+  /**
+   * Buy the next solution tier. Free in the prototype: the cost comes from
+   * HINT_CONFIG and is paid with the player's credits once they exist.
+   */
+  buyHint(): boolean {
+    const s = this.session;
+    if (this.state !== 'PLAYING' || !s || !s.canBuyHint) {
+      this.events.emit('hintRefused', { reason: 'unavailable', cost: 0 });
+      return false;
+    }
+    const cost = hintCost(s.hintTier + 1);
+    if (cost > 0 && !this.progress.spendEmbers(cost)) {
+      this.events.emit('hintRefused', { reason: 'credits', cost });
+      return false;
+    }
+    if (!s.buyHint()) {
+      if (cost > 0) this.progress.addEmbers(cost); // refund
+      this.events.emit('hintRefused', { reason: 'noSolution', cost });
+      return false;
+    }
+    if (cost > 0) this.events.emit('embersChanged', { embers: this.progress.embers });
+    this.events.emit('hintBought', { tier: s.hintTier, cost, revealed: s.hintRemaining });
+    return true;
   }
 
   setFastForward(on: boolean): void {

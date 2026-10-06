@@ -736,3 +736,11 @@ h1.logo {
     padding: 4px 8px;
   }
 }
+
+.boosts .hint-btn {
+  border-color: rgba(255, 213, 74, 0.7);
+}
+
+.boosts .hint-btn b {
+  color: #ffd54a;
+}
