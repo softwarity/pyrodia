@@ -114,7 +114,10 @@ export class DebugPanel {
   private refreshSolution(): void {
     const s = this.game.session;
     if (!s) return;
-    if (this.renderer.debug.showSolution) {
+    if (this.renderer.debug.showSolution && s.coverMode) {
+      this.renderer.debug.solution = null; // Blodia levels are solved live, there is no static solution
+      this.info.textContent = 'cover level: no static solution';
+    } else if (this.renderer.debug.showSolution) {
       const st = s.parsed.start;
       // shortest solution from the *current* board; fall back to the known reverse scramble
       const found = solve(s.grid, st.x, st.y, st.dir, { maxDepth: Math.max(6, s.knownSolution.length + 2), budget: 60_000 });

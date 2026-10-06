@@ -30,7 +30,9 @@ export interface ObjectiveDef {
  * Rows are space separated tokens:  <Kind><Rotation>[*]
  *
  *   Kind:      .. void   -- blank (solid tile without pipe, slides)
- *              I straight   C corner   T tee   X cross
+ *              ## not part of the board (nothing slides into it, the flame falls)
+ *              I straight   C corner   T tee   X cross (bridge: straight through)
+ *              Z double: two quarter arcs, Z0 = N-E + S-W, Z1 = E-S + W-N
  *              D cap (dead-end, bounces)   S source (flame start)   G goal
  *              W<rot><n> warp: a numbered pipe end; the flame entering warp n
  *              comes out of the other warp n (e.g. W31 opens West, number 1)
@@ -55,6 +57,19 @@ export interface LevelDef {
   scramble: string;
   /** Flame speed in tiles per second. */
   flameSpeed: number;
+  /**
+   * How the level is won. 'goal' (default): bring the flame to the hearth.
+   * 'cover' (Blodia rules): the flame must travel through every pipe segment.
+   */
+  win?: 'goal' | 'cover';
+  /** Blodia start: the flame enters tile (x,y) through side `from` (no source tile needed). */
+  start?: { x: number; y: number; from: 'N' | 'E' | 'S' | 'W' };
+  /**
+   * Seconds before the flame sets off by itself (Blodia's COUNTDOWN). Slides
+   * during the countdown do not start it; TURBO starts it early. When omitted
+   * the flame waits for the player's first move.
+   */
+  countdown?: number;
   /** The flame re-enters from the opposite edge when it leaves the board (default true). */
   wrap?: boolean;
   /** Survival time limit in seconds. */
@@ -85,7 +100,10 @@ export interface LevelDef {
 export interface StartInfo {
   x: number;
   y: number;
+  /** Source mode: the side the flame leaves the source tile through. */
   dir: Dir;
+  /** Blodia mode: the side the flame enters the start tile through. */
+  enterFrom?: Dir;
 }
 
 export interface ParsedLevel {

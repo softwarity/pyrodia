@@ -12,10 +12,12 @@ import { E, N, S, W, rotateMaskCW, type Mask } from './Direction';
 export type TileKind =
   | 'empty' // the void: a hole in the board, water underneath
   | 'blank' // a solid tile with no pipe: slides like any other, the flame falls off it
+  | 'none' // not part of the board (Blodia's white cells): nothing can slide into it
   | 'straight'
   | 'corner'
   | 'tee'
   | 'cross'
+  | 'double' // two independent quarter arcs in one tile (Z0: N-E + S-W, Z1: E-S + W-N)
   | 'cap' // dead-end: the flame bounces back
   | 'warp' // numbered pipe: the flame comes out of the twin with the same number
   | 'source' // where the flame is born (fixed)
@@ -33,16 +35,20 @@ export interface Tile {
   pickupId?: number;
   /** Warp number (1-9); two warps with the same number are linked. */
   warpId?: number;
+  /** Stable identity inside a level session (tiles move, their id does not). */
+  uid?: number;
 }
 
 /** Base connection masks at rotation 0. */
 export const BASE_MASK: Record<TileKind, Mask> = {
   empty: 0,
   blank: 0,
+  none: 0,
   straight: N | S,
   corner: N | E,
   tee: N | E | S,
   cross: N | E | S | W,
+  double: N | E | S | W,
   cap: N,
   warp: N,
   source: N,
@@ -53,10 +59,12 @@ export const BASE_MASK: Record<TileKind, Mask> = {
 export const DISTINCT_ROTATIONS: Record<TileKind, number> = {
   empty: 1,
   blank: 1,
+  none: 1,
   straight: 2,
   corner: 4,
   tee: 4,
   cross: 1,
+  double: 2,
   cap: 4,
   warp: 4,
   source: 4,
@@ -66,10 +74,12 @@ export const DISTINCT_ROTATIONS: Record<TileKind, number> = {
 export const KIND_CODES: Record<TileKind, string> = {
   empty: '.',
   blank: '-',
+  none: '#',
   straight: 'I',
   corner: 'C',
   tee: 'T',
   cross: 'X',
+  double: 'Z',
   cap: 'D',
   warp: 'W',
   source: 'S',
@@ -83,7 +93,11 @@ export const CODE_KINDS: Record<string, TileKind> = Object.fromEntries(
 export function makeTile(kind: TileKind, rotation = 0, locked = false, warpId?: number): Tile {
   const n = DISTINCT_ROTATIONS[kind];
   const r = ((rotation % 4) + 4) % 4;
-  const t: Tile = { kind, rotation: n === 1 ? 0 : n === 2 ? r % 2 : r, locked: locked || kind === 'source' || kind === 'goal' || kind === 'empty' };
+  const t: Tile = {
+    kind,
+    rotation: n === 1 ? 0 : n === 2 ? r % 2 : r,
+    locked: locked || kind === 'source' || kind === 'goal' || kind === 'empty' || kind === 'none',
+  };
   if (kind === 'warp') t.warpId = warpId ?? 1;
   return t;
 }
@@ -102,7 +116,47 @@ export function isSlidable(tile: Tile): boolean {
 }
 
 export function isPipe(tile: Tile): boolean {
-  return tile.kind !== 'empty' && tile.kind !== 'blank';
+  return tile.kind !== 'empty' && tile.kind !== 'blank' && tile.kind !== 'none';
+}
+
+/**
+ * The independent pipe segments of a tile, as pairs of sides (a dead end is a
+ * pair of the same side). Used to count what the flame must cover in
+ * Blodia-style levels and to draw the pipes.
+ */
+export function tileSegments(tile: Tile): [Mask, Mask][] {
+  const m = tileMask(tile);
+  const sides = [N, E, S, W].filter((d) => m & d) as Mask[];
+  switch (tile.kind) {
+    case 'straight':
+    case 'corner':
+      return [[sides[0], sides[1]]];
+    case 'cross':
+      return [
+        [W, E],
+        [N, S],
+      ];
+    case 'double':
+      return tile.rotation % 2 === 0
+        ? [
+            [N, E],
+            [S, W],
+          ]
+        : [
+            [E, S],
+            [W, N],
+          ];
+    case 'cap':
+    case 'warp':
+      return [[sides[0], sides[0]]];
+    case 'tee':
+      return [
+        [sides[0], sides[1]],
+        [sides[1], sides[2]],
+      ];
+    default:
+      return [];
+  }
 }
 
 export function cloneTile(t: Tile): Tile {
@@ -112,6 +166,7 @@ export function cloneTile(t: Tile): Tile {
     c.pickupId = t.pickupId;
   }
   if (t.warpId !== undefined) c.warpId = t.warpId;
+  if (t.uid !== undefined) c.uid = t.uid;
   return c;
 }
 

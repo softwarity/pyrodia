@@ -10,6 +10,8 @@ export interface LevelOutcome {
   /** Pickups never collected on a previous attempt (the only ones that grant rewards). */
   newPickups: number;
   boostsUsed: number;
+  /** Pipe segments the flame travelled through (Blodia 'cover' levels). */
+  segmentsCovered?: number;
 }
 
 export interface ObjectiveResult {
@@ -24,7 +26,7 @@ export function objectivesFor(def: LevelDef): ObjectiveDef[] {
   const list: ObjectiveDef[] = [{ kind: 'noDeath' }];
   if (def.pickups && def.pickups.length > 0) list.push({ kind: 'allFuel' });
   // "fast" = finish while at least 40% of the time limit remains
-  list.push({ kind: 'underTime', value: Math.round(def.timeLimit * 0.6) });
+  if (def.timeLimit > 0) list.push({ kind: 'underTime', value: Math.round(def.timeLimit * 0.6) });
   return list;
 }
 

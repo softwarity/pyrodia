@@ -9,6 +9,7 @@ import { FUEL_CONFIG, type PickupKind } from '../player/Fuel';
 import type { Dir } from '../puzzle/Direction';
 import type { Cell, Grid, SlideMove } from '../puzzle/Grid';
 import { predictPath, type PathPrediction } from '../puzzle/PathSim';
+import { tileSegments, type Tile } from '../puzzle/Tile';
 import { CONFIG } from './Config';
 
 export type SessionPhase = 'ready' | 'running' | 'won' | 'lost';
@@ -29,6 +30,8 @@ export interface SessionEvents {
   lowFuel: undefined;
   boost: { id: EmberUseId };
   fastForward: { on: boolean };
+  /** A new pipe segment was travelled (Blodia 'cover' levels). */
+  covered: { x: number; y: number; count: number; total: number };
 }
 
 /** Visual slide animation (not part of the simulation). */
@@ -60,6 +63,13 @@ export class LevelSession {
   newPickups = 0;
   embersCollected = 0;
   boostsUsed = 0;
+  /** Blodia rules: the flame must travel through every pipe segment. */
+  readonly coverMode: boolean;
+  /** Seconds of countdown before the flame starts by itself (0 = waits for the player). */
+  readonly countdown: number;
+  readonly segmentsTotal: number;
+  /** Covered segments, keyed "tileUid:sideMask" so they follow their tile when it slides. */
+  readonly coveredSegments = new Set<string>();
   phase: SessionPhase = 'ready';
   /** Seconds until the flame starts moving automatically (unused when the level waits for the player). */
   readyTimer: number;
@@ -91,18 +101,34 @@ export class LevelSession {
     this.grid = this.parsed.grid;
     this.previouslyCollected = new Set(previouslyCollected);
     this.pickupsTotal = this.parsed.pickupCount;
-    this.readyTimer = CONFIG.autoStartDelay;
+    this.coverMode = def.win === 'cover';
+    this.countdown = def.countdown ?? 0;
+    this.readyTimer = this.countdown > 0 ? this.countdown : CONFIG.autoStartDelay;
     this.timeRemaining = def.timeLimit;
+    let total = 0;
+    this.grid.forEach((t) => (total += tileSegments(t).length));
+    this.segmentsTotal = total;
     const s = this.parsed.start;
     this.maxFuel = def.maxFuel ?? FUEL_CONFIG.defaultMaxFuel;
-    const flame = new Flame(this.grid, s.x, s.y, s.dir, def.flameSpeed, {
-      initial: def.initialFuel ?? FUEL_CONFIG.defaultInitialFuel,
-      max: this.maxFuel,
-      perTile: def.fuelPerTile ?? FUEL_CONFIG.defaultFuelPerTile,
-    });
+    const flame = new Flame(
+      this.grid,
+      s.x,
+      s.y,
+      s.dir,
+      def.flameSpeed,
+      {
+        initial: def.initialFuel ?? FUEL_CONFIG.defaultInitialFuel,
+        max: this.maxFuel,
+        perTile: def.fuelPerTile ?? FUEL_CONFIG.defaultFuelPerTile,
+      },
+      s.enterFrom,
+    );
     this.flames.push(flame);
     this.entities.push(flame);
-    flame.on('centre', ({ x, y }) => this.collectAt(x, y, flame));
+    flame.on('centre', ({ x, y }) => {
+      this.collectAt(x, y, flame);
+      this.coverAt(x, y, flame);
+    });
     flame.on('extinguished', (p) => {
       if (this.phase !== 'running') return;
       this.phase = 'lost';
@@ -129,6 +155,29 @@ export class LevelSession {
       this.events.emit('won', { timeRemaining: this.timeRemaining });
     });
     this.refreshPrediction();
+  }
+
+  private segmentKey(tile: Tile, mask: number): string {
+    return `${tile.uid ?? 0}:${mask}`;
+  }
+
+  /** Has this segment of `tile` (identified by its two sides) been travelled? */
+  isCovered(tile: Tile, sideA: number, sideB: number): boolean {
+    return this.coveredSegments.has(this.segmentKey(tile, sideA | sideB));
+  }
+
+  private coverAt(x: number, y: number, flame: Flame): void {
+    const tile = this.grid.get(x, y);
+    if (tileSegments(tile).length === 0) return;
+    const key = this.segmentKey(tile, flame.entry | flame.exit);
+    if (this.coveredSegments.has(key)) return;
+    this.coveredSegments.add(key);
+    this.events.emit('covered', { x, y, count: this.coveredSegments.size, total: this.segmentsTotal });
+    if (this.coverMode && this.coveredSegments.size >= this.segmentsTotal && this.phase === 'running') {
+      this.phase = 'won';
+      flame.status = 'arrived';
+      this.events.emit('won', { timeRemaining: this.timeRemaining });
+    }
   }
 
   /** The intended solution: slides that undo the scramble (for debug / hints). */
@@ -174,6 +223,7 @@ export class LevelSession {
       pickupsTotal: this.pickupsTotal,
       newPickups: this.newPickups,
       boostsUsed: this.boostsUsed,
+      segmentsCovered: this.coverMode ? this.coveredSegments.size : 0,
     };
   }
 
@@ -186,8 +236,9 @@ export class LevelSession {
     return this.ffHeld || this.ffLocked;
   }
 
-  /** Hold-to-speed-up control. */
+  /** Hold-to-speed-up control. Pressing it during the countdown also starts the flame (Blodia's TURBO). */
   setFastForwardHeld(on: boolean): void {
+    if (on && this.phase === 'ready') this.start();
     if (this.ffHeld === on) return;
     this.ffHeld = on;
     this.applySpeed();
@@ -227,8 +278,9 @@ export class LevelSession {
       this.events.emit('slideDenied', { x, y, reason: 'void' });
       return false;
     }
-    if (this.phase === 'ready' && (tile.kind === 'source' || this.flame.occupies(x, y))) {
-      // tapping the flame releases it without moving anything
+    if (this.phase === 'ready' && tile.kind === 'source') {
+      // tapping the source releases the flame (Blodia boards use TURBO instead,
+      // because there the tile carrying the flame can itself slide)
       this.start();
       return false;
     }
@@ -243,11 +295,7 @@ export class LevelSession {
       this.events.emit('slideDenied', { x, y, reason: 'fixed' });
       return false;
     }
-    if (this.flame.occupies(x, y) && this.phase === 'running') {
-      this.shakes.set(idx, 1);
-      this.events.emit('slideDenied', { x, y, reason: 'occupied' });
-      return false;
-    }
+    const carriesFlame = this.flame.occupies(x, y);
     const target = this.grid.slide(x, y);
     if (!target) {
       this.shakes.set(idx, 1);
@@ -255,10 +303,13 @@ export class LevelSession {
       return false;
     }
     this.slides++;
+    // Blodia: the tile carrying the flame can slide, the flame rides along
+    if (carriesFlame) this.flame.moveWithTile(target.x, target.y);
     this.slideAnims.set(target.y * this.grid.width + target.x, { dx: x - target.x, dy: y - target.y, t: 0 });
     this.refreshPrediction();
     this.events.emit('slide', { from: { x, y }, to: target });
-    if (this.phase === 'ready') this.start();
+    // without a countdown the first move starts the flame; with one, slides are preparation
+    if (this.phase === 'ready' && this.countdown <= 0) this.start();
     return true;
   }
 
@@ -282,7 +333,7 @@ export class LevelSession {
       return;
     }
     if (this.phase === 'ready') {
-      if (CONFIG.autoStartDelay > 0) {
+      if (this.countdown > 0 || CONFIG.autoStartDelay > 0) {
         this.readyTimer -= dt;
         if (this.readyTimer <= 0) this.start();
       }
@@ -299,7 +350,7 @@ export class LevelSession {
         this.lowFuelWarned = true;
         this.events.emit('lowFuel', undefined);
       }
-      if (this.timeRemaining <= 0 && this.phase === 'running' && this.flame.status === 'moving') {
+      if (this.def.timeLimit > 0 && this.timeRemaining <= 0 && this.phase === 'running' && this.flame.status === 'moving') {
         this.timeRemaining = 0;
         this.phase = 'lost';
         this.flame.status = 'dead';

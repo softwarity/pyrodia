@@ -324,6 +324,7 @@ export class UI {
             `<span>Time bonus</span><b>+${formatScore(b.timeBonus)}</b>` +
             `<span>Fuel bonus</span><b>+${formatScore(b.fuelBonus)}</b>` +
             `<span>Life bonus</span><b>+${formatScore(b.lifeBonus)}</b>` +
+            (b.pipeBonus > 0 ? `<span>Pipes covered</span><b>+${formatScore(b.pipeBonus)}</b>` : '') +
             `<span>New fuel pickups</span><b>+${formatScore(b.pickupBonus)}</b>` +
             `<span>Perfect bonus</span><b>+${formatScore(b.perfectBonus)}</b>` +
             `<span class="total">Level score</span><b class="total">${formatScore(b.total)}</b>` +
@@ -411,7 +412,7 @@ export class UI {
     this.hintEl.style.display = 'none';
     g.appendChild(this.hintEl);
     const boosts = el('div', 'boosts');
-    const ff = el('button', 'ff-btn', '<b>⏩ FAST</b><small>hold here or on the hearth</small>');
+    const ff = el('button', 'ff-btn', '<b>⏩ TURBO</b><small>hold to speed up · starts the flame</small>');
     ff.setAttribute('aria-label', 'Speed up the flame');
     const hold = (on: boolean) => {
       this.game.setFastForward(on);
@@ -427,6 +428,7 @@ export class UI {
     for (const use of EMBER_USES) {
       const b = el('button', 'boost-btn', `<b>${use.description}</b><small>${use.cost} ✦ embers</small>`);
       b.dataset.cost = String(use.cost);
+      b.dataset.use = use.id;
       b.title = use.label;
       b.addEventListener('click', () => {
         this.click();
@@ -448,6 +450,11 @@ export class UI {
     this.hintEl.style.display = show ? '' : 'none';
     this.hintEl.textContent = level.hint ?? '';
     this.hintTimer = 12;
+    // boosts only make sense when the level has fuel / a time limit (not on Blodia boards)
+    this.ingame?.querySelectorAll<HTMLButtonElement>('.boost-btn').forEach((b) => {
+      const useless = (b.dataset.use === 'fuel' && level.fuelPerTile === 0) || (b.dataset.use === 'time' && level.timeLimit <= 0);
+      b.style.visibility = useless ? 'hidden' : '';
+    });
     this.hintReserve = 0; // re-measured on the next frame while the hint is visible
   }
 

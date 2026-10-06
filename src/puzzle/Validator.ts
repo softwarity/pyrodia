@@ -1,5 +1,7 @@
 import { FUEL_CONFIG } from '../player/Fuel';
-import { indexDir } from './Direction';
+import { indexDir, type Dir } from './Direction';
+import { routeExit } from './PathSim';
+import { tileSegments } from './Tile';
 import type { Grid, SlideMove } from './Grid';
 import { predictPath, type PathStep } from './PathSim';
 import { solve, type Solution } from './Solver';
@@ -31,10 +33,18 @@ export interface ValidatorOptions {
   fuel?: { initial: number; max: number; perTile: number };
   /** Slides per second a human can be expected to perform. */
   movesPerSecond?: number;
+  /**
+   * 'cover' = Blodia rules (travel every pipe). Those boards are solved live,
+   * by sliding tiles while the flame moves, so only the structure is checked.
+   */
+  mode?: 'goal' | 'cover';
+  /** Blodia start (cover mode): the flame enters tile (x,y) through `entry`. */
+  start?: { x: number; y: number; entry: Dir };
 }
 
 /** Checks that a sliding-puzzle level is well formed and can actually be completed. */
 export function validateGrid(grid: Grid, opts: ValidatorOptions): ValidationResult {
+  if (opts.mode === 'cover') return validateCoverGrid(grid, opts);
   const errors: string[] = [];
   const warnings: string[] = [];
   const mps = opts.movesPerSecond ?? 2;
@@ -143,4 +153,32 @@ export function validateGrid(grid: Grid, opts: ValidatorOptions): ValidationResu
   }
 
   return { ok: errors.length === 0, errors, warnings, solution, movesNeeded, route, initialSafeSteps, reactionTime };
+}
+
+/** Structural checks for Blodia-style boards (travel every pipe, solved live). */
+function validateCoverGrid(grid: Grid, opts: ValidatorOptions): ValidationResult {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+  let segments = 0;
+  grid.forEach((t) => (segments += tileSegments(t).length));
+  if (segments === 0) errors.push('no pipe to travel');
+  if (grid.voids().length < 1) errors.push('no void: nothing can slide');
+  if (grid.legalMoves().length === 0) errors.push('no tile can slide into the void');
+  let initialSafeSteps = 0;
+  let reactionTime = 0;
+  const st = opts.start;
+  if (!st) errors.push('cover levels need a start (x, y, from)');
+  else if (!grid.inBounds(st.x, st.y)) errors.push('start outside the board');
+  else {
+    const tile = grid.get(st.x, st.y);
+    const exit = routeExit(tile, st.entry);
+    if (exit === null) errors.push(`start tile at (${st.x},${st.y}) has no pipe opening on the start side`);
+    else {
+      const p = predictPath(grid, st.x, st.y, exit, grid.width * grid.height * 4);
+      initialSafeSteps = p.steps.length + 1;
+      reactionTime = p.end.type === 'fall' ? (p.steps.length + 1) / opts.flameSpeed : Infinity;
+      if (p.end.type === 'fall' && p.steps.length === 0) warnings.push('the flame falls right after its first tile');
+    }
+  }
+  return { ok: errors.length === 0, errors, warnings, solution: null, movesNeeded: 0, route: [], initialSafeSteps, reactionTime };
 }

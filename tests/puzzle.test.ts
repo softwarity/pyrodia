@@ -2,15 +2,16 @@ import { describe, expect, it } from 'vitest';
 import { LevelSession } from '../src/game/LevelSession';
 import { LEVELS } from '../src/level/levels';
 import { applyScramble, gridToRows, parseLevel, parseRows } from '../src/level/LevelParser';
-import { FUEL_CONFIG } from '../src/player/Fuel';
 import { computeLevelScore } from '../src/player/Scoring';
 import { E, N, S, W, opposite, rotateMaskCW, turnLeft, turnRight } from '../src/puzzle/Direction';
 import { generateLevel } from '../src/puzzle/Generator';
-import { chooseExit, predictPath } from '../src/puzzle/PathSim';
+import { chooseExit, predictPath, routeExit } from '../src/puzzle/PathSim';
 import { solve } from '../src/puzzle/Solver';
 import { makeTile, tileMask } from '../src/puzzle/Tile';
 import { tileLocalPosition } from '../src/puzzle/TileGeometry';
 import { validateGrid } from '../src/puzzle/Validator';
+import { validateLevel } from '../src/level/validateLevel';
+import type { LevelDef } from '../src/level/LevelDef';
 
 describe('directions', () => {
   it('rotates masks clockwise', () => {
@@ -134,21 +135,19 @@ describe('levels', () => {
     LEVELS.forEach((l, i) => expect(l.id).toBe(i + 1));
   });
 
-  it('every level is valid and solvable', () => {
+  it('every level is valid (goal levels solvable, Blodia boards well formed)', () => {
     for (const def of LEVELS) {
-      const parsed = parseLevel(def);
-      const result = validateGrid(parsed.grid, {
-        flameSpeed: def.flameSpeed,
-        knownSolution: parsed.solution,
-        budget: 30_000,
-        fuel: {
-          initial: def.initialFuel ?? FUEL_CONFIG.defaultInitialFuel,
-          max: def.maxFuel ?? FUEL_CONFIG.defaultMaxFuel,
-          perTile: def.fuelPerTile ?? FUEL_CONFIG.defaultFuelPerTile,
-        },
-      });
+      const result = validateLevel(def, 30_000);
       expect(result.errors, `level ${def.id}: ${result.errors.join('; ')}`).toEqual([]);
-      expect(result.movesNeeded).toBeGreaterThan(0);
+      if (def.win !== 'cover') expect(result.movesNeeded).toBeGreaterThan(0);
+    }
+  });
+
+  it('levels 1-20 are the Blodia boards (14x8, travel every pipe)', () => {
+    for (const def of LEVELS.slice(0, 20)) {
+      expect(def.win).toBe('cover');
+      expect([def.width, def.height]).toEqual([14, 8]);
+      expect(def.start).toBeDefined();
     }
   });
 
@@ -161,6 +160,71 @@ describe('levels', () => {
 });
 
 const FIRST_SLIDE = () => LEVELS.find((l) => l.name === 'First Slide')!;
+
+function coverLevel(rows: string[], start: LevelDef['start'], countdown = 5): LevelDef {
+  return {
+    id: 999,
+    name: 'test',
+    width: rows[0].split(' ').length,
+    height: rows.length,
+    rows,
+    scramble: '',
+    win: 'cover',
+    start,
+    countdown,
+    flameSpeed: 2,
+    timeLimit: 0,
+    lookahead: 2,
+    baseScore: 100,
+    fuelPerTile: 0,
+  };
+}
+
+describe('Blodia rules', () => {
+  const run = (session: LevelSession, seconds: number) => {
+    for (let t = 0; t < seconds; t += 1 / 60) session.update(1 / 60);
+  };
+
+  it('the countdown starts the flame by itself, TURBO starts it early', () => {
+    const a = new LevelSession(coverLevel(['C1 C2 ..', 'C0 C3 --'], { x: 0, y: 0, from: 'S' }, 3));
+    run(a, 2.5);
+    expect(a.phase).toBe('ready');
+    run(a, 1);
+    expect(a.phase).toBe('running');
+    const b = new LevelSession(coverLevel(['C1 C2 ..', 'C0 C3 --'], { x: 0, y: 0, from: 'S' }, 30));
+    b.setFastForwardHeld(true);
+    expect(b.phase).toBe('running');
+  });
+
+  it('the level is won once every pipe segment has been travelled', () => {
+    const session = new LevelSession(coverLevel(['C1 C2 ..', 'C0 C3 --'], { x: 0, y: 0, from: 'S' }, 0.1));
+    expect(session.segmentsTotal).toBe(4);
+    let won = false;
+    session.events.on('won', () => (won = true));
+    run(session, 4);
+    expect(won).toBe(true);
+    expect(session.coveredSegments.size).toBe(4);
+  });
+
+  it('a cross and a double tile count two segments each', () => {
+    const session = new LevelSession(coverLevel(['X0 Z0 ..'], { x: 0, y: 0, from: 'W' }));
+    expect(session.segmentsTotal).toBe(4);
+  });
+
+  it('double tiles route each arc independently', () => {
+    const grid = parseRows(['Z0 Z1'], 2, 1, false);
+    expect(routeExit(grid.get(0, 0), N)).toBe(E);
+    expect(routeExit(grid.get(0, 0), S)).toBe(W);
+    expect(routeExit(grid.get(1, 0), W)).toBe(N);
+    expect(routeExit(grid.get(1, 0), E)).toBe(S);
+  });
+
+  it('cells outside the board accept no tile and drop the flame', () => {
+    const grid = parseRows(['I1 ## ..'], 3, 1, false);
+    expect(grid.slide(0, 0)).toBeNull(); // the hole is not adjacent; '##' is not a hole
+    expect(predictPath(grid, 0, 0, E, 5).end.type).toBe('fall');
+  });
+});
 
 describe('simulation', () => {
   const run = (session: LevelSession, seconds: number) => {
@@ -217,13 +281,13 @@ describe('simulation', () => {
     expect(session.collected.size).toBe(1);
   });
 
-  it('refuses to slide the tile the flame is in', () => {
-    const session = new LevelSession(FIRST_SLIDE());
-    session.start();
-    run(session, 2.0); // flame is in tile (1,1)
+  it('the tile carrying the flame can slide, the flame rides along (Blodia)', () => {
+    const session = new LevelSession(coverLevel(['.. C1 C2', '-- C0 C3'], { x: 1, y: 0, from: 'S' }));
     expect(session.flame.x).toBe(1);
-    expect(session.flame.y).toBe(1);
-    expect(session.slide(1, 1)).toBe(false);
+    expect(session.slide(1, 0)).toBe(true);
+    expect(session.flame.x).toBe(0);
+    expect(session.flame.y).toBe(0);
+    expect(session.phase).toBe('ready'); // with a countdown, slides do not start the flame
   });
 
   it('fast-forward multiplies the flame speed without changing fuel per tile', () => {

@@ -1,4 +1,5 @@
 import { indexDir, opposite, turnLeft, turnRight, type Dir, type Mask } from './Direction';
+import { tileMask, tileSegments, type Tile } from './Tile';
 import type { Grid } from './Grid';
 
 /**
@@ -22,6 +23,20 @@ export function chooseExit(mask: Mask, entry: Dir): Dir | null {
   if (mask & l) return l;
   if (mask & entry) return entry;
   return null;
+}
+
+/** The exit side for a flame entering `tile` through `entry` (null = no pipe there). */
+export function routeExit(tile: Tile, entry: Dir): Dir | null {
+  const mask = tileMask(tile);
+  if (!(mask & entry)) return null;
+  if (tile.kind === 'double') {
+    for (const [a, b] of tileSegments(tile)) {
+      if (a === entry) return b as Dir;
+      if (b === entry) return a as Dir;
+    }
+    return null;
+  }
+  return chooseExit(mask, entry);
 }
 
 export interface PathStep {
@@ -86,7 +101,7 @@ export function predictPath(grid: Grid, x: number, y: number, exit: Dir, maxStep
         continue;
       }
     }
-    const nextExit = chooseExit(mask, entry);
+    const nextExit = routeExit(tile, entry);
     if (nextExit === null) return { steps, end: { type: 'fall', x: cx, y: cy, dir: cexit } };
     steps.push({ x: nx, y: ny, entry, exit: nextExit, wrapped });
     cx = nx;

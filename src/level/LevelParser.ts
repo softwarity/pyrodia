@@ -8,9 +8,10 @@ export function parseToken(token: string): Tile {
   if (t === '..' || t === '.') return makeTile('empty');
   if (t === '--' || t === '-') return makeTile('blank');
   if (t === '--*') return makeTile('blank', 0, true);
+  if (t === '##' || t === '#') return makeTile('none');
   const wm = /^W([0-3])([1-9])(\*?)$/.exec(t);
   if (wm) return makeTile('warp', parseInt(wm[1], 10), wm[3] === '*', parseInt(wm[2], 10));
-  const m = /^([ICTXDSG])([0-3])(\*?)$/.exec(t);
+  const m = /^([ICTXDSGZ])([0-3])(\*?)$/.exec(t);
   if (!m) throw new Error(`Bad tile token "${token}"`);
   const kind = CODE_KINDS[m[1]];
   return makeTile(kind, parseInt(m[2], 10), m[3] === '*');
@@ -19,6 +20,7 @@ export function parseToken(token: string): Tile {
 export function tileToToken(tile: Tile): string {
   if (tile.kind === 'empty') return '..';
   if (tile.kind === 'blank') return tile.locked ? '--*' : '--';
+  if (tile.kind === 'none') return '##';
   const lockedMark = tile.locked && tile.kind !== 'source' && tile.kind !== 'goal' ? '*' : '';
   if (tile.kind === 'warp') return `W${tile.rotation}${tile.warpId ?? 1}${lockedMark}`;
   return `${KIND_CODES[tile.kind]}${tile.rotation}${lockedMark}`;
@@ -46,6 +48,7 @@ export function gridToRows(grid: Grid): string[] {
 }
 
 const MOVE_DIRS: Record<string, Dir> = { U: N, R: E, D: S, L: W };
+const SIDE_DIRS: Record<'N' | 'E' | 'S' | 'W', Dir> = { N, E, S, W };
 export const DIR_LETTERS: Record<Dir, string> = { 1: 'U', 2: 'R', 4: 'D', 8: 'L' };
 
 /**
@@ -85,14 +88,26 @@ export function parseLevel(def: LevelDef): ParsedLevel {
     t.pickup = p.kind;
     t.pickupId = i;
   });
+  // stable identities so covered segments can be tracked while tiles slide
+  let uid = 1;
+  solvedGrid.forEach((t) => {
+    t.uid = uid++;
+  });
   const grid = solvedGrid.clone();
   const solution = applyScramble(grid, def.scramble ?? '');
   const sources = grid.find('source');
-  if (sources.length !== 1) throw new Error(`Level ${def.id}: expected exactly 1 source, found ${sources.length}`);
   const goals = grid.find('goal');
-  if (goals.length < 1) throw new Error(`Level ${def.id}: no goal`);
-  const s = sources[0];
-  const start = { x: s.x, y: s.y, dir: indexDir(grid.get(s.x, s.y).rotation) };
+  let start: ParsedLevel['start'];
+  if (def.start) {
+    const from = SIDE_DIRS[def.start.from];
+    if (!grid.inBounds(def.start.x, def.start.y)) throw new Error(`Level ${def.id}: start outside the board`);
+    start = { x: def.start.x, y: def.start.y, dir: opposite(from), enterFrom: from };
+  } else {
+    if (sources.length !== 1) throw new Error(`Level ${def.id}: expected exactly 1 source, found ${sources.length}`);
+    const s = sources[0];
+    start = { x: s.x, y: s.y, dir: indexDir(grid.get(s.x, s.y).rotation) };
+  }
+  if ((def.win ?? 'goal') === 'goal' && goals.length < 1) throw new Error(`Level ${def.id}: no goal`);
   return {
     def,
     grid,

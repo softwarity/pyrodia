@@ -10,7 +10,8 @@ home to the hearth before it falls into the water, runs out of fuel, or runs out
 
 This repository is a fully playable HTML5 / TypeScript prototype: 100 levels, lives, score,
 fuel, Embers, objectives, level select, persistence, procedural generator, validator and debug
-tools. It is architected so the gameplay core can later be wrapped for iOS and Android.
+tools. Levels 1–20 reproduce the board shapes of the first 20 Blodia levels with Blodia's own
+rules (travel every pipe); levels 21–100 are PYRODIA levels (bring the flame to the hearth). It is architected so the gameplay core can later be wrapped for iOS and Android.
 
 ---
 
@@ -52,6 +53,18 @@ relative (`./`) so the build works from any sub-path such as `https://<user>.git
 | Restart level | pause menu or `R` | pause menu |
 
 Rules in one breath: keep the fire in the pipes, feed it, get it to the hearth.
+
+**Blodia boards (levels 1–20)** use the original rules instead:
+
+* The flame must **travel through every pipe** of the board; there is no hearth. A cross or a
+  double-arc tile holds two pipes. Travelled pipes glow ember-orange and the HUD shows
+  `PIPES covered/total`.
+* A **COUNTDOWN** runs before the flame sets off. Slide tiles to prepare during it; press
+  **TURBO** (button or `Space`) to start early.
+* **The tile carrying the flame can slide too**; the flame rides along.
+* Dark cells without a plate are **outside the board** (Blodia's white cells): nothing slides
+  into them and the flame falls if it reaches one.
+* No fuel and no time limit on these boards, only lives.
 
 * **The flame never waits.** It moves at the level's speed from the moment the short READY
   phase ends. You can already slide tiles during READY.
@@ -144,11 +157,18 @@ Key objects:
 
 ## Level data
 
-Levels are pure data (`LevelDef`). Hand-made levels live in `src/level/data/handmade.ts`:
-a "classic" set (1–4) whose 14×8 layouts echo the first Blodia boards, then a tutorial set
-(5–12) introducing one mechanic at a time;
-levels 13–100 are generated deterministically and **baked** into `src/level/data/generated.ts`
-so the shipped game uses static data.
+Levels are pure data (`LevelDef`):
+
+* `src/level/data/blodia.ts` – levels 1–20, the Blodia boards (14×8, `win: 'cover'`). Generated
+  from pipe *paths* by `python3 scripts/blodia_levels.py`, which merges two paths through one
+  cell into a cross or a double arc. Levels 7, 10, 14, 16 and 18 are approximations of the
+  densest boards (tagged `approximation`).
+* `src/level/data/handmade.ts` – levels 21–28, the PYRODIA tutorial.
+* `src/level/data/generated.ts` – levels 29–100, generated deterministically and **baked** so
+  the shipped game uses static data.
+
+Blodia boards add `win: 'cover'`, `start: { x, y, from }` (the flame enters that tile through
+side `from`), `countdown` (seconds), `timeLimit: 0` (none) and `fuelPerTile: 0` (no fuel).
 
 `rows` describe the **solved** board (a complete route from the source to the hearth) and
 `scramble` is the list of hole moves applied to it to produce the board the player starts from.
@@ -184,6 +204,8 @@ Token = `<Kind><Rotation>[*]`:
 | --- | --- | --- |
 | `..` | the hole (void): water underneath | – |
 | `--` | blank: a solid tile without pipe, slides like any other (`--*` fixed) | – |
+| `##` | outside the board: no tile, nothing slides into it | – |
+| `Z` | double arc: two independent quarter arcs | `Z0` N-E + S-W, `Z1` E-S + W-N |
 | `I` | straight | `I0` vertical, `I1` horizontal |
 | `C` | corner | `C0` └ (N+E), `C1` ┌ (E+S), `C2` ┐ (S+W), `C3` ┘ (W+N) |
 | `T` | T-junction | `T0` ├ (N+E+S), `T1` ┬, `T2` ┤, `T3` ┴ |

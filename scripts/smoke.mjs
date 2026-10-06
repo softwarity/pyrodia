@@ -32,6 +32,18 @@ await page.screenshot({ path: `${out}/01-title.png` });
 await page.click('button.btn:has-text("PLAY")');
 await page.waitForTimeout(400);
 await page.screenshot({ path: `${out}/02-level1-ready.png` });
+// Blodia level 1: countdown running, TURBO (Space) starts the flame, pipes get covered
+const before = await page.evaluate(() => ({ phase: window.pyrodia.game.session.phase, cd: window.pyrodia.game.session.readyTimer }));
+await page.keyboard.down(' ');
+await page.waitForTimeout(150);
+await page.keyboard.up(' ');
+await page.waitForTimeout(2500);
+const after = await page.evaluate(() => {
+  const s = window.pyrodia.game.session;
+  return { phase: s.phase, covered: s.coveredSegments.size, total: s.segmentsTotal };
+});
+console.log('blodia L1', JSON.stringify({ before, after }));
+await page.screenshot({ path: `${out}/02b-level1-running.png` });
 // Mechanics checks run on the one-slide tutorial board "First Slide"
 await page.evaluate(() => {
   const { game, LEVELS } = window.pyrodia;
@@ -104,7 +116,10 @@ await page.screenshot({ path: `${out}/08-mobile.png` });
 
 // the warp tutorial and a late level for visuals
 await page.setViewportSize({ width: 1100, height: 700 });
-await page.evaluate(() => window.pyrodia.game.startRun(6));
+await page.evaluate(() => {
+  const { game, LEVELS } = window.pyrodia;
+  game.startRun(LEVELS.findIndex((l) => l.name === 'Warp Zone'));
+});
 await page.waitForTimeout(600);
 await page.screenshot({ path: `${out}/10-level7-warps.png` });
 await page.evaluate(() => window.pyrodia.game.startRun(0));

@@ -4,7 +4,8 @@ import type { LevelSession } from '../game/LevelSession';
 import { DIRS, dirDelta, maskToDirs, type Dir } from '../puzzle/Direction';
 import type { SlideMove } from '../puzzle/Grid';
 import { predictPath, type PathPrediction } from '../puzzle/PathSim';
-import { isSlidable, tileMask, type Tile } from '../puzzle/Tile';
+import { E, N, S, W } from '../puzzle/Direction';
+import { isSlidable, tileMask, tileSegments, type Tile } from '../puzzle/Tile';
 import { sideMid, tileLocalPosition, usesArc } from '../puzzle/TileGeometry';
 import { formatScore } from '../player/Scoring';
 import type { PickupKind } from '../player/Fuel';
@@ -198,7 +199,9 @@ export class CanvasRenderer {
     const ts = l.tileSize;
     // shadow
     ctx.fillStyle = THEME.boardShadow;
-    ctx.fillRect(l.originX - 4, l.originY - 4, l.boardW + 8, l.boardH + 12);
+    session.grid.forEach((t, x, y) => {
+      if (t.kind !== 'none') ctx.fillRect(l.originX + x * ts - 3, l.originY + y * ts - 3, ts + 6, ts + 8);
+    });
     if (session.grid.wrap) this.drawWrapMarkers(session, l);
 
     session.grid.forEach((tile, x, y) => {
@@ -209,7 +212,7 @@ export class CanvasRenderer {
     // slidable tiles get a soft rim so the player sees what can move
     const canPlay = session.phase === 'ready' || session.phase === 'running';
     session.grid.forEach((tile, x, y) => {
-      if (tile.kind === 'empty') return;
+      if (tile.kind === 'empty' || tile.kind === 'none') return;
       const idx = y * session.grid.width + x;
       const anim = session.slideAnims.get(idx);
       const shake = session.shakes.get(idx) ?? 0;
@@ -222,8 +225,8 @@ export class CanvasRenderer {
       }
       if (shake > 0) px += Math.sin(shake * 40) * shake * ts * 0.06;
       const lit = this.isLit(session, x, y);
-      const slidable = canPlay && isSlidable(tile) && !!session.grid.slideTarget(x, y) && !session.flame.occupies(x, y);
-      this.drawTile(tile, px, py, ts, lit, slidable);
+      const slidable = canPlay && isSlidable(tile) && !!session.grid.slideTarget(x, y);
+      this.drawTile(tile, px, py, ts, lit, slidable, session);
       if (tile.pickup && tile.pickupId !== undefined) {
         this.drawPickup(tile.pickup, px + ts / 2, py + ts / 2, ts, session.previouslyCollected.has(tile.pickupId), x, y);
       }
@@ -282,6 +285,13 @@ export class CanvasRenderer {
 
   private drawCellBackground(tile: Tile, px: number, py: number, ts: number, x: number, y: number): void {
     const ctx = this.ctx;
+    if (tile.kind === 'none') {
+      // outside the playfield (Blodia's white cells): just a faint outline
+      ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(px + 0.5, py + 0.5, ts - 1, ts - 1);
+      return;
+    }
     if (tile.kind === 'empty') {
       // the void: a hole with water glinting far below
       const wave = Math.sin(this.time * 2 + x * 0.9 + y * 1.3) * 0.08;
@@ -307,7 +317,7 @@ export class CanvasRenderer {
     ctx.strokeRect(px + 0.5, py + 0.5, ts - 1, ts - 1);
   }
 
-  private drawTile(tile: Tile, px: number, py: number, ts: number, lit: boolean, slidable: boolean): void {
+  private drawTile(tile: Tile, px: number, py: number, ts: number, lit: boolean, slidable: boolean, session: LevelSession): void {
     const ctx = this.ctx;
     ctx.save();
     // tile plate (drawn here too so sliding tiles carry their background)
@@ -333,13 +343,29 @@ export class CanvasRenderer {
       case 'goal':
         this.drawGoal(ts);
         break;
+      case 'cross': {
+        // bridge: the horizontal pipe passes under the vertical one
+        const segs = tileSegments(tile);
+        this.drawPipe(E | W, 'straight', ts, tile.locked, lit, session.isCovered(tile, segs[0][0], segs[0][1]));
+        this.drawPipe(N | S, 'straight', ts, tile.locked, lit, session.isCovered(tile, segs[1][0], segs[1][1]));
+        break;
+      }
+      case 'double': {
+        const segs = tileSegments(tile);
+        this.drawPipe(N | E, 'corner', ts, tile.locked, lit, session.isCovered(tile, segs[0][0], segs[0][1]));
+        this.drawPipe(S | W, 'corner', ts, tile.locked, lit, session.isCovered(tile, segs[1][0], segs[1][1]));
+        break;
+      }
       case 'warp':
         this.drawPipe(mask, 'straight', ts, tile.locked, lit);
         ctx.rotate(-baseRotation * (Math.PI / 2)); // keep the number upright
         this.drawWarpRing(ts, tile.warpId ?? 1, lit);
         break;
-      default:
-        this.drawPipe(mask, tile.kind, ts, tile.locked, lit);
+      default: {
+        const segs = tileSegments(tile);
+        const covered = segs.length === 1 && session.isCovered(tile, segs[0][0], segs[0][1]);
+        this.drawPipe(mask, tile.kind, ts, tile.locked, lit, covered);
+      }
     }
     ctx.restore();
   }
@@ -401,13 +427,14 @@ export class CanvasRenderer {
     return { outer: ts * 0.42, inner: ts * 0.26 };
   }
 
-  private drawPipe(mask: number, kind: Tile['kind'], ts: number, locked: boolean, lit: boolean): void {
+  private drawPipe(mask: number, kind: Tile['kind'], ts: number, locked: boolean, lit: boolean, covered = false): void {
     const ctx = this.ctx;
     const { outer, inner } = this.pipeWidths(ts);
     const h = ts / 2;
     const dirs = maskToDirs(mask);
-    const outerColor = lit ? THEME.pipeLitOuter : locked ? THEME.pipeLockedOuter : THEME.pipeOuter;
-    const innerColor = lit ? THEME.pipeLitInner : locked ? THEME.pipeLockedInner : THEME.pipeInner;
+    // travelled pipes glow ember-orange so the player sees what is left to cover
+    const outerColor = lit ? THEME.pipeLitOuter : covered ? '#8a3f12' : locked ? THEME.pipeLockedOuter : THEME.pipeOuter;
+    const innerColor = lit ? THEME.pipeLitInner : covered ? '#f0a052' : locked ? THEME.pipeLockedInner : THEME.pipeInner;
     ctx.lineCap = 'butt';
     ctx.lineJoin = 'round';
 
@@ -844,8 +871,16 @@ export class CanvasRenderer {
     if (f.status === 'dead') return;
     const ctx = this.ctx;
     const ts = l.tileSize;
-    const px = l.originX + f.wx * ts;
-    const py = l.originY + f.wy * ts;
+    let px = l.originX + f.wx * ts;
+    let py = l.originY + f.wy * ts;
+    if (f.status === 'moving' || f.status === 'waiting' || f.status === 'arrived') {
+      const anim = session.slideAnims.get(f.y * session.grid.width + f.x);
+      if (anim) {
+        const ease = 1 - Math.pow(1 - anim.t, 3);
+        px += anim.dx * ts * (1 - ease);
+        py += anim.dy * ts * (1 - ease);
+      }
+    }
     // fuel drives the flame size: a starving flame is visibly smaller
     const ext = f.extinguishRatio;
     const scale = ts * 0.3 * (0.72 + 0.45 * f.intensity) * (1 - ext * 0.8);
@@ -987,53 +1022,68 @@ export class CanvasRenderer {
       lx -= lifeR * 2.6;
     }
 
-    // row 2: fuel bar | time (or ready prompt) | embers
-    const ratio = Math.max(0, Math.min(1, session.timeRemaining / session.def.timeLimit));
+    // row 2: fuel bar | time, countdown or pipes left | embers
     const ready = session.phase === 'ready';
-    const centreText = ready ? (w < 520 ? 'TAP TO START' : 'READY · SLIDE A TILE OR TAP THE FLAME') : `${session.timeRemaining.toFixed(1)}s`;
+    const hasLimit = session.def.timeLimit > 0;
+    const ratio = hasLimit ? Math.max(0, Math.min(1, session.timeRemaining / session.def.timeLimit)) : 1;
+    let centreText: string;
+    let barRatio = ratio;
+    if (ready && session.countdown > 0) {
+      centreText = `COUNTDOWN ${Math.max(0, Math.ceil(session.readyTimer))}`;
+      barRatio = Math.max(0, session.readyTimer / session.countdown);
+    } else if (ready) {
+      centreText = w < 520 ? 'TAP TO START' : 'READY · SLIDE A TILE OR TAP THE FLAME';
+    } else if (session.coverMode) {
+      centreText = `PIPES ${session.coveredSegments.size}/${session.segmentsTotal}`;
+      barRatio = session.segmentsTotal > 0 ? session.coveredSegments.size / session.segmentsTotal : 0;
+    } else {
+      centreText = `${session.timeRemaining.toFixed(1)}s`;
+    }
     ctx.font = ready ? font(800, fontSize * 0.9) : font(700, fontSize);
     const centreW = ctx.measureText(centreText).width;
     const fuel = session.flame.fuel;
+    const fuelEnabled = session.flame.fuelPerTile > 0;
     const barH = Math.max(10, fontSize * 0.6);
     const fx = pad + fontSize * 2.2;
     const numberW = fontSize * 1.9;
-    // the bar never runs into the centred text
-    const barW = Math.max(36, Math.min(220, w * 0.22, (w - centreW) / 2 - 10 - fx - numberW));
-    ctx.textAlign = 'left';
-    ctx.fillStyle = THEME.hudDim;
-    ctx.font = font(600, fontSize * 0.7);
-    ctx.fillText('FUEL', pad, row2);
-    ctx.fillStyle = THEME.timeBarBg;
-    ctx.beginPath();
-    ctx.roundRect(fx, row2 - barH / 2, barW, barH, barH / 2);
-    ctx.fill();
-    const low = fuel.isLow;
-    const pulse = low ? 0.6 + 0.4 * Math.sin(this.time * 10) : 1;
-    ctx.fillStyle = low ? `rgba(255,74,74,${pulse})` : '#ff9a2e';
-    if (fuel.ratio > 0) {
+    if (fuelEnabled) {
+      // the bar never runs into the centred text
+      const barW = Math.max(36, Math.min(220, w * 0.22, (w - centreW) / 2 - 10 - fx - numberW));
+      ctx.textAlign = 'left';
+      ctx.fillStyle = THEME.hudDim;
+      ctx.font = font(600, fontSize * 0.7);
+      ctx.fillText('FUEL', pad, row2);
+      ctx.fillStyle = THEME.timeBarBg;
       ctx.beginPath();
-      ctx.roundRect(fx, row2 - barH / 2, Math.max(barH, barW * fuel.ratio), barH, barH / 2);
+      ctx.roundRect(fx, row2 - barH / 2, barW, barH, barH / 2);
       ctx.fill();
+      const low = fuel.isLow;
+      const pulse = low ? 0.6 + 0.4 * Math.sin(this.time * 10) : 1;
+      ctx.fillStyle = low ? `rgba(255,74,74,${pulse})` : '#ff9a2e';
+      if (fuel.ratio > 0) {
+        ctx.beginPath();
+        ctx.roundRect(fx, row2 - barH / 2, Math.max(barH, barW * fuel.ratio), barH, barH / 2);
+        ctx.fill();
+      }
+      ctx.fillStyle = THEME.hudText;
+      ctx.font = font(700, fontSize * 0.7);
+      ctx.fillText(`${Math.ceil(fuel.current)}`, fx + barW + 8, row2);
     }
-    ctx.fillStyle = THEME.hudText;
-    ctx.font = font(700, fontSize * 0.7);
-    ctx.fillText(`${Math.ceil(fuel.current)}`, fx + barW + 8, row2);
 
     ctx.textAlign = 'center';
     if (ready) {
-      // the clock only starts with the player's first move
       const p = 0.65 + 0.35 * Math.sin(this.time * 5);
       ctx.fillStyle = `rgba(255, 213, 74, ${p})`;
       ctx.font = font(800, fontSize * 0.9);
       ctx.fillText(centreText, w / 2, row2);
     } else {
-      ctx.fillStyle = ratio < 0.25 ? THEME.timeBarLow : THEME.hudText;
+      ctx.fillStyle = hasLimit && ratio < 0.25 ? THEME.timeBarLow : THEME.hudText;
       ctx.font = font(700, fontSize);
       ctx.fillText(centreText, w / 2, row2);
       if (session.fastForward && w >= 520) {
         ctx.fillStyle = `rgba(255, 213, 74, ${0.6 + 0.4 * Math.sin(this.time * 12)})`;
         ctx.font = font(800, fontSize * 0.7);
-        ctx.fillText('⏩ FAST', w / 2 + fontSize * 3.2, row2);
+        ctx.fillText('⏩ TURBO', w / 2 + centreW / 2 + fontSize * 2.2, row2);
       }
     }
 
@@ -1051,8 +1101,8 @@ export class CanvasRenderer {
     const tbH = 6;
     ctx.fillStyle = THEME.timeBarBg;
     ctx.fillRect(0, h - tbH, w, tbH);
-    ctx.fillStyle = ratio < 0.25 ? THEME.timeBarLow : THEME.timeBar;
-    ctx.fillRect(0, h - tbH, w * ratio, tbH);
+    ctx.fillStyle = hasLimit && !ready && ratio < 0.25 ? THEME.timeBarLow : THEME.timeBar;
+    ctx.fillRect(0, h - tbH, w * barRatio, tbH);
     ctx.restore();
   }
 

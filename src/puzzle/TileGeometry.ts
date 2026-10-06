@@ -23,7 +23,7 @@ function sharedCorner(a: Dir, b: Dir): { x: number; y: number } {
 }
 
 export function usesArc(kind: TileKind, entry: Dir, exit: Dir): boolean {
-  return kind === 'corner' && entry !== exit && opposite(entry) !== exit;
+  return (kind === 'corner' || kind === 'double') && entry !== exit && opposite(entry) !== exit;
 }
 
 /**

@@ -1,7 +1,7 @@
 import { CONFIG } from '../game/Config';
 import { dirDelta, indexDir, opposite, type Dir } from '../puzzle/Direction';
 import type { Grid } from '../puzzle/Grid';
-import { chooseExit } from '../puzzle/PathSim';
+import { routeExit } from '../puzzle/PathSim';
 import { sideMid, tileLocalPosition } from '../puzzle/TileGeometry';
 import { FuelTank } from '../player/Fuel';
 import { Entity } from './Entity';
@@ -58,10 +58,25 @@ export class Flame extends Entity {
     startDir: Dir,
     speed: number,
     fuel: { initial: number; max: number; perTile: number } = { initial: 100, max: 100, perTile: 0 },
+    /** Blodia start: the flame enters tile (startX,startY) through this side instead of leaving a source. */
+    enterFrom?: Dir,
   ) {
     super();
     this.fuel = new FuelTank(fuel.max, fuel.initial);
     this.fuelPerTile = fuel.perTile;
+    if (enterFrom !== undefined) {
+      const out = routeExit(grid.get(startX, startY), enterFrom) ?? enterFrom;
+      this.x = startX;
+      this.y = startY;
+      this.entry = enterFrom;
+      this.exit = out;
+      this.heading = opposite(enterFrom);
+      this.speed = speed;
+      this.progress = 0;
+      this.centreCrossed = false;
+      this.updateWorldPosition();
+      return;
+    }
     this.x = startX;
     this.y = startY;
     this.entry = startDir; // the source behaves like a cap: we "come from" the opening
@@ -83,6 +98,13 @@ export class Flame extends Entity {
 
   start(): void {
     if (this.status === 'waiting') this.status = 'moving';
+  }
+
+  /** The tile carrying the flame was slid: the flame travels with it. */
+  moveWithTile(x: number, y: number): void {
+    this.x = x;
+    this.y = y;
+    if (this.status === 'moving' || this.status === 'waiting' || this.status === 'arrived') this.updateWorldPosition();
   }
 
   /** 0..1 progress of the extinguish animation (fuel death). */
@@ -182,7 +204,7 @@ export class Flame extends Entity {
       this.emit('enterTile', { x: nx, y: ny, entry, exit: entry });
       return;
     }
-    const nextExit = chooseExit(mask, entry);
+    const nextExit = routeExit(tile, entry);
     if (nextExit === null) {
       this.beginFall();
       return;

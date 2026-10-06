@@ -17,6 +17,8 @@ export const SCORE_CONFIG = {
   pickupBonus: 150,
   /** Bonus for a perfect level (3 flames). */
   perfectBonus: 750,
+  /** Points per pipe segment travelled in Blodia 'cover' levels (Blodia gives 10 per pipe). */
+  pipePoints: 10,
   /** Embers earned: per completion, per flame, for a perfect. */
   embersPerCompletion: 1,
   embersPerStar: 1,
@@ -29,6 +31,7 @@ export interface ScoreBreakdown {
   fuelBonus: number;
   lifeBonus: number;
   pickupBonus: number;
+  pipeBonus: number;
   perfectBonus: number;
   total: number;
   stars: number;
@@ -42,8 +45,10 @@ export function computeLevelScore(def: LevelDef, outcome: LevelOutcome, lives: n
   const timeRatio = def.timeLimit > 0 ? clamp01(outcome.timeRemaining / def.timeLimit) : 0;
   const fuelRatio = maxFuel > 0 ? clamp01(outcome.fuelRemaining / maxFuel) : 0;
   const base = def.baseScore;
-  const timeBonus = Math.round(SCORE_CONFIG.timeBonusMax * timeRatio);
-  const fuelBonus = Math.round(SCORE_CONFIG.fuelBonusMax * fuelRatio);
+  const timeBonus = def.timeLimit > 0 ? Math.round(SCORE_CONFIG.timeBonusMax * timeRatio) : 0;
+  const fuelEnabled = (def.fuelPerTile ?? 1) > 0;
+  const fuelBonus = fuelEnabled ? Math.round(SCORE_CONFIG.fuelBonusMax * fuelRatio) : 0;
+  const pipeBonus = (outcome.segmentsCovered ?? 0) * SCORE_CONFIG.pipePoints;
   const lifeBonus = lives * SCORE_CONFIG.lifeBonusPerLife;
   const pickupBonus = outcome.newPickups * SCORE_CONFIG.pickupBonus;
   const perfectBonus = stars === 3 ? SCORE_CONFIG.perfectBonus : 0;
@@ -54,8 +59,9 @@ export function computeLevelScore(def: LevelDef, outcome: LevelOutcome, lives: n
     fuelBonus,
     lifeBonus,
     pickupBonus,
+    pipeBonus,
     perfectBonus,
-    total: base + timeBonus + fuelBonus + lifeBonus + pickupBonus + perfectBonus,
+    total: base + timeBonus + fuelBonus + lifeBonus + pickupBonus + pipeBonus + perfectBonus,
     stars,
     objectives,
     embersEarned,
